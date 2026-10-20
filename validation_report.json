@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-20T11:48:18.393Z",
+  "generated_at": "2026-10-20T13:46:45.586Z",
   "status": "pass",
   "summary": {
     "checks": 14,
-    "passed": 13,
+    "passed": 14,
     "failed": 0,
-    "warnings": 1,
+    "warnings": 0,
     "tickets": 3
   },
   "checks": [
@@ -78,13 +78,8 @@
     {
       "id": "V12",
       "name": "grounding_flags_and_llm_log_coverage",
-      "status": "warn",
-      "details": [
-        {
-          "ticket_id": "T-1003",
-          "message": "unsupported claim (G1): three months"
-        }
-      ]
+      "status": "pass",
+      "details": []
     },
     {
       "id": "V13",

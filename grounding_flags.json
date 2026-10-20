@@ -1,22 +1,8 @@
 {
-  "flags": [
-    {
-      "ticket_id": "T-1003",
-      "check": "G1",
-      "claim_type": "number_or_duration",
-      "sentence": "If any invoices for the last three months are missing from that section, please let us know and we will escalate the matter to our billing support team for further assistance.",
-      "unsupported_tokens": [
-        "three months"
-      ],
-      "cited_articles_checked": [
-        "KB-003"
-      ],
-      "overlap": 0.31
-    }
-  ],
+  "flags": [],
   "summary": {
     "tickets_checked": 3,
-    "tickets_flagged": 1,
-    "total_flags": 1
+    "tickets_flagged": 0,
+    "total_flags": 0
   }
 }

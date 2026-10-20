@@ -2,14 +2,17 @@
   "escalations": [
     {
       "ticket_id": "T-1001",
-      "escalate": false,
-      "target_queue": "none",
-      "reason": "E5: resolution_action=answer_from_kb (billing, medium); no escalation condition met. Refund eligibility is not assumed; verify settlement status first.",
+      "escalate": true,
+      "target_queue": "billing_ops",
+      "reason": "E1: classification resolution_action=needs_human_escalation (billing, high). Q1: KB-001: 'Escalate to billing ops if two settled charges exist for the same order.' -> billing_ops. Refund eligibility is not assumed; verify settlement status first.",
       "meta": {
         "rules_fired": [
-          "E5"
+          "E1",
+          "Q1"
         ],
-        "evidence_ids": []
+        "evidence_ids": [
+          "KB-001"
+        ]
       }
     },
     {
@@ -31,7 +34,7 @@
       "ticket_id": "T-1003",
       "escalate": false,
       "target_queue": "none",
-      "reason": "E5: resolution_action=answer_from_kb (how_to, low); no escalation condition met",
+      "reason": "E5: resolution_action=answer_from_kb (billing, low); no escalation condition met",
       "meta": {
         "rules_fired": [
           "E5"

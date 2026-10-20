@@ -137,7 +137,7 @@ flowchart LR
 
 **Sign-off** — Status: ☑ Closed ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Notes: Approved by the reviewer's instruction in-session. SPEC.md and DESIGN.md were aligned with this plan before closure. Untracked `pipeline/` (early Stage 1 files) deliberately excluded from this commit.
 
-**Closure commit:** `Close stage 0: Plan approval` (`PLAN.md`, `.gitignore`, `PROBLEM.md`, `SPEC.md`, `DESIGN.md`, `data/`, root `tickets.json` + `kb_articles.json`) · tag `stage-0-closed` · SHA: ______
+**Closure commit:** `Close stage 0: Plan approval` (`PLAN.md`, `.gitignore`, `PROBLEM.md`, `SPEC.md`, `DESIGN.md`, `data/`, root `tickets.json` + `kb_articles.json`) · tag `stage-0-closed` · SHA: `b8cef76`
 
 ---
 
@@ -184,7 +184,7 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 
 **Sign-off** — Status: ☑ Closed ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Reports reviewed: ☑ pytest ☑ PII ☑ normalisation · Notes: Approved by the reviewer's instruction in-session ("I saw the reports and it looks fine to me"); checklist ticked on that basis. No `data/` fixture changes in this stage.
 
-**Closure commit:** `Close stage 1: Foundations` (code, tests, `audit/stage-1/`, this sign-off) · tag `stage-1-closed` · SHA: see `git rev-parse stage-1-closed`
+**Closure commit:** `Close stage 1: Foundations` (code, tests, `audit/stage-1/`, this sign-off) · tag `stage-1-closed` · SHA: `08fe731`
 
 ---
 
@@ -238,7 +238,7 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 
 **Sign-off** — Status: ☑ Closed ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Reports reviewed: ☑ retrieval eval ☑ pytest · Notes: Approved by the reviewer's instruction in-session ("close stage 2, mark it done"); checklist ticked on that basis. Accepted changes to closed Stage 1: five test assertions updated for implemented retrieval, `Config` gained `retriever`/`embedding_model`, `min_score` is retriever-dependent. No `data/` fixture changes. Generated root artifacts (`retrieval_*.json`, `llm_calls.jsonl`) left out of the commit pending a decision on tracking them.
 
-**Closure commit:** `Close stage 2: Retrieval & evidence` (code, tests, `audit/stage-2/`, this sign-off) · tag `stage-2-closed` · SHA: see `git rev-parse stage-2-closed`
+**Closure commit:** `Close stage 2: Retrieval & evidence` (code, tests, `audit/stage-2/`, this sign-off) · tag `stage-2-closed` · SHA: `4b23b2a`
 
 ---
 
@@ -294,7 +294,7 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 
 **Sign-off** — Status: ☑ Closed ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Reports reviewed: ☑ eval report ☑ trace sample ☑ pytest · Notes: Approved by the reviewer's instruction in-session ("sign off 3"); checklist ticked on that basis. Accepted: deepseek repeat-stability soft miss (justified), changes to closed stages listed above. The two policy questions from the audit (E-2014 `request_more_info`; VIP urgency for E-2018/E-2019) were not answered, so gold is unchanged and they stay open for Stage 4/5 review. No `data/` fixture changes.
 
-**Closure commit:** `Close stage 3: LLM layer & classification` (code, tests, `audit/stage-3/`, this sign-off) · tag `stage-3-closed` · SHA: see `git rev-parse stage-3-closed`
+**Closure commit:** `Close stage 3: LLM layer & classification` (code, tests, `audit/stage-3/`, this sign-off) · tag `stage-3-closed` · SHA: `ca33986`
 
 ---
 
@@ -364,7 +364,7 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 
 **Sign-off** — Status: ☑ Closed ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Reports reviewed: ☑ eval report ☑ escalation ☐ calibration (skipped) ☑ grounding · Notes: Approved by the reviewer's in-session instruction ("sign off 4", choosing to close without the calibration sheet). **The calibration sheet was not scored, so judge–human agreement was never measured and all judge scores (including the faithfulness gate) are advisory, not authoritative.** The deterministic gates do not depend on the judge and are green. The 8 grounding flags were not individually marked TP/FP; no heuristic tuning was requested. Accepted: changes to closed stages listed under the AI audit result, and the judge.v1→v2 rubric correction. Carried to Stage 5: calibration can still be run later with `python -m evals.calibration build|score`. No `data/` fixture or `gold.json` changes.
 
-**Closure commit:** `Close stage 4: Drafting, guards, grounding & escalation` (code, tests, `audit/stage-4/`, this sign-off) · tag `stage-4-closed` · SHA: see `git rev-parse stage-4-closed`
+**Closure commit:** `Close stage 4: Drafting, guards, grounding & escalation` (code, tests, `audit/stage-4/`, this sign-off) · tag `stage-4-closed` · SHA: `b18557b`
 
 ---
 
@@ -430,7 +430,7 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 
 **Project sign-off** — Status: ☑ **PROJECT CLOSED** ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Notes: Closed on the reviewer's in-session instruction ("sign off manually fill the checklist using your judgement"). The checklist was completed by the agent, not by the reviewer: the fresh-clone and new-tickets checks were run by the agent in the agent's environment, and the walkthrough was not audited by hand. The judge was never calibrated by a human (Stage 4 sheet scored by an AI), so judge scores stay advisory. Known limitations in `audit/FINAL_REPORT.md` §6 are accepted as written. Open gold-policy questions (E-2014, VIP urgency) remain unresolved. No `data/` fixture or `gold.json` changes.
 
-**Closure commit:** `Close stage 5: Validation, orchestration, replay & project closure` (code, tests, `README.md`, `audit/stage-5/`, `audit/FINAL_REPORT.md`, this sign-off) · tag `stage-5-closed` (also `v1.0.0`) · SHA: ______
+**Closure commit:** `Close stage 5: Validation, orchestration, replay & project closure` (code, tests, `README.md`, `audit/stage-5/`, `audit/FINAL_REPORT.md`, this sign-off) · tag `stage-5-closed` (also `v1.0.0`) · SHA: `3a565b9`
 
 ---
 

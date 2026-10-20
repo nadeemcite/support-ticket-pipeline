@@ -64,7 +64,7 @@ flowchart LR
 | Role | Model | Provider / API ID | Verified (2026-10-20) |
 |---|---|---|---|
 | Development (primary) | `glm-5.2:cloud` | Ollama Cloud, API id `glm-5.2` | ✅ responds |
-| Development (fast) | `glm-5.2-flash:cloud` → **`glm-5.3-flash`** | Ollama Cloud, API id `glm-5.3-flash` | ⚠️ `glm-5.2-flash` **does not exist** (API: "not found, try glm-5.3-flash:cloud"). `glm-5.3-flash` used as substitute, **pending human confirmation** |
+| Development (fast) | `glm-5.2-flash:cloud` → **`glm-5.3-flash`** | Ollama Cloud, API id `glm-5.3-flash` | ⚠️ `glm-5.2-flash` **does not exist** (API: "not found, try glm-5.3-flash:cloud"). `glm-5.3-flash` used as substitute (accepted: the reviewer asked on 2026-10-20 to drop the pending note) |
 | Eval model A | `gpt-6.1-sol` | OpenAI | ✅ responds (needs `max_completion_tokens`, not `max_tokens`) |
 | Eval model B | `deepseek-v4.1-flash` | Ollama Cloud | ✅ responds |
 | Offline / CI | `stub` | local, deterministic | n/a |

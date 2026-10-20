@@ -4,7 +4,7 @@
 
 > A robot helper that reads customer messages, finds the right help-article, writes a safe reply, and knows when to call a human.
 
-**Status:** Stage 0 (plan) is closed. Stage 1 (foundations) is in progress. See [Where are we?](#where-are-we) and the [plan](PLAN.md).
+**Status:** Stages 0–2 are closed (plan, foundations + PII masking, retrieval). Stage 3 (LLM client + classification) is next. See [Where are we?](#where-are-we) and the [plan](PLAN.md).
 
 ---
 
@@ -76,9 +76,9 @@ We build in **5 stages**. A stage is *closed* only after automatic checks pass *
 | Stage | What | Status |
 |---|---|---|
 | 0 | Plan + test data | ✅ Closed (`stage-0-closed`) |
-| 1 | Load, clean, hide PII, stage machine | 🚧 In progress |
-| 2 | Retrieval | ⬜ |
-| 3 | LLM client + classification | ⬜ |
+| 1 | Load, clean, hide PII, stage machine | ✅ Closed (`stage-1-closed`) |
+| 2 | Retrieval | ✅ Closed (`stage-2-closed`) |
+| 3 | LLM client + classification | 🚧 Next |
 | 4 | Drafting, safety, escalation | ⬜ |
 | 5 | Validation, replay, final report | ⬜ |
 
@@ -113,7 +113,7 @@ No keys? Use `LLM_PROVIDER=stub`, a built-in fake model that works offline and g
 
 ## Run
 
-> `run_pipeline.py` exists and runs the stages built so far (it stops at the latest implemented stage, or earlier with `--until <STAGE>`). `validate.py` and the LLM stages arrive in Stages 3–5.
+> `run_pipeline.py` exists and runs the stages built so far (it stops at the latest implemented stage, or earlier with `--until <STAGE>`). `validate.py` and the LLM stages arrive in Stages 3–5. Retrieval (Stage 2) already works offline.
 
 ```bash
 python run_pipeline.py                      # full run on tickets.json + kb_articles.json
@@ -139,7 +139,7 @@ Tests use the stub provider and the fixtures in [`data/`](data/README.md), so th
 Evals run **offline, outside the pipeline**. Two models, `gpt-6.1-sol` and `deepseek-v4.1-flash`, process the same frozen inputs, get scored against the answer key in `data/eval/gold.json`, and **judge each other's drafts**. The model used for day-to-day work (`glm-5.2`) is never the grader.
 
 ```bash
-python -m evals.retrieval_eval        # Stage 2, no LLM
+python -m evals.retrieval_eval        # Stage 2, no LLM (available now)
 python -m evals.classification_eval   # Stage 3
 python -m evals.drafting_eval         # Stage 4
 python -m evals.e2e_eval              # Stage 5

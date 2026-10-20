@@ -180,6 +180,8 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 - [ ] Stage order cannot be bypassed (read `test_stage_machine.py`)
 - [ ] SPEC/DESIGN PII + model updates are acceptable
 
+**AI audit result (recorded by the agent, 2026-10-20):** ☑ all 6 hard gates green: 239/239 tests, 98.5% coverage on Stage 1 modules, 0 raw-PII hits across 8 fixture runs, 23/23 eval tickets' PII types match gold, 8/8 expected exit codes. Re-run with `python scripts/audit_stage1.py`; details in `audit/stage-1/AUDIT_SUMMARY.md`. Doc corrections made during the stage: SPEC §6.10 example now shows the real artifact; placeholder for cards is `[CARD_NUMBER_n]` (matching the approved `pii_cases.json`, not `[CARD_n]`); P-DET documents the credential-keyword limitation; DESIGN §10 lists `stages.py`, `runner.py`, `scripts/`. **Awaiting human review.**
+
 **Sign-off** — Status: ☐ Closed ☐ Changes requested · Reviewer: ______ · Date: ______ · Reports reviewed: ☐ pytest ☐ PII ☐ normalisation · Notes: ______
 
 **Closure commit:** `Close stage 1: Foundations` (code, tests, `audit/stage-1/`, this sign-off) · tag `stage-1-closed` · SHA: ______

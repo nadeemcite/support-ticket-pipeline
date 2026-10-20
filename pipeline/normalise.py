@@ -66,9 +66,11 @@ def _pii_summary(
         if placeholder not in entries:
             tag = pii.PLACEHOLDER_RE.fullmatch(placeholder).group(1)
             entries[placeholder] = (PIIType(tag.lower()), pii.pii_hash(salt, value))
+    # A value whose only occurrence was cut by truncation is no longer in the ticket: drop it.
     return [
         PIISummaryEntry(type=pii_type, placeholder=placeholder, count=combined.count(placeholder), hash=value_hash)
         for placeholder, (pii_type, value_hash) in entries.items()
+        if placeholder in combined
     ]
 
 

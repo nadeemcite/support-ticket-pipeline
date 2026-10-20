@@ -7,6 +7,7 @@ import pytest
 
 from pipeline.config import DEFAULT_PII_SALT
 from pipeline.loader import load_inputs
+from pipeline.pii import pii_hash
 from pipeline.normalise import clean_text, normalise_article, normalise_language, normalise_ticket, normalise_tickets
 from tests.conftest import EVAL, FIXTURES, ROOT
 
@@ -80,7 +81,7 @@ def test_truncation_never_leaves_partial_placeholder_or_pii():
     message = "x" * 30 + " contact jane.doe@example.com today"
     ticket = normalise_ticket({"ticket_id": "L-2", "message": message}, 42, DEFAULT_PII_SALT)
     assert "jane" not in ticket.message and "[EMAIL_" not in ticket.message
-    assert ticket.pii_summary.count == 1
+    assert ticket.pii_summary == []  # the only occurrence was truncated away
 
 
 def test_missing_fields_get_notes():
@@ -124,3 +125,26 @@ def test_normalise_article():
     assert (article.article_id, article.title, article.category, article.content, article.updated_at) == (
         "KB-9", "T", "billing", "a b", None,
     )
+
+
+def test_pii_summary_matches_spec_shape():
+    """SPEC §6.10: list of {type, placeholder, count, hash}, first-occurrence order, hash = sha256(salt + value)."""
+    raw = {
+        "ticket_id": "S-1",
+        "subject": "Card 4111 1111 1111 1111",
+        "message": "Charged 4111 1111 1111 1111 twice; reply to a@example.com",
+    }
+    ticket = normalise_ticket(raw, 4000, "salt-")
+    dumped = ticket.model_dump(mode="json")["pii_summary"]
+    assert dumped == [
+        {"type": "card_number", "placeholder": "[CARD_NUMBER_1]", "count": 2, "hash": pii_hash("salt-", "4111 1111 1111 1111")},
+        {"type": "email", "placeholder": "[EMAIL_1]", "count": 1, "hash": pii_hash("salt-", "a@example.com")},
+    ]
+    assert ticket.subject == "Card [CARD_NUMBER_1]"
+    assert ticket.message == "Charged [CARD_NUMBER_1] twice; reply to [EMAIL_1]"
+
+
+def test_pii_summary_count_includes_extra_fields():
+    raw = {"ticket_id": "S-2", "message": "mail a@example.com", "contact": "a@example.com"}
+    ticket = normalise_ticket(raw, 4000, DEFAULT_PII_SALT)
+    assert [(e.placeholder, e.count) for e in ticket.pii_summary] == [("[EMAIL_1]", 2)]

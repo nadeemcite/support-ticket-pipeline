@@ -506,7 +506,7 @@ flowchart TD
 ```mermaid
 flowchart LR
     RAW[raw ticket text] --> DET["pii.py detect<br/>email · phone · card (Luhn)<br/>IBAN (mod-97) · credential"]
-    DET --> MASK["mask → [EMAIL_1] [CARD_1] …<br/>stable, idempotent"]
+    DET --> MASK["mask → [EMAIL_1] [CARD_NUMBER_1] …<br/>stable, idempotent"]
     MASK --> NT[normalised_tickets.json<br/>masked text + pii_summary<br/>salted hashes]
     NT --> RET[retrieval]
     NT --> LLM[classification + drafting prompts]
@@ -573,7 +573,9 @@ ticket-classification/
 ├── run_pipeline.py            # CLI: full run
 ├── validate.py                # CLI: standalone validation
 ├── pipeline/
-│   ├── orchestrator.py        # Stage enum, StageMachine, run loop
+│   ├── orchestrator.py        # Stage enum, StageMachine, Pipeline run loop, manifest builder
+│   ├── stages.py              # stage functions + registry (unbuilt stages are placeholders)
+│   ├── runner.py              # runs the pipeline, maps errors to exit codes, always writes the manifest
 │   ├── config.py
 │   ├── taxonomy.py
 │   ├── schemas.py
@@ -596,6 +598,7 @@ ticket-classification/
 │       └── query_expansion.v1.json
 ├── tests/                     # unit + end-to-end (stub provider), markers stage1…stage5
 ├── evals/                     # offline eval harness (never run by run_pipeline.py)
+├── scripts/                   # audit_stage<N>.py: runs a stage's AI audit, writes audit/stage-N/
 ├── data/                      # eval set, gold labels, fixtures (see data/README.md)
 ├── audit/                     # per-stage audit reports, FINAL_REPORT.md (committed)
 ├── tickets.json               # input
@@ -610,7 +613,7 @@ ticket-classification/
 ├── llm_calls.jsonl            # ┘
 ├── artifacts/                 # intermediate artifacts + manifest
 ├── .cache/                    # replay cache (git-ignored)
-├── requirements.txt
+├── requirements.txt           # runtime deps · requirements-dev.txt adds pytest/pytest-cov
 ├── pytest.ini
 ├── README.md · DESIGN.md · SPEC.md · PLAN.md · PROBLEM.md
 └── .env                       # API keys (git-ignored)

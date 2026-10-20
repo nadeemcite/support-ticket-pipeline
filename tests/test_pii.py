@@ -1,5 +1,6 @@
 """PII detection and masking: every case in fixtures/pii_cases.json (P-DET, P-MASK)."""
 
+import hashlib
 import json
 
 import pytest
@@ -97,9 +98,9 @@ def test_placeholder_helpers():
     assert not pii.contains_placeholder("see [NOTE_1]")
 
 
-def test_hash_is_salted_stable_and_type_scoped():
-    first = pii.pii_hash("salt", PIIType.EMAIL, "a@example.com")
-    assert first == pii.pii_hash("salt", PIIType.EMAIL, "a@example.com")
-    assert first != pii.pii_hash("other", PIIType.EMAIL, "a@example.com")
-    assert first != pii.pii_hash("salt", PIIType.CREDENTIAL, "a@example.com")
-    assert first.startswith("sha256:") and "example" not in first
+def test_hash_is_salted_sha256_of_salt_plus_value():
+    first = pii.pii_hash("salt", "a@example.com")
+    assert first == "sha256:" + hashlib.sha256(b"salta@example.com").hexdigest()
+    assert first == pii.pii_hash("salt", "a@example.com")
+    assert first != pii.pii_hash("other", "a@example.com")
+    assert "example" not in first

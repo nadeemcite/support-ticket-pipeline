@@ -1,6 +1,6 @@
 # Stage 1 — AI audit summary
 
-- Generated: 2026-10-20 06:22 UTC · git: `b8cef76` · Python 3.14.5
+- Generated: 2026-10-20 06:24 UTC · git: `084a73c` · Python 3.14.5
 - Input hashes (sha256): `tickets.json` 93ccb484522c2c6d… · `kb_articles.json` 3f17c76129d9efbc… · `data/eval/tickets.json` 2148f103ba03ba02…
 - **AI gates: ALL GREEN ✅** — the stage still needs human review and sign-off in `PLAN.md` before it is closed.
 
@@ -8,8 +8,8 @@
 
 | Gate | Threshold | Value | |
 |---|---|---|---|
-| All Stage 1 tests pass | 100% | 237/237 | ✅ |
-| Line coverage, Stage 1 modules | ≥ 90% | 98.4% | ✅ |
+| All Stage 1 tests pass | 100% | 239/239 | ✅ |
+| Line coverage, Stage 1 modules | ≥ 90% | 98.5% | ✅ |
 | Raw-PII hits in eval-set `normalised_tickets.json` | 0 | 0 | ✅ |
 | Raw-PII hits in any fixture run's artifacts / manifest | 0 | 0 | ✅ |
 | Eval PII types match gold | 23/23 | 23/23 | ✅ |

@@ -64,26 +64,21 @@ Cases with an empty expected list are **false-positive guards** (order IDs, date
 
 ## How placeholders and hashes appear in the artifact
 
-`normalised_tickets.json` stores only masked text plus a `pii_summary` (type, placeholder, salted hash). Example for E-2007:
+`normalised_tickets.json` stores only masked text plus a `pii_summary` (type, placeholder, count, `sha256(PII_HASH_SALT + value)`). Example for E-2007:
 
 ```json
-{
-  "count": 2,
-  "types": {
-    "card_number": 1,
-    "email": 1
+[
+  {
+    "type": "card_number",
+    "placeholder": "[CARD_NUMBER_1]",
+    "count": 1,
+    "hash": "sha256:6986c79c7a9b672ccf8483a33cdb13f129f261adfe04981905bb1974430923b8"
   },
-  "items": [
-    {
-      "placeholder": "[CARD_NUMBER_1]",
-      "type": "card_number",
-      "hash": "sha256:1daf2699438f61c1"
-    },
-    {
-      "placeholder": "[EMAIL_1]",
-      "type": "email",
-      "hash": "sha256:b76ce1bd7797d9d6"
-    }
-  ]
-}
+  {
+    "type": "email",
+    "placeholder": "[EMAIL_1]",
+    "count": 1,
+    "hash": "sha256:cd06e9f1add4f33adf5802b7b8f589f79d21e70c4c045798be2c3fc61765ddd4"
+  }
+]
 ```

@@ -25,7 +25,7 @@ def normalised():
 
 @pytest.mark.parametrize("ticket_id", list(GOLD))
 def test_detected_types_match_gold(normalised, ticket_id):
-    detected = sorted(item.type.value for item in normalised[ticket_id].pii_summary.items)
+    detected = sorted(entry.type.value for entry in normalised[ticket_id].pii_summary)
     assert detected == sorted(GOLD[ticket_id]["pii_expected"])
 
 

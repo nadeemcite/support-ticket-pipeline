@@ -316,28 +316,36 @@ Run ID, timestamps, provider/model, input SHA-256s, stage trail (O4), counts (`t
 
 ```json
 {
+  "schema_version": 1,
   "tickets": [
     {
-      "ticket_id": "E-2013",
+      "ticket_id": "E-2007",
+      "input_index": 9,
       "customer_tier": "standard",
       "language": "en",
-      "subject": "Charge on my card",
-      "message": "Please check the charge on card [CARD_1], contact me at [EMAIL_1].",
+      "subject": "Two settled charges for order 88213",
+      "message": "Both charges for order 88213 are now settled on my statement, not pending. My card is [CARD_NUMBER_1] and my email is [EMAIL_1]. Please refund one of them.",
+      "created_at": "2026-05-21T11:15:00Z",
       "insufficient_content": false,
+      "truncated": false,
       "notes": [],
       "extra": {},
       "pii_summary": [
-        { "type": "email", "placeholder": "[EMAIL_1]", "count": 1, "hash": "sha256:ab12…" },
-        { "type": "card_number", "placeholder": "[CARD_1]", "count": 1, "hash": "sha256:cd34…" }
-      ]
+        { "type": "card_number", "placeholder": "[CARD_NUMBER_1]", "count": 1, "hash": "sha256:6986c79c7…" },
+        { "type": "email", "placeholder": "[EMAIL_1]", "count": 1, "hash": "sha256:cd06e9f1a…" }
+      ],
+      "content_hash": "sha256:6ec1d12f3…"
     }
   ]
 }
 ```
 
 - `subject` and `message` hold **masked** text only. Raw values are never persisted. The placeholder → value mapping exists in memory for the duration of the stage (needed for `unmask`) and is discarded.
-- `hash` = `sha256(PII_HASH_SALT + value)`, so repeated values can be correlated without being recoverable.
-- Normalisation is idempotent: `normalise(normalise(x)) == normalise(x)`.
+- `pii_summary` has one entry per placeholder, in first-occurrence order. `count` = occurrences in the masked ticket (subject, message and `extra`). A value whose only occurrence was cut by truncation is dropped.
+- `hash` = `"sha256:" + sha256(PII_HASH_SALT + value)`, so repeated values can be correlated without being recoverable.
+- `notes` records every default or repair (`language defaulted to 'en' …`, `unknown customer_tier '…'`, `message truncated …`). `extra` holds unknown input fields (I2), PII-masked as well.
+- `content_hash` = `sha256` of the canonical `{subject, message, language, customer_tier}`. It's the per-ticket key for the replay cache (R1).
+- Normalisation is idempotent: `normalise(normalise(x)) == normalise(x)`, byte for byte.
 
 ---
 
@@ -437,8 +445,8 @@ Unsupported claims are written to `grounding_flags.json`. They never block the d
 
 | ID | Rule |
 |---|---|
-| P-DET | Deterministic detection of `email`, `phone`, `card_number` (13–19 digits, **Luhn-valid**), `iban` (**mod-97-valid**) and `credential` (a ticket that discloses a password/PIN/OTP/CVV value). Order IDs, dates, amounts, error codes and Luhn-/mod-97-invalid digit runs are **not** PII (false-positive guards) |
-| P-MASK | Each detection is replaced by a stable placeholder `[TYPE_n]` (`[EMAIL_1]`, `[CARD_1]`, …), numbered per ticket by first occurrence. `mask(mask(x)) == mask(x)` and `unmask(mask(x)) == x` |
+| P-DET | Deterministic detection of `email`, `phone`, `card_number` (13–19 digits, **Luhn-valid**), `iban` (**mod-97-valid**) and `credential` (a ticket that discloses a password/PIN/OTP/CVV value). Order IDs, dates, amounts, error codes and Luhn-/mod-97-invalid digit runs are **not** PII (false-positive guards). Credentials are found by keyword + value (`password is …`, `contraseña es …`, `the code is 482913`); generic `code`/`PIN` keywords need a 4–8 digit value and are ignored after qualifiers like `error`, `order`, `promo`. **Limitation:** a secret disclosed without a keyword ("it's hunter2") is not detected |
+| P-MASK | Each detection is replaced by a stable placeholder `[TYPE_n]` (`[EMAIL_1]`, `[CARD_NUMBER_1]`, `[IBAN_1]`, …; `TYPE` = the upper-cased type name), numbered per ticket by first occurrence. `mask(mask(x)) == mask(x)` and `unmask(mask(x)) == x` |
 | P-LLM | Classification and drafting prompts (and `--log-prompts` dumps) contain masked text only |
 | P-OUT | Drafts and escalation reasons contain no raw PII and no placeholders. Drafts refer to PII generically ("the email address you provided") |
 | P-LOG | No raw PII in any artifact or log except the two input files. `normalised_tickets.json` stores masked text plus `pii_summary` (§6.10); `llm_calls.jsonl` stores hashes, not prompts |

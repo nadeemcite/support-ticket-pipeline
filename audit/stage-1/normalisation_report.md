@@ -15,7 +15,7 @@ Source: `data/fixtures/edge_cases/tickets.json` (expectations in `expected.json`
 |---|---|---|---|---|
 | 3 | X-002 | language | `""` | `"en"` |
 | 3 | X-002 | notes | — | language defaulted to 'en' (missing or blank) |
-| 4 | X-003 | language | `"\u2205 (missing)"` | `"en"` |
+| 4 | X-003 | language | `∅ (missing)` | `"en"` |
 | 4 | X-003 | notes | — | language defaulted to 'en' (missing or blank) |
 | 5 | X-004 | language | `"en-GB"` | `"en"` |
 | 6 | X-005 | language | `"EN"` | `"en"` |

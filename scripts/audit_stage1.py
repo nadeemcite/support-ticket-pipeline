@@ -151,7 +151,7 @@ def write_pii_report(fixture_results: list[dict]) -> dict:
     matches = 0
     rows = []
     for ticket_id, ticket in raw.items():
-        found = sorted(item["type"] for item in normalised[ticket_id]["pii_summary"]["items"])
+        found = sorted(entry["type"] for entry in normalised[ticket_id]["pii_summary"])
         expected = sorted(gold[ticket_id]["pii_expected"])
         ok = found == expected
         matches += ok
@@ -218,7 +218,7 @@ def write_pii_report(fixture_results: list[dict]) -> dict:
         "",
         "## How placeholders and hashes appear in the artifact",
         "",
-        "`normalised_tickets.json` stores only masked text plus a `pii_summary` (type, placeholder, salted hash). Example for E-2007:",
+        "`normalised_tickets.json` stores only masked text plus a `pii_summary` (type, placeholder, count, `sha256(PII_HASH_SALT + value)`). Example for E-2007:",
         "",
         "```json",
         json.dumps(normalised["E-2007"]["pii_summary"], indent=2),
@@ -261,7 +261,7 @@ def write_normalisation_report(fixture_results: list[dict]) -> None:
         norm = by_index[index]
         for field in ("language", "customer_tier", "subject", "message"):
             before = raw.get(field, "∅ (missing)")
-            before_repr = json.dumps(before, ensure_ascii=True) if isinstance(before, str) else str(before)
+            before_repr = json.dumps(before, ensure_ascii=True) if field in raw else before
             after = norm[field]
             if before != after:
                 lines.append(f"| {index} | {norm['ticket_id']} | {field} | `{md_escape(before_repr)}` | `{md_escape(json.dumps(after, ensure_ascii=False))}` |")

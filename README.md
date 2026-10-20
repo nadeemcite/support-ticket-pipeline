@@ -94,10 +94,14 @@ cd support-ticket-pipeline
 
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # runtime requirements plus pytest and coverage
 
-cp .env.example .env                # if present; otherwise create .env and add the keys below
+python run_pipeline.py --provider stub && python validate.py   # first run: offline, no keys needed
+
+cp .env.example .env                # only for real model runs; add the keys below
 ```
+
+With no API key configured, `python run_pipeline.py` does the same as `--provider stub` and prints a `note:` saying so. Setting `LLM_PROVIDER` or any key turns that off.
 
 `.env` (never committed):
 
@@ -110,7 +114,7 @@ OPENAI_API_KEY=...                  # embeddings (default retriever), openai pro
 RETRIEVER=embedding                 # embedding (default, needs OPENAI_API_KEY) | tfidf (offline; default with stub)
 ```
 
-No keys? Use `LLM_PROVIDER=stub`: a built-in fake model plus TF-IDF retrieval. It works offline and gives repeatable answers. Real runs use OpenAI `text-embedding-3-small` for retrieval, so they need `OPENAI_API_KEY` unless you pass `--retriever tfidf`.
+No keys? That is the default: the pipeline falls back to `stub` (or pass `--provider stub`): a built-in fake model plus TF-IDF retrieval. It works offline and gives repeatable answers. Real runs use OpenAI `text-embedding-3-small` for retrieval, so they need `OPENAI_API_KEY` unless you pass `--retriever tfidf`.
 
 ## Run
 

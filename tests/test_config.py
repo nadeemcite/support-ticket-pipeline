@@ -9,8 +9,11 @@ from pipeline.config import ConfigError, load_config, normalise_model_id
 pytestmark = pytest.mark.stage1
 
 
+KEYS = {"OLLAMA_API_KEY": "k", "OLLAMA_BASE_URL": "u"}
+
+
 def test_defaults(tmp_path):
-    config = load_config({}, env={}, dotenv_path=None)
+    config = load_config({}, env=KEYS, dotenv_path=None)
     assert (config.provider, config.model, config.fast_model) == ("ollama", "glm-5.2", "glm-5.3-flash")
     assert (config.top_k, config.temperature, config.retriever) == (3, 0.0, "embedding")
     assert config.min_score is None and config.effective_min_score == 0.25
@@ -56,8 +59,23 @@ def test_invalid_config_raises(cli, env):
         load_config(cli, env=env, dotenv_path=None)
 
 
-def test_credentials_check():
+def test_no_keys_falls_back_to_stub_with_a_note():
     config = load_config({}, env={}, dotenv_path=None)
+    assert (config.provider, config.retriever, config.effective_min_score) == ("stub", "tfidf", 0.05)
+    assert len(config.notes) == 1 and "no LLM API key" in config.notes[0] and "stub" in config.notes[0]
+    assert "notes" not in config.public_dict()
+    assert load_config({}, env=KEYS, dotenv_path=None).notes == ()
+    assert load_config({}, env={"OPENAI_API_KEY": "k"}, dotenv_path=None).provider == "ollama"  # a key was configured: no silent switch
+
+
+@pytest.mark.parametrize("cli, env", [({"provider": "ollama"}, {}), ({}, {"LLM_PROVIDER": "ollama"})])
+def test_explicit_provider_is_never_replaced(cli, env):
+    config = load_config(cli, env=env, dotenv_path=None)
+    assert config.provider == "ollama" and config.notes == ()
+
+
+def test_credentials_check():
+    config = load_config({"provider": "ollama"}, env={}, dotenv_path=None)
     with pytest.raises(ConfigError, match="OLLAMA_API_KEY, OLLAMA_BASE_URL"):
         config.require_credentials(env={})
     config.require_credentials(env={"OLLAMA_API_KEY": "k", "OLLAMA_BASE_URL": "u"})

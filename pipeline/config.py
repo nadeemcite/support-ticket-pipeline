@@ -68,6 +68,7 @@ class Config:
     no_cache: bool = False
     log_prompts: bool = False
     pii_salt: str = field(default=DEFAULT_PII_SALT, repr=False)
+    notes: tuple[str, ...] = field(default=(), compare=False)  # console notices (e.g. the stub fallback); not recorded
 
     @property
     def effective_min_score(self) -> float:
@@ -85,6 +86,7 @@ class Config:
         """Config as recorded in the manifest: no salt, paths as strings."""
         data = asdict(self)
         data.pop("pii_salt")
+        data.pop("notes")
         data["min_score"] = self.effective_min_score
         return {key: str(value) if isinstance(value, Path) else value for key, value in data.items()}
 
@@ -135,7 +137,16 @@ def load_config(
                 raise ConfigError(f"{env_key}={environ[env_key]!r} is not a valid {cast.__name__}") from exc
         return default
 
-    provider = pick("provider", "LLM_PROVIDER", "ollama").strip().lower()
+    notes: list[str] = []
+    provider_set = "provider" in cli or bool(environ.get("LLM_PROVIDER"))
+    default_provider = "ollama"
+    if not provider_set and not any(environ.get(var) for var in CREDENTIAL_VARS["ollama"] + ("OPENAI_API_KEY",)):
+        default_provider = "stub"
+        notes.append(
+            "no LLM API key configured (OLLAMA_API_KEY/OLLAMA_BASE_URL or OPENAI_API_KEY): "
+            "using the offline stub provider with TF-IDF retrieval; set LLM_PROVIDER and a key for real model runs"
+        )
+    provider = pick("provider", "LLM_PROVIDER", default_provider).strip().lower()
     if provider not in PROVIDERS:
         raise ConfigError(f"Unknown provider {provider!r}; expected one of {', '.join(PROVIDERS)}")
 
@@ -166,6 +177,7 @@ def load_config(
         no_cache=bool(cli.get("no_cache", False)),
         log_prompts=bool(cli.get("log_prompts", False)),
         pii_salt=environ.get("PII_HASH_SALT") or DEFAULT_PII_SALT,
+        notes=tuple(notes),
     )
     if config.top_k < 1:
         raise ConfigError("RETRIEVAL_TOP_K must be >= 1")

@@ -40,6 +40,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return EXIT_FATAL
 
+    for note in config.notes:
+        print(f"note: {note}", file=sys.stderr)
     outcome = run(config, until=Stage[args.until] if args.until else None)
     for line in console_summary(outcome.manifest, outcome.error, outcome.exit_code):
         print(line, file=sys.stderr if line.startswith("error:") else sys.stdout)

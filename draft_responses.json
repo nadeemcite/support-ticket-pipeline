@@ -1,0 +1,44 @@
+{
+  "drafts": [
+    {
+      "ticket_id": "T-1001",
+      "draft_response": "Hello,\n\nThank you for reaching out about the duplicate charges you noticed on your card.\n\nIt is common to see both a completed charge and a temporary pending authorization for the same order. Pending authorizations typically disappear on their own within 3-5 business days, as they are not settled charges.\n\nIf two fully settled charges are confirmed for the same order, our billing team will review whether a refund applies. I have noted your case for review, and if a duplicate settled charge is found, the billing team will follow up with you.\n\nIf the pending authorization does not disappear after 5 business days, please reply to this ticket and we will investigate further.\n\nThank you for your patience.\n\nBest regards,\nCustomer Support",
+      "citations": [
+        "KB-001",
+        "KB-004"
+      ],
+      "meta": {
+        "language": "en",
+        "fallback": false,
+        "attempts": 1,
+        "violations_resolved": []
+      }
+    },
+    {
+      "ticket_id": "T-1002",
+      "draft_response": "Hello,\n\nThank you for reaching out about being unable to log in after resetting your password. I'm sorry for the inconvenience this is causing.\n\nBefore we proceed, please try the following steps:\n\n1. Make sure you are using the most recent password you set during the reset.\n2. Clear your browser's cached sessions and cookies.\n3. Retry logging in using an incognito or private browsing window.\n\nIf the issue persists after these steps, I have escalated your case to our account support specialist team. They will review your account and follow up with you directly to resolve the login problem.\n\nPlease never share your password or any security codes with anyone, including our support staff.\n\nThank you for your patience.\n\nBest regards,\nCustomer Support",
+      "citations": [
+        "KB-002"
+      ],
+      "meta": {
+        "language": "en",
+        "fallback": false,
+        "attempts": 1,
+        "violations_resolved": []
+      }
+    },
+    {
+      "ticket_id": "T-1003",
+      "draft_response": "Hello,\n\nThank you for reaching out. Invoice PDFs can be downloaded from the dashboard by navigating to Billing > Documents. From there, you can filter by month and download each invoice as a PDF.\n\nIf any invoices for the last three months are missing from that section, please let us know and we will escalate the matter to our billing support team for further assistance.\n\nBest regards,\nCustomer Support",
+      "citations": [
+        "KB-003"
+      ],
+      "meta": {
+        "language": "en",
+        "fallback": false,
+        "attempts": 1,
+        "violations_resolved": []
+      }
+    }
+  ]
+}

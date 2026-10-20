@@ -1,0 +1,102 @@
+{
+  "generated_at": "2026-10-20T11:48:18.393Z",
+  "status": "pass",
+  "summary": {
+    "checks": 14,
+    "passed": 13,
+    "failed": 0,
+    "warnings": 1,
+    "tickets": 3
+  },
+  "checks": [
+    {
+      "id": "V01",
+      "name": "required_artifacts_exist",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V02",
+      "name": "json_parses",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V03",
+      "name": "schemas_match",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V04",
+      "name": "ticket_coverage",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V05",
+      "name": "classification_in_taxonomy",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V06",
+      "name": "retrieval_contract",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V07",
+      "name": "citations_subset_of_retrieved",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V08",
+      "name": "escalation_invariant",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V09",
+      "name": "draft_language_matches_ticket",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V10",
+      "name": "no_credential_requests_or_refund_promises",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V11",
+      "name": "escalation_consistency",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V12",
+      "name": "grounding_flags_and_llm_log_coverage",
+      "status": "warn",
+      "details": [
+        {
+          "ticket_id": "T-1003",
+          "message": "unsupported claim (G1): three months"
+        }
+      ]
+    },
+    {
+      "id": "V13",
+      "name": "no_pii_leakage",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "id": "V14",
+      "name": "no_placeholder_leakage",
+      "status": "pass",
+      "details": []
+    }
+  ]
+}

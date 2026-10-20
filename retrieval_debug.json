@@ -1,0 +1,247 @@
+{
+  "config": {
+    "retrieval_version": "retrieval.v1",
+    "method": "embedding",
+    "provider": "openai",
+    "model": "text-embedding-3-small",
+    "article_text": "title. category. content",
+    "query_text": "subject. message (PII-masked)",
+    "explanation": "top_terms = lexical TF-IDF overlap; best_snippet = KB sentence with the highest embedding similarity",
+    "embedding_dims": 1536,
+    "top_k": 3,
+    "min_score": 0.25,
+    "kb_hash": "sha256:0e9ee05a319e6f3d6a345d4c067796fefad6c43104e4e21895fa5475a2a585cc"
+  },
+  "results": [
+    {
+      "ticket_id": "T-1001",
+      "query_terms": [
+        "charg",
+        "twic",
+        "order",
+        "plac",
+        "card",
+        "show",
+        "two",
+        "complet",
+        "pend",
+        "refund"
+      ],
+      "candidates": [
+        {
+          "article_id": "KB-001",
+          "rank": 1,
+          "score": 0.5553,
+          "lexical_score": 0.4221,
+          "kept": true,
+          "top_terms": [
+            {
+              "term": "charg",
+              "contribution": 0.1548
+            },
+            {
+              "term": "pend",
+              "contribution": 0.0689
+            },
+            {
+              "term": "card",
+              "contribution": 0.0554
+            },
+            {
+              "term": "order",
+              "contribution": 0.0554
+            },
+            {
+              "term": "two",
+              "contribution": 0.0447
+            }
+          ],
+          "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+        },
+        {
+          "article_id": "KB-004",
+          "rank": 2,
+          "score": 0.2895,
+          "lexical_score": 0.0589,
+          "kept": true,
+          "top_terms": [
+            {
+              "term": "refund",
+              "contribution": 0.0589
+            }
+          ],
+          "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+        },
+        {
+          "article_id": "KB-003",
+          "rank": 3,
+          "score": 0.1642,
+          "lexical_score": 0.0,
+          "kept": false,
+          "top_terms": [],
+          "best_snippet": "If invoices are missing, escalate to billing support."
+        },
+        {
+          "article_id": "KB-002",
+          "rank": 4,
+          "score": 0.1439,
+          "lexical_score": 0.0,
+          "kept": false,
+          "top_terms": [],
+          "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+        }
+      ]
+    },
+    {
+      "ticket_id": "T-1002",
+      "query_terms": [
+        "log",
+        "resett",
+        "password",
+        "chang",
+        "morn",
+        "every",
+        "login",
+        "attempt",
+        "say",
+        "invalid",
+        "credential",
+        "although",
+        "reset",
+        "link",
+        "work"
+      ],
+      "candidates": [
+        {
+          "article_id": "KB-002",
+          "rank": 1,
+          "score": 0.5529,
+          "lexical_score": 0.4152,
+          "kept": true,
+          "top_terms": [
+            {
+              "term": "password",
+              "contribution": 0.2219
+            },
+            {
+              "term": "login",
+              "contribution": 0.0967
+            },
+            {
+              "term": "reset",
+              "contribution": 0.0967
+            }
+          ],
+          "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+        },
+        {
+          "article_id": "KB-001",
+          "rank": 2,
+          "score": 0.1342,
+          "lexical_score": 0.0,
+          "kept": false,
+          "top_terms": [],
+          "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+        },
+        {
+          "article_id": "KB-003",
+          "rank": 3,
+          "score": 0.1123,
+          "lexical_score": 0.0,
+          "kept": false,
+          "top_terms": [],
+          "best_snippet": "If invoices are missing, escalate to billing support."
+        },
+        {
+          "article_id": "KB-004",
+          "rank": 4,
+          "score": 0.0738,
+          "lexical_score": 0.0,
+          "kept": false,
+          "top_terms": [],
+          "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+        }
+      ]
+    },
+    {
+      "ticket_id": "T-1003",
+      "query_terms": [
+        "download",
+        "invoic",
+        "pdf",
+        "need",
+        "last",
+        "thre",
+        "month",
+        "account",
+        "find",
+        "option",
+        "dashboard"
+      ],
+      "candidates": [
+        {
+          "article_id": "KB-003",
+          "rank": 1,
+          "score": 0.7572,
+          "lexical_score": 0.6819,
+          "kept": true,
+          "top_terms": [
+            {
+              "term": "invoic",
+              "contribution": 0.1683
+            },
+            {
+              "term": "download",
+              "contribution": 0.1439
+            },
+            {
+              "term": "download invoic",
+              "contribution": 0.1161
+            },
+            {
+              "term": "invoic pdf",
+              "contribution": 0.0824
+            },
+            {
+              "term": "pdf",
+              "contribution": 0.0824
+            }
+          ],
+          "best_snippet": "Customers can filter by month and download each invoice as PDF."
+        },
+        {
+          "article_id": "KB-002",
+          "rank": 2,
+          "score": 0.2311,
+          "lexical_score": 0.0476,
+          "kept": false,
+          "top_terms": [
+            {
+              "term": "account",
+              "contribution": 0.0476
+            }
+          ],
+          "best_snippet": "Ask the user to verify they are using the most recent password, clear cached sessions, and retry in an incognito window."
+        },
+        {
+          "article_id": "KB-004",
+          "rank": 3,
+          "score": 0.1646,
+          "lexical_score": 0.0,
+          "kept": false,
+          "top_terms": [],
+          "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+        },
+        {
+          "article_id": "KB-001",
+          "rank": 4,
+          "score": 0.163,
+          "lexical_score": 0.0,
+          "kept": false,
+          "top_terms": [],
+          "best_snippet": "Pending authorizations usually disappear within 3-5 business days."
+        }
+      ]
+    }
+  ]
+}

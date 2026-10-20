@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "ticket_id": "T-1001",
+      "retrieved_articles": [
+        {
+          "article_id": "KB-001",
+          "score": 0.5553,
+          "title": "Duplicate card charges and pending authorizations"
+        },
+        {
+          "article_id": "KB-004",
+          "score": 0.2895,
+          "title": "Refund policy overview"
+        }
+      ]
+    },
+    {
+      "ticket_id": "T-1002",
+      "retrieved_articles": [
+        {
+          "article_id": "KB-002",
+          "score": 0.5529,
+          "title": "Login issues after password reset"
+        }
+      ]
+    },
+    {
+      "ticket_id": "T-1003",
+      "retrieved_articles": [
+        {
+          "article_id": "KB-003",
+          "score": 0.7572,
+          "title": "Downloading invoices from the dashboard"
+        }
+      ]
+    }
+  ]
+}

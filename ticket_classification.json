@@ -1,0 +1,56 @@
+{
+  "classifications": [
+    {
+      "ticket_id": "T-1001",
+      "issue_type": "billing",
+      "urgency": "medium",
+      "resolution_action": "answer_from_kb",
+      "customer_sensitive": true,
+      "requires_refund_caution": true,
+      "rationale": "KB-001 explains that a completed charge plus a pending authorization is normal and the pending charge typically drops off in 3-5 days; no refund should be promised unless two settled charges are confirmed. KB-004 reinforces not guaranteeing same-day refunds.",
+      "meta": {
+        "fallback": false,
+        "attempts": 1,
+        "overrides": [],
+        "evidence_ids": [
+          "KB-001",
+          "KB-004"
+        ]
+      }
+    },
+    {
+      "ticket_id": "T-1002",
+      "issue_type": "account_access",
+      "urgency": "high",
+      "resolution_action": "needs_human_escalation",
+      "customer_sensitive": true,
+      "requires_refund_caution": false,
+      "rationale": "KB-002 states that if a password reset succeeded but login still fails, escalate to account support. The customer confirms the reset link worked yet login still fails, meeting the escalation condition. VIP is blocked from core use, so urgency is high.",
+      "meta": {
+        "fallback": false,
+        "attempts": 1,
+        "overrides": [],
+        "evidence_ids": [
+          "KB-002"
+        ]
+      }
+    },
+    {
+      "ticket_id": "T-1003",
+      "issue_type": "how_to",
+      "urgency": "low",
+      "resolution_action": "answer_from_kb",
+      "customer_sensitive": true,
+      "requires_refund_caution": false,
+      "rationale": "KB-003 directly answers where to download invoice PDFs (Billing > Documents). No missing invoices are reported, so no escalation condition applies.",
+      "meta": {
+        "fallback": false,
+        "attempts": 1,
+        "overrides": [],
+        "evidence_ids": [
+          "KB-003"
+        ]
+      }
+    }
+  ]
+}

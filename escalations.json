@@ -1,0 +1,43 @@
+{
+  "escalations": [
+    {
+      "ticket_id": "T-1001",
+      "escalate": false,
+      "target_queue": "none",
+      "reason": "E5: resolution_action=answer_from_kb (billing, medium); no escalation condition met. Refund eligibility is not assumed; verify settlement status first.",
+      "meta": {
+        "rules_fired": [
+          "E5"
+        ],
+        "evidence_ids": []
+      }
+    },
+    {
+      "ticket_id": "T-1002",
+      "escalate": true,
+      "target_queue": "account_support",
+      "reason": "E1: classification resolution_action=needs_human_escalation (account_access, high). Q1: KB-002: 'If the reset succeeded but login still fails, escalate to account support.' -> account_support",
+      "meta": {
+        "rules_fired": [
+          "E1",
+          "Q1"
+        ],
+        "evidence_ids": [
+          "KB-002"
+        ]
+      }
+    },
+    {
+      "ticket_id": "T-1003",
+      "escalate": false,
+      "target_queue": "none",
+      "reason": "E5: resolution_action=answer_from_kb (how_to, low); no escalation condition met",
+      "meta": {
+        "rules_fired": [
+          "E5"
+        ],
+        "evidence_ids": []
+      }
+    }
+  ]
+}

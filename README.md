@@ -4,7 +4,7 @@
 
 > A robot helper that reads customer messages, finds the right help-article, writes a safe reply, and knows when to call a human.
 
-**Status:** Stages 0–4 are closed (plan, foundations + PII masking, retrieval, LLM classification, drafting + safety + escalation). Stage 5 (validation, replay, final report) is in progress. See [Where are we?](#where-are-we) and the [plan](PLAN.md).
+**Status:** Stages 0–4 are closed. Stage 5 (validation, replay, final report) is **built and all its automatic checks pass**. Only the human project sign-off in [PLAN.md](PLAN.md) is left, and it hasn't been recorded yet, so there is no `stage-5-closed` tag. Final roll-up: [`audit/FINAL_REPORT.md`](audit/FINAL_REPORT.md). See [Where are we?](#where-are-we) and the [plan](PLAN.md).
 
 ---
 

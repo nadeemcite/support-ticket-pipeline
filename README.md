@@ -4,7 +4,7 @@
 
 > A robot helper that reads customer messages, finds the right help-article, writes a safe reply, and knows when to call a human.
 
-**Status:** Stages 0–2 are closed (plan, foundations + PII masking, retrieval). Stage 3 (LLM client + classification) is next. See [Where are we?](#where-are-we) and the [plan](PLAN.md).
+**Status:** Stages 0–4 are closed (plan, foundations + PII masking, retrieval, LLM classification, drafting + safety + escalation). Stage 5 (validation, replay, final report) is next. See [Where are we?](#where-are-we) and the [plan](PLAN.md).
 
 ---
 
@@ -21,7 +21,7 @@ One helper can't read thousands of letters. So we built a **robot assistant**. F
 | # | What the robot does | Like in real life |
 |---|---|---|
 | 1 | **Hides secrets** | Puts a sticker over phone numbers and card numbers so nobody sees them |
-| 2 | **Looks up the rulebook** | Flips through the shop's help-book (the *knowledge base*) for the 3 best pages |
+| 2 | **Looks up the rulebook** | Flips through the shop's help-book (the *knowledge base*) for the 3 best pages, by meaning (embeddings) or by matching words (offline TF-IDF) |
 | 3 | **Sorts the letter** | Is it about money, logging in, something broken, or a question? How urgent? |
 | 4 | **Writes a reply** | Using **only** facts from the help-book, in the customer's own language |
 | 5 | **Decides: robot or human?** | Tricky or serious letters go to a person, with the reason written down |
@@ -78,9 +78,9 @@ We build in **5 stages**. A stage is *closed* only after automatic checks pass *
 | 0 | Plan + test data | ✅ Closed (`stage-0-closed`) |
 | 1 | Load, clean, hide PII, stage machine | ✅ Closed (`stage-1-closed`) |
 | 2 | Retrieval | ✅ Closed (`stage-2-closed`) |
-| 3 | LLM client + classification | 🚧 Next |
-| 4 | Drafting, safety, escalation | ⬜ |
-| 5 | Validation, replay, final report | ⬜ |
+| 3 | LLM client + classification | ✅ Closed (`stage-3-closed`) |
+| 4 | Drafting, safety, escalation | ✅ Closed (`stage-4-closed`) |
+| 5 | Validation, replay, final report | 🚧 Next |
 
 ---
 
@@ -106,18 +106,20 @@ LLM_PROVIDER=ollama                 # ollama (default) | openai | stub
 LLM_MODEL=glm-5.2
 OLLAMA_API_KEY=...
 OLLAMA_BASE_URL=...                 # OpenAI-compatible, ends with /v1
-OPENAI_API_KEY=...                  # only for openai provider and evals
+OPENAI_API_KEY=...                  # embeddings (default retriever), openai provider and evals
+RETRIEVER=embedding                 # embedding (default, needs OPENAI_API_KEY) | tfidf (offline; default with stub)
 ```
 
-No keys? Use `LLM_PROVIDER=stub`, a built-in fake model that works offline and gives repeatable answers.
+No keys? Use `LLM_PROVIDER=stub`: a built-in fake model plus TF-IDF retrieval. It works offline and gives repeatable answers. Real runs use OpenAI `text-embedding-3-small` for retrieval, so they need `OPENAI_API_KEY` unless you pass `--retriever tfidf`.
 
 ## Run
 
-> `run_pipeline.py` exists and runs the stages built so far (it stops at the latest implemented stage, or earlier with `--until <STAGE>`). `validate.py` and the LLM stages arrive in Stages 3–5. Retrieval (Stage 2) already works offline.
+> `run_pipeline.py` runs everything built so far: load, PII masking, retrieval, classification, drafting and escalation. Use `--until <STAGE>` to stop early. The standalone `validate.py` and the final validation stage arrive in Stage 5.
 
 ```bash
 python run_pipeline.py                      # full run on tickets.json + kb_articles.json
-python run_pipeline.py --provider stub      # offline
+python run_pipeline.py --provider stub      # offline: fake model + TF-IDF retrieval, no keys
+python run_pipeline.py --retriever tfidf    # keep the real LLM but skip the embeddings API
 python run_pipeline.py --tickets data/eval/tickets.json --kb data/eval/kb_articles.json --out-dir /tmp/out
 python validate.py                          # re-check the artifacts on disk
 ```
@@ -139,10 +141,10 @@ Tests use the stub provider and the fixtures in [`data/`](data/README.md), so th
 Evals run **offline, outside the pipeline**. Two models, `gpt-6.1-sol` and `deepseek-v4.1-flash`, process the same frozen inputs, get scored against the answer key in `data/eval/gold.json`, and **judge each other's drafts**. The model used for day-to-day work (`glm-5.2`) is never the grader.
 
 ```bash
-python -m evals.retrieval_eval        # Stage 2, no LLM (available now)
-python -m evals.classification_eval   # Stage 3
-python -m evals.drafting_eval         # Stage 4
-python -m evals.e2e_eval              # Stage 5
+python -m evals.retrieval_eval        # Stage 2: retrieval vs gold (needs OPENAI_API_KEY for embeddings)
+python -m evals.classification_eval   # Stage 3: 2 models x 3 repeats (--repeats, --workers, --no-dev)
+python -m evals.drafting_eval         # Stage 4: drafting + cross-judging (--workers)
+# python -m evals.e2e_eval            # Stage 5: not built yet
 ```
 
 Reports land in `audit/stage-N/` and are committed. Gates and thresholds per stage: [PLAN.md](PLAN.md).

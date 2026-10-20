@@ -268,7 +268,7 @@ def escalations_decided(ctx: RunContext) -> None:
     escalations = []
     for ticket in ctx.data["tickets"]:
         evidence = [articles[hit.article_id] for hit in ctx.data["retrieval"][ticket.ticket_id].retrieved_articles]
-        escalations.append(decide(ctx.data["classifications"][ticket.ticket_id], evidence))
+        escalations.append(decide(ctx.data["classifications"][ticket.ticket_id], evidence, ticket.language))
     ctx.data["escalations"] = {e.ticket_id: e for e in escalations}
     atomic_write_json(ctx.path(ESCALATIONS), {"escalations": [e.model_dump(mode="json") for e in escalations]})
     queues: Counter[str] = Counter(e.target_queue.value for e in escalations)

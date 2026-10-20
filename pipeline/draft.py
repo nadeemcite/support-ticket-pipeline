@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pydantic import ValidationError
 
 from pipeline import guards
+from pipeline.language import is_supported, language_code
 from pipeline.llm import CallResult, LLMClient, echo_for_retry, parse_json_object
 from pipeline.prompts import DRAFT_VERSION, draft_json_schema, draft_messages, draft_retry_feedback
 from pipeline.schemas import Classification, DraftMeta, DraftOutput, DraftResponse, KBArticle, NormalisedTicket
@@ -65,8 +66,22 @@ def credential_disclosed(ticket: NormalisedTicket) -> bool:
 
 
 def template_language(language: str) -> str:
-    code = language.lower().split("-")[0]
+    code = language_code(language)
     return code if code in TEMPLATES else "en"
+
+
+def unsupported_language_draft(ticket: NormalisedTicket) -> DraftResponse:
+    """E6: no model call. The safety patterns only cover en/es/fr/de/pt, so an LLM reply in another language could not
+    be checked. A short English holding note goes out and the ticket is escalated so a person replies."""
+    t = TEMPLATES["en"]
+    parts = [t["ack"], t["escalation"]]
+    if credential_disclosed(ticket):
+        parts.append(t["password"])
+    parts.append(t["followup"])
+    return DraftResponse(
+        ticket_id=ticket.ticket_id, draft_response=" ".join(parts), citations=[],
+        meta=DraftMeta(language="en", fallback=True, attempts=0, violations_resolved=[]),
+    )
 
 
 def fallback_draft(ticket: NormalisedTicket, classification: Classification) -> DraftResponse:
@@ -140,6 +155,8 @@ def draft_ticket(
     client: LLMClient, ticket: NormalisedTicket, classification: Classification, evidence: list[KBArticle],
     input_artifacts: list[str], max_chars: int,
 ) -> DraftResponse:
+    if not is_supported(ticket.language):
+        return unsupported_language_draft(ticket)
     retrieved_ids = [a.article_id for a in evidence]
     messages = draft_messages(ticket, classification, evidence, credential_disclosed(ticket), max_chars)
     schema = draft_json_schema()

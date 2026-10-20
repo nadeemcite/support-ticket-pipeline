@@ -31,9 +31,18 @@ def detect_language(text: str) -> str | None:
     return winners[0] if len(winners) == 1 else None
 
 
+def language_code(language: str) -> str:
+    return language.lower().split("-")[0]
+
+
+def is_supported(language: str) -> bool:
+    """Whether the drafter, its safety patterns and the language check cover this ticket language."""
+    return language_code(language) in STOPWORDS
+
+
 def matches_language(text: str, language: str) -> bool | None:
     """True/False when decidable, None when the ticket language isn't supported or the text is too short."""
-    code = language.lower().split("-")[0]
+    code = language_code(language)
     if code not in STOPWORDS:
         return None
     detected = detect_language(text)

@@ -73,7 +73,7 @@ def test_until_drafted_stops_before_escalation(make_config):
 def test_drafting_prompt_sees_masked_text_only(make_config, scripted_llm):
     provider = scripted_llm(respond=route())
     config = make_config(tickets=EVAL / "tickets.json", kb=EVAL / "kb_articles.json")
-    assert run(config).exit_code == 0
+    assert run(config, until=Stage.ESCALATIONS_DECIDED).exit_code == 0
     raw = json.loads((EVAL / "tickets.json").read_text())["tickets"]
     raw_values = [d.value for t in raw for d in pii.detect(t["subject"] + " " + t["message"])]
     drafting = [c for c in provider.calls if "<classification>" in c[1]["content"]]

@@ -15,7 +15,7 @@ from pydantic import ValidationError
 
 from pipeline import guards, pii
 from pipeline.io_utils import atomic_write_json
-from pipeline.language import matches_language
+from pipeline.language import is_supported, matches_language
 from pipeline.loader import load_inputs
 from pipeline.orchestrator import utc_now
 from pipeline.schemas import Classification, DraftResponse, Escalation, GroundingFlag, LLMCallRecord, RetrievalResult
@@ -226,13 +226,19 @@ def v08(c: Check, loaded: Loaded) -> None:
 
 
 def v09(c: Check, loaded: Loaded) -> None:
+    """A draft must look like the ticket's language. A language the pipeline does not support must be escalated (E6)."""
     if not _need(c, loaded, "drafts"):
         return
+    escalations = _by_ticket(loaded.data.get("escalations") or [])
     for draft in loaded.data["drafts"]:
-        ticket = loaded.tickets.get(draft.get("ticket_id"), {})
-        language = str(ticket.get("language") or "en")
-        if matches_language(draft.get("draft_response", ""), language) is False:
-            c.add(f"draft does not look like language '{language}'", draft.get("ticket_id"))
+        ticket_id = draft.get("ticket_id")
+        language = str(loaded.tickets.get(ticket_id, {}).get("language") or "en")
+        if not is_supported(language):
+            esc = escalations.get(str(ticket_id))
+            if esc is None or not esc.get("escalate") or "E6" not in (esc.get("meta") or {}).get("rules_fired", []):
+                c.add(f"language '{language}' is not supported but the ticket is not escalated by E6", ticket_id)
+        elif matches_language(draft.get("draft_response", ""), language) is False:
+            c.add(f"draft does not look like language '{language}'", ticket_id)
 
 
 def _by_ticket(items: list[dict]) -> dict[str, dict]:
@@ -279,6 +285,8 @@ def v12(c: Check, loaded: Loaded) -> None:
     expected = set(loaded.accepted_ids)
     for stage in ("classification", "drafting"):
         covered = {r.get("ticket_id") for r in loaded.llm if r.get("stage") == stage and r.get("status") == "ok"}
+        if stage == "drafting":  # unsupported-language tickets get a template and no model call (E6)
+            covered |= {t for t in expected if not is_supported(str(loaded.tickets.get(t, {}).get("language") or "en"))}
         for ticket_id in sorted(expected - covered):
             c.add(f"no successful {stage} call in {LLM_LOG}", ticket_id)
 
@@ -349,7 +357,7 @@ def validate(out_dir: Path, tickets_path: Path, kb_path: Path, top_k: int = 3, m
         ("V06", "retrieval_contract", "fail", v06, (top_k, min_score)),
         ("V07", "citations_subset_of_retrieved", "fail", v07, ()),
         ("V08", "escalation_invariant", "fail", v08, ()),
-        ("V09", "draft_language_matches_ticket", "warn", v09, ()),
+        ("V09", "draft_language_matches_ticket", "fail", v09, ()),
         ("V10", "no_credential_requests_or_refund_promises", "fail", v10, ()),
         ("V11", "escalation_consistency", "fail", v11, ()),
         ("V12", "grounding_flags_and_llm_log_coverage", "warn", v12, ()),

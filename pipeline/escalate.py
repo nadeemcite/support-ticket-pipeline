@@ -1,6 +1,6 @@
 """Escalation decision and queue routing (SPEC §7.3): a pure function of classification + KB evidence.
 
-E1-E3 decide ``escalate = true`` (E4/E5 decide false). Routing prefers the escalation clause in a retrieved
+E1-E3 and E6 decide ``escalate = true`` (E4/E5 decide false). Routing prefers the escalation clause in a retrieved
 article of the ticket's category (Q1) and falls back to the issue type (Q2). The ``reason`` names every
 rule fired and quotes the KB clause (E-INV2); it never contains PII or a refund promise (E-INV3/E-INV4).
 """
@@ -8,6 +8,7 @@ rule fired and quotes the KB clause (E-INV2); it never contains PII or a refund 
 import re
 
 from pipeline import guards
+from pipeline.language import is_supported
 from pipeline.retrieval import split_sentences
 from pipeline.schemas import Classification, Escalation, EscalationMeta, KBArticle
 from pipeline.taxonomy import IssueType, ResolutionAction, TargetQueue, Urgency
@@ -55,7 +56,7 @@ def _summary(c: Classification) -> str:
     return f"{c.issue_type.value}, {c.urgency.value}"
 
 
-def decide(classification: Classification, evidence: list[KBArticle]) -> Escalation:
+def decide(classification: Classification, evidence: list[KBArticle], language: str = "en") -> Escalation:
     c = classification
     fired: list[str] = []
     reasons: list[str] = []
@@ -68,6 +69,9 @@ def decide(classification: Classification, evidence: list[KBArticle]) -> Escalat
     if c.meta.fallback:
         fired.append("E3")
         reasons.append("E3: classification fell back after model output failed validation")
+    if not is_supported(language):
+        fired.append("E6")
+        reasons.append(f"E6: ticket language '{language}' is not supported for automated replies; a person must reply")
 
     evidence_ids: list[str] = []
     if not fired:

@@ -403,7 +403,7 @@ Every applied override is appended to `meta.overrides` (e.g. `"C3: no evidence, 
 | ID | Rule | Enforced by |
 |---|---|---|
 | D1 | The prompt contains **only** retrieved articles (full content) + the classification + the ticket | `draft.py` prompt builder |
-| D2 | Reply in `ticket.language` | prompt; validator V09 (warn, heuristic language check) |
+| D2 | Reply in `ticket.language`. A language outside en/es/fr/de/pt gets no model call: a short English holding note and escalation by E6 | prompt; validator V09 (fail, heuristic language check; E6 for unsupported languages) |
 | D3 | `citations ⊆ retrieved article_ids`; each cited ID must have been in the prompt | block + retry; V07 |
 | D4 | `citations` non-empty when retrieved articles exist and action = `answer_from_kb` | block + retry |
 | D5 | No credential/sensitive-data requests (S1) | block + retry; V10 |
@@ -423,13 +423,14 @@ Drafting notes:
 
 ### 7.3 Escalation (`E*` decide, `Q*` route)
 
-A pure function `decide(classification, evidence) → Escalation` (`evidence` = the retrieved articles in rank order). E1–E3 are all evaluated and every one that matches is listed in `meta.rules_fired` and `reason`; any match decides `escalate = true`. E4/E5 apply only when none of E1–E3 matched.
+A pure function `decide(classification, evidence, language) → Escalation` (`evidence` = the retrieved articles in rank order). E1–E3 and E6 are all evaluated and every one that matches is listed in `meta.rules_fired` and `reason`; any match decides `escalate = true`. E4/E5 apply only when none of E1–E3 matched.
 
 | ID | Condition | Result |
 |---|---|---|
 | E1 | `resolution_action == needs_human_escalation` | `escalate = true` |
 | E2 | `urgency == critical` | `escalate = true` |
 | E3 | classification `meta.fallback == true` | `escalate = true` |
+| E6 | `ticket.language` is not one of en/es/fr/de/pt (the safety patterns and the language check cannot vouch for a reply) | `escalate = true`; a person replies |
 | E4 | `resolution_action == request_more_info` | `escalate = false` (waiting on the customer) |
 | E5 | otherwise (`answer_from_kb`) | `escalate = false` |
 
@@ -514,7 +515,7 @@ A `credential` detection also triggers C5 and D10.
 | V06 | Retrieval: ≤ 3 articles, IDs exist in the KB, sorted, scores within `[min_score, 1]` | fail |
 | V07 | Draft citations ⊆ that ticket's retrieved `article_id`s | fail |
 | V08 | Escalation invariant E-INV1; `target_queue` ∈ taxonomy | fail |
-| V09 | Draft language looks like `ticket.language` (stopword heuristic in `pipeline/language.py`; abstains for unsupported languages and very short text) | warn |
+| V09 | Draft language looks like `ticket.language` (stopword heuristic in `pipeline/language.py`; abstains for very short text). A ticket in an unsupported language must be escalated with E6 | fail |
 | V10 | No draft matches S1; no draft or reason matches S2 when `requires_refund_caution` | fail |
 | V11 | Drafts mention escalation (S3) when `resolution_action == needs_human_escalation`; consistency: `needs_human_escalation ⇒ escalate == true` | fail |
 | V12 | Grounding flags count (from `grounding_flags.json` when present); LLM log covers every ticket for both stages | warn |

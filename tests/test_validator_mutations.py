@@ -117,14 +117,15 @@ def test_v08_queue_escalate_mismatch(work):
     assert "V08" in failing(checks)
 
 
-def test_v09_wrong_language_is_a_warning_not_a_failure(work):
+def test_v09_wrong_language_fails(work):
     spanish = next(t for t in json.loads((EVAL / "tickets.json").read_text())["tickets"] if t["language"] == "es")["ticket_id"]
 
     def english(items):
         next(i for i in items if i["ticket_id"] == spanish)["draft_response"] = "Thank you for contacting us. We have received your message and escalated it to our specialist team, who will help you with this."
 
     checks, report = check(work, lambda out: edit(out, "draft_responses.json", "drafts", english))
-    assert checks["V09"]["status"] == "warn" and report["status"] == "pass" and report["summary"]["warnings"] >= 1
+    assert checks["V09"]["status"] == "fail" and report["status"] == "fail"
+    assert any(spanish == d["ticket_id"] for d in checks["V09"]["details"])
 
 
 def test_v10_credential_request_and_refund_promise(work):

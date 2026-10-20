@@ -42,7 +42,7 @@
 | `python run_pipeline.py --no-cache` | Ignore `.cache/` (full recompute) | same |
 | `python run_pipeline.py --tickets <path> --kb <path>` | Alternate input paths (default: repo root) | same |
 | `python run_pipeline.py --log-prompts` | Also dump full prompts to `artifacts/prompts/` | same |
-| `python validate.py` | Validate existing artifacts only (no LLM calls) | `0` no fails · `1` fails · `2` artifacts unreadable |
+| `python validate.py` | Validate existing artifacts only (no LLM, no network). Also takes `--tickets --kb --out-dir`; V06 uses the `top_k`/`min_score` recorded in the run's manifest (`--retriever` overrides) | `0` no fails · `1` ≥ 1 failed check (a missing or corrupt artifact is a V01/V02 fail) · `2` the inputs are unusable or the report can't be written |
 
 ### 2.2 Configuration (env / `.env`)
 
@@ -314,7 +314,7 @@ An empty `flags` list is a valid (good) outcome.
 }
 ```
 
-`status` is `pass` if there are no `fail`s (warnings allowed), otherwise `fail`.
+`status` is `pass` if there are no `fail`s (warnings allowed), otherwise `fail`. A detail is `{ticket_id?, message}`. A check that needs a missing or unreadable artifact reports `fail` with "artifact missing" (never skipped), even if its normal severity is `warn`. `summary.tickets` is the number of accepted input tickets.
 
 ### 6.8 `llm_calls.jsonl` (required)
 
@@ -514,11 +514,11 @@ A `credential` detection also triggers C5 and D10.
 | V06 | Retrieval: ≤ 3 articles, IDs exist in the KB, sorted, scores within `[min_score, 1]` | fail |
 | V07 | Draft citations ⊆ that ticket's retrieved `article_id`s | fail |
 | V08 | Escalation invariant E-INV1; `target_queue` ∈ taxonomy | fail |
-| V09 | Draft language looks like `ticket.language` (stopword heuristic) | warn |
+| V09 | Draft language looks like `ticket.language` (stopword heuristic in `pipeline/language.py`; abstains for unsupported languages and very short text) | warn |
 | V10 | No draft matches S1; no draft or reason matches S2 when `requires_refund_caution` | fail |
 | V11 | Drafts mention escalation (S3) when `resolution_action == needs_human_escalation`; consistency: `needs_human_escalation ⇒ escalate == true` | fail |
 | V12 | Grounding flags count (from `grounding_flags.json` when present); LLM log covers every ticket for both stages | warn |
-| V13 | PII leakage: the PII detector finds nothing in drafts, escalation reasons or `llm_calls.jsonl` | fail |
+| V13 | PII leakage: the PII detector finds nothing in drafts, escalation reasons or `llm_calls.jsonl` (every string field except `prompt_hash` and `timestamp`, which are hex/digit runs) | fail |
 | V14 | No `[TYPE_n]` placeholders in drafts or escalation reasons | fail |
 
 ```mermaid
@@ -560,7 +560,7 @@ flowchart LR
 | R2 | LLM cache key: `prompt_hash` (L4). It includes the model and template version, so changing either invalidates the cache |
 | R3 | Artifacts are always fully rewritten from current inputs; the cache only skips computation |
 | R4 | `--no-cache` bypasses reads (but still writes). `.cache/` is git-ignored |
-| R5 | The manifest reports `cache_hits` / `cache_misses` per stage |
+| R5 | The manifest's `cache` block reports `{hits, misses}` per stage (`retrieval`, `classification`, `drafting`). Retrieval counts tickets; an LLM stage counts a ticket as a hit only when every attempt for it came from the cache |
 | R6 | Changing one ticket in `tickets.json` → only that ticket triggers new retrieval/LLM work (verified by test T9) |
 
 ---
@@ -572,6 +572,8 @@ flowchart LR
 | 0 | Pipeline completed, validation `pass` (warnings allowed) |
 | 1 | Pipeline completed, validation has ≥ 1 `fail` |
 | 2 | Fatal: bad inputs (I1), missing credentials, stage-order violation, or I/O failure |
+
+`validate.py` returns the same `0`/`1` as the pipeline for the same artifacts, because both call `pipeline/validation.py` (acceptance criterion A4).
 
 Fatal errors print one actionable message (e.g. `OLLAMA_API_KEY not set — export it or use --provider stub`) and leave the previous artifacts untouched (atomic writes).
 

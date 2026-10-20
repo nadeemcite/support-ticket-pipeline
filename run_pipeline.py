@@ -6,6 +6,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from pipeline.finalise import console_summary
 from pipeline.config import PROVIDERS, RETRIEVERS, ConfigError, load_config
 from pipeline.orchestrator import Stage
 from pipeline.runner import EXIT_FATAL, run
@@ -40,15 +41,8 @@ def main(argv: list[str] | None = None) -> int:
         return EXIT_FATAL
 
     outcome = run(config, until=Stage[args.until] if args.until else None)
-    counts = outcome.manifest.get("counts", {})
-    print(f"final stage: {outcome.manifest['final_stage']}  exit code: {outcome.exit_code}")
-    if counts:
-        print(
-            f"tickets: {counts.get('tickets_accepted', 0)} accepted, {counts.get('tickets_rejected', 0)} rejected, "
-            f"{counts.get('tickets_duplicate', 0)} duplicate · PII detections: {counts.get('pii_detections', {})}"
-        )
-    if outcome.error:
-        print(f"error: {outcome.error}", file=sys.stderr)
+    for line in console_summary(outcome.manifest, outcome.error, outcome.exit_code):
+        print(line, file=sys.stderr if line.startswith("error:") else sys.stdout)
     return outcome.exit_code
 
 

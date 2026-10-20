@@ -21,7 +21,7 @@ def read(config, name):
 
 def test_stub_run_writes_all_three_artifacts(make_config):
     config = make_config(tickets=EVAL / "tickets.json", kb=EVAL / "kb_articles.json")
-    outcome = run(config)
+    outcome = run(config, until=Stage.ESCALATIONS_DECIDED)
     assert outcome.exit_code == 0 and outcome.manifest["final_stage"] == "ESCALATIONS_DECIDED"
     ids = [t["ticket_id"] for t in json.loads((EVAL / "tickets.json").read_text())["tickets"]]
     drafts = [DraftResponse.model_validate(d) for d in read(config, "draft_responses.json")["drafts"]]

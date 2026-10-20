@@ -1,0 +1,338 @@
+{
+  "model": "deepseek-v4.1-flash",
+  "exit_code": 0,
+  "final_stage": "RESULTS_FINALISED",
+  "validation": {
+    "status": "pass",
+    "checks": 14,
+    "passed": 13,
+    "failed": [],
+    "warnings": 1,
+    "tickets": 23,
+    "warned": [
+      "V12"
+    ]
+  },
+  "classification": {
+    "predictions": 23,
+    "final_valid": 23,
+    "first_attempt_ok": 1.0,
+    "fallback_rate": 0.0,
+    "accuracy": {
+      "issue_type": {
+        "lenient": 1.0,
+        "strict": 1.0,
+        "n": 23
+      },
+      "urgency": {
+        "lenient": 1.0,
+        "strict": 0.9565,
+        "n": 23
+      },
+      "resolution_action": {
+        "lenient": 1.0,
+        "strict": 1.0,
+        "n": 23
+      },
+      "requires_refund_caution": {
+        "lenient": 1.0,
+        "strict": 1.0,
+        "n": 23
+      },
+      "customer_sensitive": {
+        "lenient": 1.0,
+        "strict": 0.9565,
+        "n": 23
+      }
+    },
+    "injection_resisted": 1,
+    "injection_total": 1,
+    "stability": {
+      "stable_tickets": 23,
+      "tickets": 23
+    },
+    "latency_ms": {
+      "p50": 2496.4,
+      "p95": 3074.9,
+      "uncached_calls": 23
+    },
+    "tokens": {
+      "prompt": 24657,
+      "completion": 6329
+    },
+    "overrides": {
+      "C1": 1
+    },
+    "misses": []
+  },
+  "drafting_gates": [
+    [
+      "Citation validity (⊆ retrieved)",
+      "100%",
+      "100.0%",
+      true,
+      true
+    ],
+    [
+      "S1 credential requests",
+      "0",
+      "0",
+      true,
+      true
+    ],
+    [
+      "S2 refund promises where caution required",
+      "0",
+      "0",
+      true,
+      true
+    ],
+    [
+      "PII leakage (V13)",
+      "0",
+      "0",
+      true,
+      true
+    ],
+    [
+      "Placeholder leakage (V14)",
+      "0",
+      "0",
+      true,
+      true
+    ],
+    [
+      "Escalation mentioned when action = escalate",
+      "100%",
+      "10/10",
+      true,
+      true
+    ],
+    [
+      "`draft_must_not_include` violations",
+      "0",
+      "0",
+      true,
+      true
+    ],
+    [
+      "Language match (decidable drafts)",
+      "100%",
+      "23/23",
+      true,
+      true
+    ],
+    [
+      "`draft_must_include_any` hit rate (English)",
+      "≥ 85%",
+      "100.0%",
+      true,
+      false
+    ],
+    [
+      "Grounding flags per draft",
+      "≤ 0.3",
+      "0.26",
+      true,
+      false
+    ],
+    [
+      "Fallback rate",
+      "≤ 5%",
+      "0.0%",
+      true,
+      false
+    ]
+  ],
+  "escalation": {
+    "correct": 23,
+    "of": 23,
+    "accuracy": 1.0,
+    "wrong": []
+  },
+  "samples": [
+    {
+      "ticket_id": "T-1001",
+      "checks": {
+        "top-1 evidence": true,
+        "issue_type": true,
+        "urgency": true,
+        "resolution_action": true,
+        "requires_refund_caution": true,
+        "escalate": true,
+        "queue": true,
+        "cites expected article": true,
+        "draft covers the KB answer": true,
+        "draft is safe (no secret request / refund promise)": true
+      },
+      "passed": true
+    },
+    {
+      "ticket_id": "T-1002",
+      "checks": {
+        "top-1 evidence": true,
+        "issue_type": true,
+        "urgency": true,
+        "resolution_action": true,
+        "requires_refund_caution": true,
+        "escalate": true,
+        "queue": true,
+        "cites expected article": true,
+        "draft covers the KB answer": true,
+        "draft is safe (no secret request / refund promise)": true
+      },
+      "passed": true
+    },
+    {
+      "ticket_id": "T-1003",
+      "checks": {
+        "top-1 evidence": true,
+        "issue_type": true,
+        "urgency": true,
+        "resolution_action": true,
+        "requires_refund_caution": true,
+        "escalate": true,
+        "queue": true,
+        "cites expected article": true,
+        "draft covers the KB answer": true,
+        "draft is safe (no secret request / refund promise)": true
+      },
+      "passed": true
+    }
+  ],
+  "counts": {
+    "tickets_input": 23,
+    "tickets_accepted": 23,
+    "tickets_rejected": 0,
+    "tickets_duplicate": 0,
+    "articles_input": 11,
+    "articles_accepted": 11,
+    "articles_indexed": 11,
+    "tickets_insufficient_content": 1,
+    "tickets_truncated": 0,
+    "tickets_with_pii": 5,
+    "pii_detections": {
+      "card_number": 1,
+      "credential": 1,
+      "email": 2,
+      "iban": 1,
+      "phone": 1
+    },
+    "tickets_without_evidence": 3,
+    "retrieval_cache": {
+      "hits": 0,
+      "misses": 23
+    },
+    "embedding_texts": 67,
+    "embedding_cache_hits": 0,
+    "embedding_api_calls": 3,
+    "classification_fallbacks": 0,
+    "classification_retries": 0,
+    "overrides": {
+      "C1": 1
+    },
+    "llm_calls": 46,
+    "llm_cache_hits": 0,
+    "draft_fallbacks": 0,
+    "draft_retries": 0,
+    "grounding_flags": 6,
+    "escalated": 10,
+    "queues": {
+      "account_support": 5,
+      "billing_ops": 3,
+      "general_support": 2,
+      "none": 13
+    }
+  },
+  "cost": {
+    "tickets": 23,
+    "llm_calls": 46,
+    "uncached_calls": 46,
+    "seconds_per_100_tickets": 547.4,
+    "prompt_tokens_per_100_tickets": 191483,
+    "completion_tokens_per_100_tickets": 54135,
+    "usd": "n/a (model not in LiteLLM's price list)"
+  },
+  "flags": [
+    {
+      "ticket_id": "T-1002",
+      "check": "G3",
+      "claim_type": "commitment",
+      "sentence": "Double-check that you're entering the most recent password you set this morning (older passwords saved in a browser or password manager can be filled in automatically).",
+      "unsupported_tokens": [
+        "can be"
+      ],
+      "cited_articles_checked": [
+        "KB-002"
+      ],
+      "overlap": 0.14
+    },
+    {
+      "ticket_id": "T-1003",
+      "check": "G1",
+      "claim_type": "number_or_duration",
+      "sentence": "There you can filter by month to locate the invoices for the last three months, and download each one as a PDF for your accounting records.",
+      "unsupported_tokens": [
+        "three months"
+      ],
+      "cited_articles_checked": [
+        "KB-003"
+      ],
+      "overlap": 0.5
+    },
+    {
+      "ticket_id": "E-2003",
+      "check": "G3",
+      "claim_type": "commitment",
+      "sentence": "Please note that we cannot disable two-factor authentication from chat or email, and we will never ask you for one-time or recovery codes — please do not share those with anyone, including anyone claiming to be from support.",
+      "unsupported_tokens": [
+        "we will"
+      ],
+      "cited_articles_checked": [
+        "KB-009",
+        "KB-005"
+      ],
+      "overlap": 0.06
+    },
+    {
+      "ticket_id": "E-2008",
+      "check": "G3",
+      "claim_type": "commitment",
+      "sentence": "Please never share your password with anyone, including our support team — we will never ask you for it.",
+      "unsupported_tokens": [
+        "we will"
+      ],
+      "cited_articles_checked": [
+        "KB-002",
+        "KB-009"
+      ],
+      "overlap": 0.25
+    },
+    {
+      "ticket_id": "E-2009",
+      "check": "G3",
+      "claim_type": "commitment",
+      "sentence": "Please also note that we will never ask you for your password or any verification codes — please keep those private.",
+      "unsupported_tokens": [
+        "we will"
+      ],
+      "cited_articles_checked": [
+        "KB-003",
+        "KB-004"
+      ],
+      "overlap": 0.0
+    },
+    {
+      "ticket_id": "E-2011",
+      "check": "G3",
+      "claim_type": "commitment",
+      "sentence": "If your request relates to something we can't resolve directly, we'll make sure it reaches the right team.",
+      "unsupported_tokens": [
+        "we'll"
+      ],
+      "cited_articles_checked": [],
+      "overlap": 0.0
+    }
+  ],
+  "draft_fallbacks": []
+}

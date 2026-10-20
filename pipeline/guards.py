@@ -13,7 +13,7 @@ from pipeline.retrieval import split_sentences
 _WORD_RE = re.compile(r"[\w']+", re.UNICODE)
 NEGATIONS = frozenset(
     """not never no cannot can't cant won't don't dont doesn't didn't isn't aren't wouldn't shouldn't
-    nunca jamais pas niemals nie nicht kein keine nenhum nem não nao sin evite evitar ne""".split()
+    nunca jamais pas niemals nie nicht kein keine nenhum nem não nao sin evite evitar ne unable""".split()
 )
 
 _SECRET_NOUN = (
@@ -122,12 +122,22 @@ def has_credential_advice(text: str) -> bool:
     return False
 
 
+_CLAUSE_BREAK_RE = re.compile(r"[,;:\u2014]")
+S2_NEGATION_WINDOW = 6
+
+
+def _clause_prefix(prefix: str) -> str:
+    """The part of the sentence before a trigger that is in the same clause ("No problem, we will refund" is not negated)."""
+    return _CLAUSE_BREAK_RE.split(prefix)[-1]
+
+
 def s2_refund_promise(text: str) -> bool:
-    """S2: promises or announces a refund. A negation within the 4 words before the trigger cancels it."""
+    """S2: promises or announces a refund. A negation within 6 words before the trigger, in the same clause, or inside
+    the match cancels it ("we cannot promise a refund", "I'm not able to confirm or promise a refund")."""
     for sentence in sentences(text):
         for pattern in _S2_PATTERNS:
             for match in pattern.finditer(sentence):
-                if negated_before(sentence[: match.start()], window=4) or negated_before(match.group(0), window=6):
+                if negated_before(_clause_prefix(sentence[: match.start()]), window=S2_NEGATION_WINDOW) or negated_before(match.group(0), window=S2_NEGATION_WINDOW):
                     continue
                 return True
     return False

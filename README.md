@@ -80,7 +80,7 @@ We build in **5 stages**. A stage is *closed* only after automatic checks pass *
 | 2 | Retrieval | ✅ Closed (`stage-2-closed`) |
 | 3 | LLM client + classification | ✅ Closed (`stage-3-closed`) |
 | 4 | Drafting, safety, escalation | ✅ Closed (`stage-4-closed`) |
-| 5 | Validation, replay, final report | 🚧 In progress |
+| 5 | Validation, replay, final report | 🚧 Built, awaiting human sign-off (closing it closes the project) |
 
 ---
 
@@ -114,17 +114,39 @@ No keys? Use `LLM_PROVIDER=stub`: a built-in fake model plus TF-IDF retrieval. I
 
 ## Run
 
-> `run_pipeline.py` runs everything built so far: load, PII masking, retrieval, classification, drafting and escalation. Use `--until <STAGE>` to stop early. The standalone `validate.py` and the final validation stage are being built in Stage 5 and are not part of a closed stage yet.
+> `run_pipeline.py` runs all 10 stages: load, PII masking, retrieval, classification, drafting, escalation, validation (V01–V14) and finalisation. Use `--until <STAGE>` to stop early.
 
 ```bash
 python run_pipeline.py                      # full run on tickets.json + kb_articles.json
 python run_pipeline.py --provider stub      # offline: fake model + TF-IDF retrieval, no keys
 python run_pipeline.py --retriever tfidf    # keep the real LLM but skip the embeddings API
 python run_pipeline.py --tickets data/eval/tickets.json --kb data/eval/kb_articles.json --out-dir /tmp/out
-python validate.py                          # re-check the artifacts on disk (Stage 5, in progress)
+python validate.py                          # re-check the artifacts on disk (no LLM, no network); writes validation_report.json
 ```
 
-Exit codes: `0` all good · `1` validation failures · `2` fatal error. All flags are in [SPEC §2](SPEC.md).
+Exit codes (both commands): `0` all good (warnings allowed) · `1` at least one failed validation check · `2` fatal error (bad inputs or config, missing key, I/O). All flags are in [SPEC §2](SPEC.md).
+
+### Validate
+
+`validate.py` re-reads every artifact from disk and runs 14 checks (V01–V14, [SPEC §8](SPEC.md)): artifacts exist and parse, schemas match, every ticket is covered, labels are in the taxonomy, citations were retrieved, escalation is consistent, no credential request or refund promise, no PII or `[TYPE_n]` placeholder anywhere. It uses the same code as the pipeline's validation stage, so the two always agree. A missing artifact is a failed check, never a skipped one.
+
+```bash
+python validate.py --tickets data/eval/tickets.json --kb data/eval/kb_articles.json --out-dir /tmp/out
+```
+
+### Replay and caching
+
+Re-running is safe and cheap. Artifacts are **always fully rewritten**; a content-addressed cache in `<out-dir>/.cache/` only skips work whose inputs did not change:
+
+- embeddings are keyed by the hash of the (masked) text and model;
+- retrieval is keyed by KB hash + retrieval settings + the ticket's content hash;
+- LLM answers are keyed by the prompt hash (provider, model, parameters, prompt version and messages).
+
+Change one ticket and only that ticket is recomputed; edit a KB article and every retrieval entry is recomputed. The manifest (`artifacts/run_manifest.json`) reports hits and misses per stage, and `--no-cache` forces a full recompute. `audit/stage-5/replay_report.md` shows a run 1 → 2 → 3 example.
+
+### Where the audit reports live
+
+Each stage's evidence is in `audit/stage-N/` (start with `AUDIT_SUMMARY.md`). The project roll-up, with known limitations, is [`audit/FINAL_REPORT.md`](audit/FINAL_REPORT.md); a worked example of three tickets through every stage is [`audit/stage-5/sample_walkthrough.md`](audit/stage-5/sample_walkthrough.md).
 
 ## Test
 
@@ -144,7 +166,8 @@ Evals run **offline, outside the pipeline**. Two models, `gpt-6.1-sol` and `deep
 python -m evals.retrieval_eval        # Stage 2: retrieval vs gold (needs OPENAI_API_KEY for embeddings)
 python -m evals.classification_eval   # Stage 3: 2 models x 3 repeats (--repeats, --workers, --no-dev)
 python -m evals.drafting_eval         # Stage 4: drafting + cross-judging (--workers)
-# python -m evals.e2e_eval            # Stage 5: not built yet
+python -m evals.e2e_eval run --model gpt-6.1-sol   # Stage 5: the real pipeline end to end, one run per model
+python -m evals.e2e_eval report                    #   score the runs against gold, write the report
 ```
 
 Reports land in `audit/stage-N/` and are committed. Gates and thresholds per stage: [PLAN.md](PLAN.md).

@@ -373,9 +373,9 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 **Goal:** a single command that regenerates and validates everything from a clean checkout with any equivalent inputs, plus final evidence that the whole system meets the brief. **Closing this stage closes the project.**
 
 **Deliverables**
-- `pipeline/validation.py` (V01–V14) + `validate.py` CLI, `run_pipeline.py` (all 10 stages wired, exit codes 0/1/2, CLI flags), `finalise.py` (manifest, console summary), replay cache across stages (R1–R6).
+- `pipeline/validation.py` (V01–V14) + `validate.py` CLI, `run_pipeline.py` (all 10 stages wired, exit codes 0/1/2, CLI flags), `finalise.py` (per-stage cache report, console summary; the manifest itself is written by `runner.py`), replay cache across stages (R1–R6).
 - `README.md`: setup, run, validate, models/providers, replay approach (stretch §8), artifact guide, and where the audit reports live.
-- `evals/e2e_eval.py`: full pipeline on the eval set, with both eval models as the pipeline LLM.
+- `evals/e2e_eval.py`: full pipeline on the eval set, with both eval models as the pipeline LLM. `scripts/audit_stage5.py` regenerates `audit/stage-5/` and `audit/FINAL_REPORT.md`.
 - `audit/FINAL_REPORT.md`: roll-up of all stage gates, final E2E results, known limitations.
 
 **Exit criteria:** every acceptance criterion A1–A5 (SPEC §12.1) and the sample-ticket expectations (SPEC §12.2) are met.
@@ -417,6 +417,16 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 - [ ] No secrets or raw PII in any committed file or artifact (`.env` ignored; V13 passes)
 - [ ] All earlier stages show `Closed`, each with a closure commit and tag (`git tag -l 'stage-*'` lists `stage-0-closed` … `stage-4-closed`)
 - [ ] `FINAL_REPORT.md` known limitations accepted
+
+**AI audit result (recorded by agent, 2026-10-20):** ☑ all hard gates green: 617 offline tests pass (3 skips are the "stage not built yet" guards, which no longer apply), 97.9% line coverage on Stage 5 modules, acceptance criteria A1–A5 verified on real runs (A1 with `glm-5.2` + embeddings, A5 from a clean copy with no `.env` or keys), replay matches `fixtures/replay/expected.json`, an identical rerun is 100% cache hits, a KB edit invalidates all retrieval entries, cold runs are byte-identical, no secrets or raw PII in committable files. End to end on the eval set with each eval model as the pipeline LLM (cold, no cache): `validate.py` pass, escalation vs gold 23/23 for both, sample tickets T-1001/2/3 3/3 for both, no hard metric worse than Stages 3/4, 0 classification and 0 draft fallbacks. Re-run `python -m evals.e2e_eval run --model <m> --cold` (per model), then `report`, then `python scripts/audit_stage5.py`; details in `audit/stage-5/AUDIT_SUMMARY.md` and `audit/FINAL_REPORT.md`.
+
+**Things the reviewer should know:**
+- *The e2e run found a real guard bug, fixed in this stage.* `deepseek-v4.1-flash` wrote a correct reply ("I'm not able to confirm or promise a refund…") that S2 rejected three times because its negation window was 4 words, so T-1001 shipped as the template fallback with no citation and failed its SPEC §12.2 check. S2 now uses a 6-word, clause-aware window and also treats "unable" as a negation. Regression tests were added, and the 92 stored Stage 4 drafts plus all safety fixtures still pass. This edits closed Stage 4 code (`pipeline/guards.py`), as does pinning Stage 4's `test_drafting_stage.py` to its own stage, since a default run now continues through validation.
+- *`audit/stage-4/` was not regenerated*, so its reports still reflect the pre-fix guard; the numbers were rechecked offline (above) rather than rewritten.
+- *`glm-5.2` (dev model, information only)* ended with a template fallback on E-2008 (the ticket where the customer pasted a password) and 5 grounding flags. It is not a gate.
+- *The Stage 4 calibration sheet was scored by an AI agent* (noted at its top), so judge–human agreement was never measured. `FINAL_REPORT.md` limitation 2 says so; judge scores remain advisory.
+- *Leak-scan exemptions are listed* in `AUDIT_SUMMARY.md`: the Stage 1 masking report, the README privacy note and each `pytest.xml` contain synthetic PII on purpose.
+- *Validation warnings:* the `deepseek-v4.1-flash` run has one V12 warning (6 grounding flags). Warnings do not fail a run.
 
 **Project sign-off** — Status: ☐ **PROJECT CLOSED** ☐ Changes requested · Reviewer: ______ · Date: ______ · Notes: ______
 

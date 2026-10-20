@@ -36,7 +36,7 @@ def _pct(num: int, den: int) -> str:
     return f"{100 * num / den:.1f}%" if den else "n/a"
 
 
-def gates(records: list[dict], downgraded: bool = False) -> list[tuple[str, str, str, bool, bool]]:
+def gates(records: list[dict], downgraded: bool = False, with_judge: bool = True) -> list[tuple[str, str, str, bool, bool]]:
     """(name, threshold, value, ok, is_hard) rows for one model and mode."""
     n = len(records)
     checks = [r["checks"] for r in records]
@@ -58,6 +58,8 @@ def gates(records: list[dict], downgraded: bool = False) -> list[tuple[str, str,
         ("Grounding flags per draft", "≤ 0.3", f"{flags / n:.2f}", flags / n <= 0.3, False),
         ("Fallback rate", "≤ 5%", _pct(sum(c["fallback"] for c in checks), n), sum(c["fallback"] for c in checks) / n <= 0.05, False),
     ]
+    if not with_judge:
+        return rows
     if judged and len(judged) == n:
         faith = mean(s["faithfulness"] for s in judged)
         rows.append(("Judge faithfulness, mean (1–5)" + (" — advisory" if downgraded else ""), f"≥ {JUDGE_FAITHFULNESS}", f"{faith:.2f}", faith >= JUDGE_FAITHFULNESS, not downgraded))

@@ -53,6 +53,8 @@ def run(config: Config, until: Stage | None = None) -> RunOutcome:
         if target >= Stage.KB_INDEXED:
             config.require_embedding_credentials()
         pipeline.run(ctx, until=until)
+        if ctx.data.get("validation", {}).get("status") == "fail":
+            exit_code = EXIT_VALIDATION_FAILED
     except FATAL_ERRORS as exc:
         pipeline.machine.fail()
         error = f"{type(exc).__name__}: {exc}"

@@ -135,7 +135,8 @@ flowchart TB
 | `guards.py` | Safety patterns S1–S3 (credential request, refund promise, escalation mention), credential-advice check, PII/placeholder checks | ✅ |
 | `grounding.py` | Grounding guard G1–G3: flags numbers, UI paths and commitments in a draft that its cited KB text doesn't support | ✅ |
 | `language.py` | Stopword language heuristic for en/es/fr/de/pt (V09, drafting eval) | ✅ |
-| `validation.py` | Cross-artifact checks → `validation_report.json` | ✅ |
+| `validation.py` | V01–V14, re-reading every artifact from disk → `validation_report.json`. One implementation for the `OUTPUTS_VALIDATED` stage and `validate.py` | ✅ |
+| `finalise.py` | Per-stage cache report (R5) and the console summary | ✅ |
 | `llm.py` | Provider abstraction (OpenAI, Ollama, stub), per-provider parameter adapter, timeouts, retries, JSON mode | — |
 | `cache.py` | Content-addressed read/write under `.cache/` | ✅ |
 | `llm_log.py` | Appends one JSON line per LLM call to `llm_calls.jsonl` | ✅ |

@@ -58,6 +58,8 @@ def test_s1_does_not_fire_on_advice_or_participles(text):
         "We can't guarantee a refund.",
         "No refund has been issued yet.",
         "Billing will tell you whether a refund applies.",
+        "I'm not able to confirm or promise a refund at this stage.",  # found in a real draft (Stage 5 e2e): negation 5 words back
+        "We are unable to guarantee or promise a refund yet.",
     ],
 )
 def test_s2_negation_and_neutral_wording(text):
@@ -66,7 +68,7 @@ def test_s2_negation_and_neutral_wording(text):
 
 @pytest.mark.parametrize(
     "text",
-    ["We have refunded the charge.", "Wir erstatten Ihnen den Betrag heute.", "Nous vous rembourserons demain.", "Você será reembolsado hoje."],
+    ["No problem, we will refund you today.", "We have refunded the charge.", "Wir erstatten Ihnen den Betrag heute.", "Nous vous rembourserons demain.", "Você será reembolsado hoje."],
 )
 def test_s2_other_languages_and_forms(text):
     assert guards.s2_refund_promise(text)

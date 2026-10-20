@@ -11,6 +11,7 @@ from pipeline.classify import OUTPUT_ARTIFACT as CLASSIFICATION, classify_ticket
 from pipeline.config import Config
 from pipeline.draft import OUTPUT_ARTIFACT as DRAFTS, draft_ticket
 from pipeline.escalate import decide
+from pipeline.finalise import cache_report
 from pipeline.grounding import check_grounding
 from pipeline.io_utils import atomic_write_json, atomic_write_text, canonical_json, sha256_canonical
 from pipeline.llm import ChatProvider, LiteLLMProvider, LLMClient
@@ -29,6 +30,7 @@ from pipeline.retrieval import (
 from pipeline.schemas import RetrievalResult
 from pipeline.taxonomy import ResolutionAction, Urgency
 from pipeline.stub import StubProvider
+from pipeline.validation import validate
 
 NORMALISED_TICKETS = "artifacts/normalised_tickets.json"
 KB_INDEX = "artifacts/kb_index.json"
@@ -38,6 +40,7 @@ RETRIEVAL_DEBUG = "retrieval_debug.json"
 LLM_CALLS = "llm_calls.jsonl"
 GROUNDING_FLAGS = "grounding_flags.json"
 ESCALATIONS = "escalations.json"
+VALIDATION_REPORT = "validation_report.json"
 
 
 def make_embedder(config: Config) -> Embedder:
@@ -199,6 +202,7 @@ def tickets_classified(ctx: RunContext) -> None:
     for ticket in ctx.data["tickets"]:
         evidence = [articles[hit.article_id] for hit in ctx.data["retrieval"][ticket.ticket_id].retrieved_articles]
         classifications.append(classify_ticket(client, ticket, evidence, input_artifacts))
+    ctx.data.setdefault("llm_records", []).extend(client.records)
     ctx.data["classifications"] = {c.ticket_id: c for c in classifications}
     atomic_write_json(ctx.path(CLASSIFICATION), {"classifications": [c.model_dump(mode="json") for c in classifications]})
     overrides: Counter[str] = Counter(o.split(":")[0] for c in classifications for o in c.meta.overrides)
@@ -232,6 +236,7 @@ def responses_drafted(ctx: RunContext) -> None:
                 or classification.meta.fallback
             )
             flags.extend(check_grounding(ticket.ticket_id, draft.draft_response, [articles[c] for c in draft.citations], allowed, ticket.language))
+    ctx.data.setdefault("llm_records", []).extend(client.records)
     ctx.data["drafts"] = {d.ticket_id: d for d in drafts}
     ctx.data["grounding_flags"] = flags
     atomic_write_json(ctx.path(DRAFTS), {"drafts": [d.model_dump(mode="json") for d in drafts]})
@@ -270,6 +275,19 @@ def escalations_decided(ctx: RunContext) -> None:
     ctx.manifest["counts"].update({"escalated": sum(e.escalate for e in escalations), "queues": dict(sorted(queues.items()))})
 
 
+def outputs_validated(ctx: RunContext) -> None:
+    """V01-V14 against what is on disk (SPEC §8). A failed check does not raise: it sets the exit code (runner)."""
+    config = ctx.config
+    report = validate(config.out_dir, config.tickets_path, config.kb_path, config.top_k, config.effective_min_score)
+    ctx.data["validation"] = report
+    ctx.manifest["validation"] = {"status": report["status"], "summary": report["summary"], "failed_checks": [c["id"] for c in report["checks"] if c["status"] == "fail"]}
+
+
+def results_finalised(ctx: RunContext) -> None:
+    """Closing facts for the manifest: per-stage cache hits and misses (R5)."""
+    ctx.manifest["cache"] = cache_report(ctx.manifest.get("counts", {}).get("retrieval_cache"), ctx.data.get("llm_records", []))
+
+
 def build_specs() -> list[StageSpec]:
     return [
         StageSpec(Stage.INIT, init, plan_stage=1),
@@ -280,6 +298,6 @@ def build_specs() -> list[StageSpec]:
         StageSpec(Stage.TICKETS_CLASSIFIED, tickets_classified, requires=(RETRIEVAL_RESULTS,), plan_stage=3),
         StageSpec(Stage.RESPONSES_DRAFTED, responses_drafted, requires=(CLASSIFICATION, RETRIEVAL_RESULTS), plan_stage=4),
         StageSpec(Stage.ESCALATIONS_DECIDED, escalations_decided, requires=(DRAFTS,), plan_stage=4),
-        StageSpec(Stage.OUTPUTS_VALIDATED, None, plan_stage=5),
-        StageSpec(Stage.RESULTS_FINALISED, None, plan_stage=5),
+        StageSpec(Stage.OUTPUTS_VALIDATED, outputs_validated, requires=(ESCALATIONS,), plan_stage=5),
+        StageSpec(Stage.RESULTS_FINALISED, results_finalised, requires=(VALIDATION_REPORT,), plan_stage=5),
     ]

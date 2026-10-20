@@ -1,0 +1,81 @@
+{
+  "articles": [
+    {
+      "article_id": "KB-001",
+      "title": "Duplicate card charges and pending authorizations",
+      "category": "billing",
+      "updated_at": "2026-05-01T09:00:00Z",
+      "content": "Customers may see both a completed charge and a temporary pending authorization. Pending authorizations usually disappear within 3-5 business days. Refunds should not be promised unless two settled charges are confirmed. Escalate to billing ops if two settled charges exist for the same order."
+    },
+    {
+      "article_id": "KB-002",
+      "title": "Login issues after password reset",
+      "category": "account_access",
+      "updated_at": "2026-05-10T09:00:00Z",
+      "content": "Ask the user to verify they are using the most recent password, clear cached sessions, and retry in an incognito window. If the reset succeeded but login still fails, escalate to account support. Never ask the customer to send their password."
+    },
+    {
+      "article_id": "KB-003",
+      "title": "Downloading invoices from the dashboard",
+      "category": "billing",
+      "updated_at": "2026-04-15T09:00:00Z",
+      "content": "Invoice PDFs are available under Billing > Documents. Customers can filter by month and download each invoice as PDF. If invoices are missing, escalate to billing support."
+    },
+    {
+      "article_id": "KB-004",
+      "title": "Refund policy overview",
+      "category": "billing",
+      "updated_at": "2026-03-22T09:00:00Z",
+      "content": "Refunds depend on settlement status, product type, and fraud checks. Agents should not guarantee same-day refunds unless policy explicitly allows it."
+    },
+    {
+      "article_id": "KB-005",
+      "title": "Lost access to two-factor authentication device",
+      "category": "account_access",
+      "updated_at": "2026-05-12T09:00:00Z",
+      "content": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email. Escalate to account support so the customer's identity can be verified. Never ask the customer for one-time codes or recovery codes."
+    },
+    {
+      "article_id": "KB-006",
+      "title": "Mobile app crashes on launch",
+      "category": "technical_problem",
+      "updated_at": "2026-05-15T09:00:00Z",
+      "content": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app. Collect the device model, operating system version and app version. If the app still crashes after reinstalling, escalate to general support with the collected details."
+    },
+    {
+      "article_id": "KB-007",
+      "title": "Exporting reports to CSV",
+      "category": "how_to",
+      "updated_at": "2026-04-20T09:00:00Z",
+      "content": "Reports can be exported under Reports > Export. Choose CSV as the format, select the date range, and click Download. Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+    },
+    {
+      "article_id": "KB-008",
+      "title": "Cancelling a subscription",
+      "category": "billing",
+      "updated_at": "2026-04-28T09:00:00Z",
+      "content": "Subscriptions can be cancelled under Billing > Plan > Cancel subscription. Access continues until the end of the current billing period. Cancelling does not trigger an automatic refund for the current period. Requests to change where a refund is paid must be escalated to billing ops."
+    },
+    {
+      "article_id": "KB-009",
+      "title": "Suspected unauthorized account access",
+      "category": "account_access",
+      "updated_at": "2026-05-18T09:00:00Z",
+      "content": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical. Advise them to reset their password immediately and sign out of all sessions under Settings > Security. Escalate to account support immediately."
+    },
+    {
+      "article_id": "KB-010",
+      "title": "Changing the account email address",
+      "category": "how_to",
+      "updated_at": "2026-04-02T09:00:00Z",
+      "content": "The account email address can be changed under Settings > Profile > Email. A confirmation link is sent to the new address and expires after 24 hours. The change takes effect once the link is confirmed."
+    },
+    {
+      "article_id": "KB-011",
+      "title": "Service status and outages",
+      "category": "technical_problem",
+      "updated_at": "2026-05-19T09:00:00Z",
+      "content": "Check the public status page for known incidents. If an incident is listed, share the status page link and expected updates. If the status page shows no incident but several features are failing, escalate to general support."
+    }
+  ]
+}

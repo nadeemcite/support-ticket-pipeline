@@ -1,0 +1,21 @@
+{
+  "description": "Replay/idempotency expectations. Run 1 uses the root tickets.json (T-1001..T-1003); run 2 swaps in tickets_v2.json. KB is unchanged (root kb_articles.json). Rule IDs refer to SPEC.md section 10.",
+  "run_1": {"tickets": "tickets.json"},
+  "run_2": {
+    "tickets": "data/fixtures/replay/tickets_v2.json",
+    "unchanged": ["T-1001", "T-1003"],
+    "changed": ["T-1002"],
+    "added": ["T-1004"],
+    "expected_cache": {
+      "retrieval": {"hits": ["T-1001", "T-1003"], "misses": ["T-1002", "T-1004"]},
+      "classification": {"hits": ["T-1001", "T-1003"], "misses": ["T-1002", "T-1004"]},
+      "drafting": {"hits": ["T-1001", "T-1003"], "misses": ["T-1002", "T-1004"]}
+    }
+  },
+  "run_3_identical_rerun": {
+    "tickets": "data/fixtures/replay/tickets_v2.json",
+    "expected_cache": "100% hits in every stage",
+    "expected_artifacts": "Byte-identical to run 2 for all per-ticket artifacts, excluding timestamp/run_id fields."
+  },
+  "kb_change": "Editing any KB article must invalidate ALL retrieval cache entries (kb hash is part of the key, rule R1)."
+}

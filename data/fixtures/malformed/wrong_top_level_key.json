@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "ticket_id": "M-001",
+      "customer_tier": "standard",
+      "language": "en",
+      "subject": "Top-level key is 'items' instead of 'tickets'",
+      "message": "Loader must fail with exit code 2 (rule I1).",
+      "created_at": "2026-05-22T10:00:00Z"
+    }
+  ]
+}

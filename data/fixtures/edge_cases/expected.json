@@ -1,0 +1,17 @@
+{
+  "description": "Deterministic expectations for loading + normalising data/fixtures/edge_cases/tickets.json (KB: root kb_articles.json). Rule IDs refer to SPEC.md section 3.3.",
+  "accepted_ticket_ids": ["X-001", "X-002", "X-003", "X-004", "X-005", "X-006", "X-007", "X-008", "X-009"],
+  "duplicates": [{"ticket_id": "X-001", "input_index": 1, "rule": "I4"}],
+  "rejected": [{"input_index": 2, "reason": "missing ticket_id", "rule": "I3"}],
+  "normalised": {
+    "X-002": {"language": "en", "notes_contain": "language defaulted", "rule": "I5"},
+    "X-003": {"language": "en", "notes_contain": "language defaulted", "rule": "I5"},
+    "X-004": {"language": "en"},
+    "X-005": {"language": "en", "customer_tier": "gold", "notes_contain": "unknown customer_tier"},
+    "X-006": {"subject": "Lots of whitespace", "message": "Double spaces, tabs and a control character must be cleaned."},
+    "X-007": {"message_is_nfc": true},
+    "X-008": {"extra": {"channel": "email", "account_id": "ACC-99812", "tags": ["priority", "beta"]}, "rule": "I2"},
+    "X-009": {"insufficient_content": true, "rule": "I6"}
+  },
+  "idempotency": "Normalising an already-normalised ticket must return an identical record (byte-identical JSON)."
+}

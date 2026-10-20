@@ -1,0 +1,17 @@
+{
+  "description": "Deterministic cases for the grounding (hallucination) guard (SPEC.md section 7.5). Each case: a draft sentence, the cited article IDs (content taken from root kb_articles.json), and whether it must be flagged plus the expected check ID.",
+  "kb": "kb_articles.json",
+  "cases": [
+    {"id": "G-01", "sentence": "Pending authorizations usually disappear within 3-5 business days.", "citations": ["KB-001"], "flag": false},
+    {"id": "G-02", "sentence": "The pending charge will disappear within 24 hours.", "citations": ["KB-001"], "flag": true, "check": "G1"},
+    {"id": "G-03", "sentence": "You can find your invoices under Billing > Documents.", "citations": ["KB-003"], "flag": false},
+    {"id": "G-04", "sentence": "You can find your invoices under Account > Invoices.", "citations": ["KB-003"], "flag": true, "check": "G2"},
+    {"id": "G-05", "sentence": "We will refund the extra charge to your card.", "citations": ["KB-001"], "flag": true, "check": "G3"},
+    {"id": "G-06", "sentence": "Our team will review whether two settled charges exist for the same order.", "citations": ["KB-001"], "flag": false},
+    {"id": "G-07", "sentence": "Please retry in an incognito window after clearing cached sessions.", "citations": ["KB-002"], "flag": false},
+    {"id": "G-08", "sentence": "Our account support team will reset your account within 2 hours.", "citations": ["KB-002"], "flag": true, "check": "G1"},
+    {"id": "G-09", "sentence": "Thank you for contacting us.", "citations": [], "flag": false, "note": "Not a concrete claim; ignored."},
+    {"id": "G-10", "sentence": "Invoices can be filtered by month and downloaded as PDF.", "citations": ["KB-003"], "flag": false},
+    {"id": "G-11", "sentence": "Invoices can be downloaded as PDF.", "citations": ["KB-001"], "flag": true, "check": "G3", "note": "Supported by KB-003 but NOT by the cited article; grounding is checked only against cited text."}
+  ]
+}

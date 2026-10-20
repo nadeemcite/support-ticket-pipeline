@@ -1,0 +1,98 @@
+{
+  "description": "Deterministic PII/secret detector cases. All values are synthetic test data: example.com/.org domains (RFC 2606), Ofcom drama-range UK numbers, the standard Visa test PAN, and the published IBAN example. 'expected' lists the types that must be detected; 'masked' is the exact expected output of mask(). An empty expected list means NO detection (false-positive guard).",
+  "placeholder_format": "[<TYPE>_<n>] where n counts per type within one text, starting at 1",
+  "cases": [
+    {
+      "id": "P01",
+      "text": "My email is jane.doe@example.com, please reply there.",
+      "expected": ["email"],
+      "masked": "My email is [EMAIL_1], please reply there."
+    },
+    {
+      "id": "P02",
+      "text": "Call me on +44 20 7946 0958 after 5pm.",
+      "expected": ["phone"],
+      "masked": "Call me on [PHONE_1] after 5pm."
+    },
+    {
+      "id": "P03",
+      "text": "My card is 4111 1111 1111 1111 and it was charged twice.",
+      "expected": ["card_number"],
+      "masked": "My card is [CARD_NUMBER_1] and it was charged twice."
+    },
+    {
+      "id": "P04",
+      "text": "Card 4111-1111-1111-1111 expired.",
+      "expected": ["card_number"],
+      "masked": "Card [CARD_NUMBER_1] expired."
+    },
+    {
+      "id": "P05",
+      "text": "Reference number 1234 5678 9012 3456 from the bank.",
+      "expected": [],
+      "masked": "Reference number 1234 5678 9012 3456 from the bank.",
+      "note": "16 digits but fails the Luhn check, so it is not a card number."
+    },
+    {
+      "id": "P06",
+      "text": "Send it to IBAN GB82 WEST 1234 5698 7654 32 please.",
+      "expected": ["iban"],
+      "masked": "Send it to IBAN [IBAN_1] please."
+    },
+    {
+      "id": "P07",
+      "text": "My password is Summer2026! - can you log in for me?",
+      "expected": ["credential"],
+      "masked": "My password is [CREDENTIAL_1] - can you log in for me?"
+    },
+    {
+      "id": "P08",
+      "text": "the code is 482913, I just got it by SMS",
+      "expected": ["credential"],
+      "masked": "the code is [CREDENTIAL_1], I just got it by SMS",
+      "note": "One-time code disclosure."
+    },
+    {
+      "id": "P09",
+      "text": "I changed my password this morning but login fails.",
+      "expected": [],
+      "masked": "I changed my password this morning but login fails.",
+      "note": "Mentions 'password' without disclosing one; must not be flagged."
+    },
+    {
+      "id": "P10",
+      "text": "Order 88213 was charged on 2026-05-20 for $49.99.",
+      "expected": [],
+      "masked": "Order 88213 was charged on 2026-05-20 for $49.99.",
+      "note": "Order IDs, dates and amounts are NOT PII."
+    },
+    {
+      "id": "P11",
+      "text": "Old: sam.lee@example.org, new: s.lee@example.com",
+      "expected": ["email", "email"],
+      "masked": "Old: [EMAIL_1], new: [EMAIL_2]"
+    },
+    {
+      "id": "P12",
+      "text": "Error 503 since 09:00 UTC on the dashboard.",
+      "expected": [],
+      "masked": "Error 503 since 09:00 UTC on the dashboard.",
+      "note": "Error codes and times are not phone numbers."
+    },
+    {
+      "id": "P13",
+      "text": "Mi correo es ana.garcia@example.com y mi contraseña es Clave#123",
+      "expected": ["email", "credential"],
+      "masked": "Mi correo es [EMAIL_1] y mi contraseña es [CREDENTIAL_1]",
+      "note": "Spanish credential disclosure."
+    },
+    {
+      "id": "P14",
+      "text": "Please never share your password with anyone.",
+      "expected": [],
+      "masked": "Please never share your password with anyone.",
+      "note": "Advice text (as found in KB/drafts) must not be flagged."
+    }
+  ],
+  "restore_roundtrip": "unmask(mask(text)) must equal the original text for every case; mask() must be idempotent: mask(mask(text)) == mask(text)."
+}

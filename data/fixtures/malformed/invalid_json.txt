@@ -1,0 +1,6 @@
+{
+  "tickets": [
+    {
+      "ticket_id": "M-002",
+      "subject": "Truncated file - trailing comma and missing brackets",
+      "message": "Loader must fail with exit code 2 (rule I1).",

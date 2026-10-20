@@ -1,0 +1,93 @@
+{
+  "tickets": [
+    {
+      "ticket_id": "X-001",
+      "customer_tier": "standard",
+      "language": "en",
+      "subject": "Cannot find invoices",
+      "message": "Where are my invoice PDFs?",
+      "created_at": "2026-05-22T09:00:00Z"
+    },
+    {
+      "ticket_id": "X-001",
+      "customer_tier": "standard",
+      "language": "en",
+      "subject": "Duplicate ID - must be dropped",
+      "message": "This record reuses ticket_id X-001 and must be listed as a duplicate in the manifest.",
+      "created_at": "2026-05-22T09:05:00Z"
+    },
+    {
+      "customer_tier": "standard",
+      "language": "en",
+      "subject": "Missing ticket_id - must be rejected",
+      "message": "This record has no ticket_id and must be listed in rejected_tickets.",
+      "created_at": "2026-05-22T09:10:00Z"
+    },
+    {
+      "ticket_id": "X-002",
+      "customer_tier": "standard",
+      "language": "",
+      "subject": "Blank language",
+      "message": "My login fails after the password reset.",
+      "created_at": "2026-05-22T09:15:00Z"
+    },
+    {
+      "ticket_id": "X-003",
+      "customer_tier": "standard",
+      "subject": "Missing language field",
+      "message": "Pending charge on my card.",
+      "created_at": "2026-05-22T09:20:00Z"
+    },
+    {
+      "ticket_id": "X-004",
+      "customer_tier": "standard",
+      "language": "en-GB",
+      "subject": "Regional language tag",
+      "message": "How do I download invoices?",
+      "created_at": "2026-05-22T09:25:00Z"
+    },
+    {
+      "ticket_id": "X-005",
+      "customer_tier": "GOLD",
+      "language": "EN",
+      "subject": "Unknown tier and upper-case language",
+      "message": "Unknown tier must be kept but flagged; language lower-cased.",
+      "created_at": "2026-05-22T09:30:00Z"
+    },
+    {
+      "ticket_id": "X-006",
+      "customer_tier": "standard",
+      "language": "en",
+      "subject": "   Lots   of\twhitespace\n\n  ",
+      "message": "  Double   spaces,\ttabs and\u0007 a control character\u0000 must be cleaned.  ",
+      "created_at": "2026-05-22T09:35:00Z"
+    },
+    {
+      "ticket_id": "X-007",
+      "customer_tier": "standard",
+      "language": "en",
+      "subject": "Unicode normalisation",
+      "message": "Café vs Café must normalise to the same NFC form.",
+      "created_at": "2026-05-22T09:40:00Z"
+    },
+    {
+      "ticket_id": "X-008",
+      "customer_tier": "vip",
+      "language": "en",
+      "subject": "Extra fields are ignored",
+      "message": "This ticket carries unknown fields that must be preserved under extra.",
+      "created_at": "2026-05-22T09:45:00Z",
+      "channel": "email",
+      "account_id": "ACC-99812",
+      "tags": ["priority", "beta"]
+    },
+    {
+      "ticket_id": "X-009",
+      "customer_tier": "standard",
+      "language": "en",
+      "subject": "",
+      "message": "   ",
+      "created_at": "2026-05-22T09:50:00Z"
+    }
+  ]
+}

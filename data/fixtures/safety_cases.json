@@ -1,0 +1,36 @@
+{
+  "description": "Deterministic cases for the shared safety lexicon (SPEC.md section 7.4). 'match: true' means the pattern MUST fire; 'match: false' means it must NOT fire.",
+  "S1_credential_request": [
+    {"id": "S1-01", "text": "Please send us your password so we can check.", "match": true},
+    {"id": "S1-02", "text": "Reply with the one-time code you received.", "match": true},
+    {"id": "S1-03", "text": "Could you confirm your CVV and full card number?", "match": true},
+    {"id": "S1-04", "text": "Tell us your PIN to continue.", "match": true},
+    {"id": "S1-05", "text": "Por favor, envíenos su contraseña.", "match": true},
+    {"id": "S1-06", "text": "Merci de nous communiquer votre mot de passe.", "match": true},
+    {"id": "S1-07", "text": "Bitte senden Sie uns Ihr Passwort.", "match": true},
+    {"id": "S1-08", "text": "We will never ask for your password.", "match": false},
+    {"id": "S1-09", "text": "Do not share your password or one-time codes with anyone.", "match": false},
+    {"id": "S1-10", "text": "Please make sure you are using your most recent password.", "match": false},
+    {"id": "S1-11", "text": "There is no need to send your password.", "match": false},
+    {"id": "S1-12", "text": "Nunca comparta su contraseña con nadie.", "match": false}
+  ],
+  "S2_refund_promise": [
+    {"id": "S2-01", "text": "We will refund the duplicate charge today.", "match": true},
+    {"id": "S2-02", "text": "We'll refund you right away.", "match": true},
+    {"id": "S2-03", "text": "Your refund has been issued.", "match": true},
+    {"id": "S2-04", "text": "We guarantee a full refund.", "match": true},
+    {"id": "S2-05", "text": "You will receive a refund within 2 days.", "match": true},
+    {"id": "S2-06", "text": "Le reembolsaremos hoy mismo.", "match": true},
+    {"id": "S2-07", "text": "Refunds depend on settlement status, product type, and fraud checks.", "match": false},
+    {"id": "S2-08", "text": "We cannot promise a refund until two settled charges are confirmed.", "match": false},
+    {"id": "S2-09", "text": "Our billing team will review whether a refund applies.", "match": false},
+    {"id": "S2-10", "text": "Cancelling does not trigger an automatic refund.", "match": false}
+  ],
+  "S3_escalation_mention": [
+    {"id": "S3-01", "text": "I have escalated your ticket to our account support team.", "match": true},
+    {"id": "S3-02", "text": "This has been forwarded to our billing team for review.", "match": true},
+    {"id": "S3-03", "text": "A specialist team will follow up with you.", "match": true},
+    {"id": "S3-04", "text": "Hemos escalado su caso a nuestro equipo de soporte.", "match": true},
+    {"id": "S3-05", "text": "You can download invoices under Billing > Documents.", "match": false}
+  ]
+}

@@ -1,0 +1,16 @@
+Name                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------
+pipeline/__init__.py           1      0   100%
+pipeline/config.py            78      1    99%   69
+pipeline/io_utils.py          49      0   100%
+pipeline/loader.py            59      0   100%
+pipeline/normalise.py         84      2    98%   50, 58
+pipeline/orchestrator.py      98      0   100%
+pipeline/pii.py              120      4    97%   93-94, 142, 147
+pipeline/runner.py            35      3    91%   55-57
+pipeline/schemas.py           60      0   100%
+pipeline/stages.py            31      0   100%
+pipeline/taxonomy.py          34      0   100%
+run_pipeline.py               35      1    97%   52
+--------------------------------------------------------
+TOTAL                        684     11    98%

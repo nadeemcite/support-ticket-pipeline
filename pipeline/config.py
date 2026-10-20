@@ -17,8 +17,9 @@ RETRIEVERS = ("embedding", "tfidf")
 
 # Minimum similarity per retriever (SPEC §2.2), chosen from the Stage 2 threshold sweep. Cosine
 # scales differ: embedding similarities of unrelated texts sit around 0.1-0.2 (highest no-match
-# ticket 0.21, lowest relevant top-1 0.39); TF-IDF scores of unrelated texts are ~0.
-DEFAULT_MIN_SCORE = {"embedding": 0.25, "tfidf": 0.05}
+# ticket 0.21, lowest relevant top-1 0.39); TF-IDF scores of unrelated texts are ~0, but generic wording ("thank you for the service") can reach 0.1-0.2.
+# The TF-IDF sweep on the eval set is flat up to 0.07 and loses recall@3 from 0.08 (E-2014/KB-011 scores 0.0766).
+DEFAULT_MIN_SCORE = {"embedding": 0.25, "tfidf": 0.07}
 
 DEFAULT_MODELS = {
     "ollama": "glm-5.2",

@@ -58,7 +58,7 @@
 | `RETRIEVER` | `embedding` (`tfidf` when provider is `stub`) | `embedding`: OpenAI embeddings via LiteLLM (needs `OPENAI_API_KEY`, also when the LLM provider is Ollama). `tfidf`: offline |
 | `EMBEDDING_MODEL` | `text-embedding-3-small` | |
 | `RETRIEVAL_TOP_K` | `3` | The brief requires 3 |
-| `RETRIEVAL_MIN_SCORE` | `0.25` (embedding) / `0.05` (tfidf) | Below it → not a useful match. Chosen by the Stage 2 threshold sweep |
+| `RETRIEVAL_MIN_SCORE` | `0.25` (embedding) / `0.07` (tfidf) | Below it → not a useful match. Chosen by the threshold sweep (`python -m evals.retrieval_eval`): TF-IDF metrics are flat up to 0.07 and recall@3 drops from 0.08 (E-2014/KB-011 scores 0.0766), so 0.07 is the highest loss-free value |
 | `MAX_TICKET_CHARS` | `4000` | Message truncation |
 | `MAX_DRAFT_CHARS` | `1500` | |
 | `PII_HASH_SALT` | fixed non-secret string | Salt for the hashes in `pii_summary` (§6.10). Fixed by default so reruns are byte-identical |

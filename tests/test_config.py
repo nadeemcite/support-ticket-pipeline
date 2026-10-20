@@ -18,7 +18,7 @@ def test_defaults(tmp_path):
     assert (config.top_k, config.temperature, config.retriever) == (3, 0.0, "embedding")
     assert config.min_score is None and config.effective_min_score == 0.25
     stub = load_config({"provider": "stub"}, env={}, dotenv_path=None)
-    assert (stub.retriever, stub.effective_min_score) == ("tfidf", 0.05)
+    assert (stub.retriever, stub.effective_min_score) == ("tfidf", 0.07)
 
 
 def test_precedence_cli_over_env_over_dotenv(tmp_path):
@@ -61,7 +61,7 @@ def test_invalid_config_raises(cli, env):
 
 def test_no_keys_falls_back_to_stub_with_a_note():
     config = load_config({}, env={}, dotenv_path=None)
-    assert (config.provider, config.retriever, config.effective_min_score) == ("stub", "tfidf", 0.05)
+    assert (config.provider, config.retriever, config.effective_min_score) == ("stub", "tfidf", 0.07)
     assert len(config.notes) == 1 and "no LLM API key" in config.notes[0] and "stub" in config.notes[0]
     assert "notes" not in config.public_dict()
     assert load_config({}, env=KEYS, dotenv_path=None).notes == ()

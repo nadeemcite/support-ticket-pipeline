@@ -130,6 +130,17 @@ python validate.py                          # re-check the artifacts on disk (no
 
 Exit codes (both commands): `0` all good (warnings allowed) · `1` at least one failed validation check · `2` fatal error (bad inputs or config, missing key, I/O). All flags are in [SPEC §2](SPEC.md).
 
+### CI and Docker
+
+`.github/workflows/ci.yml` runs the offline test suite, a stub pipeline run and `validate.py` on every push and pull request (no secrets needed). The `Dockerfile` does the same stub run + validation by default and takes real keys only at run time:
+
+```bash
+docker build -t support-ticket-pipeline .
+docker run --rm support-ticket-pipeline                                   # stub run + validate
+docker run --rm --env-file .env -v "$PWD/out:/app/out" support-ticket-pipeline \
+  sh -c "python run_pipeline.py --out-dir out && python validate.py --out-dir out"   # real model
+```
+
 ### Validate
 
 `validate.py` re-reads every artifact from disk and runs 14 checks (V01–V14, [SPEC §8](SPEC.md)): artifacts exist and parse, schemas match, every ticket is covered, labels are in the taxonomy, citations were retrieved, escalation is consistent, no credential request or refund promise, no PII or `[TYPE_n]` placeholder anywhere. It uses the same code as the pipeline's validation stage, so the two always agree. A missing artifact is a failed check, never a skipped one.

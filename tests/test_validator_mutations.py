@@ -199,3 +199,41 @@ def test_report_is_written_and_marks_status(clean_run, tmp_path):
     report = validate(clean_run.out_dir, clean_run.tickets_path, clean_run.kb_path, 3, clean_run.effective_min_score, write=True)
     on_disk = json.loads((clean_run.out_dir / "validation_report.json").read_text())
     assert on_disk["status"] == report["status"] == "pass" and set(on_disk) == {"generated_at", "status", "summary", "checks"}
+
+
+S1_PHRASES = [
+    "What is your password?",
+    "Please let us know your password.",
+    "Please share your login credentials.",
+    "Could you share your login details with us?",
+]
+S2_PHRASES = [
+    "Don't worry, you will get your money back.",
+    "We will send you your money back.",
+    "We have issued the refund.",
+    "We've processed your refund today.",
+    "The refund was reversed this morning.",
+    "Your refund has been issued.",
+]
+
+
+@pytest.mark.parametrize("phrase", S1_PHRASES)
+def test_v10_catches_credential_phrasing(work, phrase):
+    checks, report = check(work, lambda out: edit(out, "draft_responses.json", "drafts", lambda items: items[0].update(draft_response=phrase)))
+    assert "V10" in failing(checks) and report["status"] == "fail"
+
+
+@pytest.mark.parametrize("phrase", S2_PHRASES)
+def test_v10_catches_refund_promise_phrasing(work, phrase):
+    def promise(out):
+        edit(out, "ticket_classification.json", "classifications", lambda items: items[0].update(requires_refund_caution=True))
+        edit(out, "draft_responses.json", "drafts", lambda items: items[0].update(draft_response=phrase))
+
+    checks, report = check(work, promise)
+    assert "V10" in failing(checks) and report["status"] == "fail"
+
+
+@pytest.mark.parametrize("phrase", ["We will never ask for your password.", "Never share your login credentials with anyone."])
+def test_v10_allows_credential_advice(work, phrase):
+    checks, _ = check(work, lambda out: edit(out, "draft_responses.json", "drafts", lambda items: items[0].update(draft_response=phrase)))
+    assert "V10" not in failing(checks)

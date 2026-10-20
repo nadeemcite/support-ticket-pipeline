@@ -17,7 +17,7 @@ NEGATIONS = frozenset(
 )
 
 _SECRET_NOUN = (
-    r"(?:password|passcode|pin|otp|one[- ]time (?:code|password|passcode)s?|2fa(?: code)?s?|verification codes?|"
+    r"(?:password|passcode|pin|otp|(?:(?:log[- ]?in|sign[- ]?in|account|access) (?:credentials?|details|info(?:rmation)?))|credentials?|one[- ]time (?:code|password|passcode)s?|2fa(?: code)?s?|verification codes?|"
     r"security codes?|recovery codes?|cvv|cvc|(?:full )?card number|"
     r"contrase[ñn]a|clave|c[oó]digo(?: de verificaci[oó]n| de seguridad)?|n[uú]mero de tarjeta|"
     r"mot de passe|code de v[eé]rification|code secret|num[eé]ro de carte|"
@@ -25,7 +25,8 @@ _SECRET_NOUN = (
     r"senha|c[oó]digo de verifica[cç][aã]o|n[uú]mero do cart[aã]o)"
 )
 _REQUEST_VERB = (
-    r"(?:send|share|provide|give|tell|confirm|enter|type|submit|reply with|ask(?:ing)? (?:you )?for|"
+    r"(?:send|share|provide|give|tell|confirm|enter|type|submit|reply with|ask(?:ing)? (?:you )?for|let us know|"
+    r"what(?:'s|\s+is|\s+are)|"
     r"env[ií](?:e|en|a|ar|enos|enme)|comparta|compartan|compartir|proporcione|proporcionen|proporciona|"
     r"indique|indiquen|facilite|faciliten|mande|manden|"
     r"communiquer|communiquez|envoyer|envoyez|partager|partagez|fournir|fournissez|donner|donnez|indiquer|indiquez|"
@@ -45,9 +46,13 @@ _ADVICE_VERB_RE = re.compile(
 )
 
 _REFUND = r"(?:refund\w*|reembols\w*|rembours\w*|r[uü]ckerstatt\w*|erstatt\w*)"
+_ISSUE_VERB = r"(?:issued|processed|reversed|approved|credited|sent|completed)"
+_DONE_VERB = r"(?:issued|processed|reversed|approved|credited)"  # active voice: "we have issued the refund"
 _S2_PATTERNS = [
     re.compile(rf"\b(?:we will|we'll|we are going to|you will|you'll|we shall)\s+(?:\w+\s+){{0,4}}?{_REFUND}\b", re.IGNORECASE),
-    re.compile(rf"\b{_REFUND}\s+(?:has been|have been|is being|are being|will be|is going to be)\s+(?:issued|processed|approved|sent|completed|credited)\b", re.IGNORECASE),
+    re.compile(rf"\b{_REFUND}\s+(?:has been|have been|was|were|is being|are being|will be|is going to be)\s+{_ISSUE_VERB}\b", re.IGNORECASE),
+    re.compile(rf"\b{_DONE_VERB}\s+(?:\w+\s+){{0,3}}?{_REFUND}\b", re.IGNORECASE),
+    re.compile(r"\b(?:your |the )?money(?: is| will be)? back\b|\b(?:send|give|return|credit|pay|get|receive)\w*\s+(?:you |me )?(?:your |the )?money\b", re.IGNORECASE),
     re.compile(r"\b(?:has|have|had) been refunded\b|\bwe(?:'ve| have) refunded\b", re.IGNORECASE),
     re.compile(rf"\b(?:guarantee|promise)\w*\s+(?:\w+\s+){{0,3}}?{_REFUND}\b", re.IGNORECASE),
     re.compile(rf"\b{_REFUND}\b(?:\W+\w+){{0,6}}?\W+(?:today|immediately|right away|within \d+|hoy mismo|aujourd'hui|heute|hoje)\b", re.IGNORECASE),
@@ -123,7 +128,7 @@ def has_credential_advice(text: str) -> bool:
 
 
 _CLAUSE_BREAK_RE = re.compile(r"[,;:\u2014]")
-S2_NEGATION_WINDOW = 6
+S2_NEGATION_WINDOW = 8
 
 
 def _clause_prefix(prefix: str) -> str:
@@ -132,7 +137,7 @@ def _clause_prefix(prefix: str) -> str:
 
 
 def s2_refund_promise(text: str) -> bool:
-    """S2: promises or announces a refund. A negation within 6 words before the trigger, in the same clause, or inside
+    """S2: promises or announces a refund. A negation within 8 words before the trigger, in the same clause, or inside
     the match cancels it ("we cannot promise a refund", "I'm not able to confirm or promise a refund")."""
     for sentence in sentences(text):
         for pattern in _S2_PATTERNS:

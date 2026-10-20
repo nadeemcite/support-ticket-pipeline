@@ -23,3 +23,14 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Pipeline caches / raw eval outputs (PLAN Stage 1)
+.cache/
+audit/**/evals/raw/
+.coverage
+coverage.xml
+
+# Pipeline runtime
+.cache/
+artifacts/
+audit/**/evals/raw/

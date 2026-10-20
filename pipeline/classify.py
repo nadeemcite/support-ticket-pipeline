@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from pydantic import ValidationError
 
-from pipeline.llm import CallResult, LLMClient, parse_json_object
+from pipeline.llm import CallResult, LLMClient, echo_for_retry, parse_json_object
 from pipeline.prompts import CLASSIFY_VERSION, classification_json_schema, classify_messages, retry_feedback
 from pipeline.schemas import Classification, ClassificationMeta, ClassificationOutput, KBArticle, NormalisedTicket
 from pipeline.taxonomy import IssueType, LLMStage, PIIType, ResolutionAction, Urgency
@@ -108,7 +108,7 @@ def classify_ticket(
             output = outcome.output
             break
         if outcome.status != "transport_error":  # a transport failure retries the same prompt
-            messages = [*messages, {"role": "assistant", "content": result.text[:2000]}, {"role": "user", "content": retry_feedback(outcome.errors)}]
+            messages = [*messages, {"role": "assistant", "content": echo_for_retry(result.text)}, {"role": "user", "content": retry_feedback(outcome.errors)}]
 
     fallback = output is None
     values, overrides = apply_overrides(output or fallback_output(ticket), ticket, evidence)

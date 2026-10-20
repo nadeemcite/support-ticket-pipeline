@@ -415,9 +415,15 @@ Every applied override is appended to `meta.overrides` (e.g. `"C3: no evidence, 
 | D11 | No raw PII and no `[TYPE_n]` placeholders in the draft (P-OUT). The prompt tells the model to refer generically ("the email address you provided") | block + retry; V13, V14 |
 | DF | After 3 failed attempts → template fallback in the ticket language (en if no template exists): acknowledgement + (escalation sentence if required) + (password advice if C5) + "a support specialist will follow up". Templates pass S1/S2/V13/V14. `citations = []`, `meta.fallback = true` | `draft.py` |
 
+Drafting notes:
+
+- A retry prompt echoes the rejected output so the model can fix it. Output that contains PII is replaced by a placeholder sentence (`llm.echo_for_retry`), because otherwise the P-LLM guard would abort the whole run on a model that emitted an email address. The same applies to classification retries.
+- `meta.violations_resolved` lists the rule codes (`D3`…`D11`, `ID`, `JSON`, `SCHEMA`) raised by earlier attempts. For a fallback draft they were *not* resolved; the field then records why the model output was rejected.
+- `meta.language` is the language the text is actually written in: the ticket language for model drafts, the template language for fallbacks (`en` when no template exists). V09 compares it with the ticket language using `pipeline/language.py` (stopword heuristic for en/es/fr/de/pt).
+
 ### 7.3 Escalation (`E*` decide, `Q*` route)
 
-A pure function `decide(classification, retrieval, kb) → Escalation`. Rules are evaluated in order; the first match decides `escalate`.
+A pure function `decide(classification, evidence) → Escalation` (`evidence` = the retrieved articles in rank order). E1–E3 are all evaluated and every one that matches is listed in `meta.rules_fired` and `reason`; any match decides `escalate = true`. E4/E5 apply only when none of E1–E3 matched.
 
 | ID | Condition | Result |
 |---|---|---|
@@ -451,17 +457,23 @@ Invariants:
 
 The lexicon covers en and has es/fr/de/pt equivalents for S1/S2. Other languages are covered by the LLM instruction plus the en patterns (many credential terms are loan-words).
 
+Matching details (implemented in `pipeline/guards.py`, covered by `fixtures/safety_cases.json` and extra edge cases in `tests/test_safety_patterns.py`):
+
+- **S1** pairs a *request verb* with a *secret noun* in one sentence (gap ≤ 80 characters). The verb list is `send, share, provide, give, tell, confirm, enter, type, submit, reply with, ask for` plus imperative/infinitive forms in es/fr/de/pt (past participles such as `partagés` are deliberately excluded). A pair is **negated** when one of the 3 words before the verb (2 between verb and noun) is a negation (`never, not, no, nunca, jamais, niemals, nicht, …`), or, for verb-final languages, `niemals/nie/nicht/jamais/nunca` follows the noun within 4 words ("Geben Sie Ihr Passwort niemals weiter"). Negation elsewhere in the sentence does not cancel a request ("we won't be able to help unless you send your password" still fires).
+- **S2** cancels a match only when a negation is within the 4 words before the trigger or inside the matched span ("we cannot promise a refund", "we will not refund"). It also covers `has been refunded` and the es/fr/de/pt phrasings.
+- **D10 advice** is the S1 pair *with* a negation ("We will never ask for your password", "Nunca comparta su contraseña").
+
 ### 7.5 Grounding guard (`G*`)
 
 For each accepted, non-fallback draft, split it into sentences and classify each one:
 
 | ID | Claim type | Detection | Supported iff |
 |---|---|---|---|
-| G1 | Number / duration / amount | `\d+`, `\d+-\d+`, number words + `(minutes\|hours\|days\|business days\|weeks)` | the same number/range appears in a cited article's content |
+| G1 | Number / duration / amount | a number or range (`\d+`, `\d+-\d+`, `3 to 5`, number words) **followed by a unit** (`minutes\|hours\|days\|business days\|weeks\|months\|rows\|%`…). Bare numbers (order IDs, amounts the customer wrote) are not claims | the same number/range appears in a cited article **with a unit of the same kind** ("two settled charges" does not support "two business days"). A single number also matches an end of a cited range ("5 business days" vs "3-5 business days") |
 | G2 | UI path / location | `X > Y`, `under <Capitalised> …`, `Settings/…` | the path text appears in a cited article's content (case-insensitive) |
-| G3 | Commitment / action | `we will\|we'll\|our team will\|you will receive\|can be\|is available\|has been (done\|processed)` | content-word overlap with the best-matching cited sentence ≥ 0.5 **or** an escalation statement allowed by E1–E3. A cited sentence containing a negation (`not\|never\|should not be promised\|cannot`) **never** counts as support |
+| G3 | Commitment / action | `we will\|we'll\|our team will\|you will receive\|can be\|is available\|has been (done\|processed)` | content-word overlap with the best-matching cited sentence ≥ 0.5 **or** an escalation statement that E1–E3 allow **or** that a cited article itself prescribes (it contains an `escalate to …` clause). A cited sentence containing a negation (`not\|never\|cannot\|n't`) **never** counts as support (OD-4). Statements about the *support process* (`review, investigate, look into, follow up, contact you, get back to you`) are not product claims and are not checked |
 
-Unsupported claims are written to `grounding_flags.json`. They never block the draft and are surfaced as V12 warnings.
+Unsupported claims are written to `grounding_flags.json`. They never block the draft and are surfaced as V12 warnings. G2 matches `X > Y` paths and `under <Capitalised>` (an `under X` that is the head of a matched path is not counted twice). Only the text of the articles the draft **cites** counts as support (fixture G-11).
 
 ### 7.6 PII rules (`P*`), implemented in `pipeline/pii.py`
 

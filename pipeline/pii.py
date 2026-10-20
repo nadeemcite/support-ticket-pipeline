@@ -53,6 +53,13 @@ _NON_SECRET_QUALIFIERS = {
     "error", "status", "order", "promo", "promotion", "discount", "tracking", "reference",
     "zip", "postal", "post", "country", "area", "product", "coupon", "voucher", "invoice",
 }
+# "<keyword> is <word>" is prose, not a pasted secret, when the word is an ordinary adjective or participle
+# ("your password is disclosed / wrong / expired"). Seen in model drafts during Stage 4.
+_NON_SECRET_VALUES = frozenset(
+    """correct incorrect wrong invalid valid expired exposed disclosed compromised visible shared safe secure strong weak
+    required changed reset locked blocked disabled missing lost forgotten unchanged not still already now being the a an
+    my your no ok fine working too case-sensitive""".split()
+)
 _TRAILING_PUNCTUATION = ".,;:)\"'»]"
 
 
@@ -142,7 +149,7 @@ def _detect_credentials(text: str) -> list[Detection]:
     for match in _CREDENTIAL_RE.finditer(text):
         keyword = match.group("kw").lower()
         value = match.group("val").rstrip(_TRAILING_PUNCTUATION)
-        if not value or PLACEHOLDER_RE.fullmatch(value):
+        if not value or PLACEHOLDER_RE.fullmatch(value) or value.lower() in _NON_SECRET_VALUES:
             continue
         if keyword in _GENERIC_CODE_KEYWORDS:
             if _preceding_word(text, match.start("kw")) in _NON_SECRET_QUALIFIERS:

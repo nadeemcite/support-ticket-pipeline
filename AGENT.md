@@ -22,7 +22,8 @@ pytest -m "not live"           # skip real-model tests
 python run_pipeline.py --provider stub    # offline run (TF-IDF retrieval); runs the stages built so far (--until <STAGE>, --out-dir <dir>)
 python run_pipeline.py                    # real run: embeddings need OPENAI_API_KEY in .env
 python validate.py                        # validate artifacts on disk (Stage 5+)
-python -m evals.<name>                    # offline evals (need keys), Stages 2-5
+python -m evals.<name>                    # offline evals (need keys), Stages 2-5 (e.g. drafting_eval, report_drafting)
+python -m evals.calibration build|score   # Stage 4 blind judge-calibration sheet (the human fills it in)
 ```
 
 Commands marked with a stage don't exist until that stage is built. Check before assuming.

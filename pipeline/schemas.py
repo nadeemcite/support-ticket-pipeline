@@ -127,6 +127,30 @@ class DraftResponse(BaseModel):
     meta: DraftMeta
 
 
+class DraftOutput(BaseModel):
+    """What the model must return when drafting (SPEC §6.4 fields, no ``meta``)."""
+
+    model_config = STRICT
+
+    ticket_id: str
+    draft_response: str
+    citations: list[str] = Field(default_factory=list)
+
+
+class GroundingFlag(BaseModel):
+    """One unsupported claim in a draft (SPEC §6.6). Flags never block a draft."""
+
+    model_config = STRICT
+
+    ticket_id: str
+    check: str
+    claim_type: str
+    sentence: str
+    unsupported_tokens: list[str]
+    cited_articles_checked: list[str]
+    overlap: float = Field(ge=0.0, le=1.0)
+
+
 class EscalationMeta(BaseModel):
     model_config = STRICT
 

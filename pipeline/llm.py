@@ -201,6 +201,14 @@ class LLMClient:
                 handle.write(canonical_json(record) + "\n")
 
 
+WITHHELD = "[previous output withheld: it contained personal data]"
+
+
+def echo_for_retry(text: str) -> str:
+    """Model output fed back in a retry prompt. Output containing PII is withheld so a retry can't trip P-LLM."""
+    return WITHHELD if pii.contains_pii(text) else text[:2000]
+
+
 def parse_json_object(text: str) -> dict[str, Any]:
     data = json.loads(strip_fences(text))
     if not isinstance(data, dict):

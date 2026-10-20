@@ -24,7 +24,7 @@ def _log(config):
 
 def test_stub_run_on_eval_set(make_config):
     config = make_config(tickets=EVAL / "tickets.json", kb=EVAL / "kb_articles.json")
-    outcome = run(config)
+    outcome = run(config, until=Stage.TICKETS_CLASSIFIED)
     assert outcome.exit_code == 0 and outcome.manifest["final_stage"] == "TICKETS_CLASSIFIED"
     records = _classifications(config)
     expected_ids = [t["ticket_id"] for t in json.loads((EVAL / "tickets.json").read_text())["tickets"]]
@@ -62,9 +62,9 @@ def test_scripted_provider_sees_masked_text_only(make_config, scripted_llm):
 def test_rerun_uses_llm_cache(make_config, scripted_llm):
     provider = scripted_llm(respond=lambda messages: valid_reply(ticket_id_from(messages)))
     config = make_config()
-    run(config)
+    run(config, until=Stage.TICKETS_CLASSIFIED)
     first_calls = len(provider.calls)
-    outcome = run(config)
+    outcome = run(config, until=Stage.TICKETS_CLASSIFIED)
     assert len(provider.calls) == first_calls == 3
     assert outcome.manifest["counts"]["llm_cache_hits"] == 3
     assert all(r["cached"] for r in _log(config))
@@ -72,7 +72,7 @@ def test_rerun_uses_llm_cache(make_config, scripted_llm):
 
 def test_fallbacks_counted_and_run_still_succeeds(make_config, scripted_llm):
     scripted_llm(respond=lambda messages: "not json")
-    outcome = run(make_config())
+    outcome = run(make_config(), until=Stage.TICKETS_CLASSIFIED)
     assert outcome.exit_code == 0
     assert outcome.manifest["counts"]["classification_fallbacks"] == 3
     assert outcome.manifest["counts"]["llm_calls"] == 9  # 3 tickets x 3 attempts

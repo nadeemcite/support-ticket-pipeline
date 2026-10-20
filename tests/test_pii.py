@@ -104,3 +104,11 @@ def test_hash_is_salted_sha256_of_salt_plus_value():
     assert first == pii.pii_hash("salt", "a@example.com")
     assert first != pii.pii_hash("other", "a@example.com")
     assert "example" not in first
+
+
+def test_prose_after_a_credential_keyword_is_not_a_secret():
+    from pipeline import pii
+
+    for text in ("Because your password is disclosed in this message, change it.", "my password is wrong", "the PIN was expired"):
+        assert not pii.contains_pii(text), text
+    assert pii.contains_pii("my password is hunter2")

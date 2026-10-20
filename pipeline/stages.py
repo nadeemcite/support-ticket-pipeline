@@ -9,6 +9,9 @@ from collections import Counter
 from pipeline.cache import JsonCache
 from pipeline.classify import OUTPUT_ARTIFACT as CLASSIFICATION, classify_ticket
 from pipeline.config import Config
+from pipeline.draft import OUTPUT_ARTIFACT as DRAFTS, draft_ticket
+from pipeline.escalate import decide
+from pipeline.grounding import check_grounding
 from pipeline.io_utils import atomic_write_json, atomic_write_text, canonical_json, sha256_canonical
 from pipeline.llm import ChatProvider, LiteLLMProvider, LLMClient
 from pipeline.loader import load_inputs
@@ -24,6 +27,7 @@ from pipeline.retrieval import (
     retrieve,
 )
 from pipeline.schemas import RetrievalResult
+from pipeline.taxonomy import ResolutionAction, Urgency
 from pipeline.stub import StubProvider
 
 NORMALISED_TICKETS = "artifacts/normalised_tickets.json"
@@ -32,6 +36,8 @@ EMBEDDING_CALLS = "artifacts/embedding_calls.jsonl"
 RETRIEVAL_RESULTS = "retrieval_results.json"
 RETRIEVAL_DEBUG = "retrieval_debug.json"
 LLM_CALLS = "llm_calls.jsonl"
+GROUNDING_FLAGS = "grounding_flags.json"
+ESCALATIONS = "escalations.json"
 
 
 def make_embedder(config: Config) -> Embedder:
@@ -208,6 +214,62 @@ def tickets_classified(ctx: RunContext) -> None:
     ctx.manifest["llm"] = {"provider": client.provider.name, "model": client.provider.model}
 
 
+def responses_drafted(ctx: RunContext) -> None:
+    """One checked draft per ticket (SPEC §7.2), then grounding flags (SPEC §7.5)."""
+    client = make_llm_client(ctx)
+    articles = {a.article_id: a for a in ctx.data["articles"]}
+    input_artifacts = [NORMALISED_TICKETS, RETRIEVAL_RESULTS, CLASSIFICATION, str(ctx.config.kb_path)]
+    drafts, flags = [], []
+    for ticket in ctx.data["tickets"]:
+        classification = ctx.data["classifications"][ticket.ticket_id]
+        evidence = [articles[hit.article_id] for hit in ctx.data["retrieval"][ticket.ticket_id].retrieved_articles]
+        draft = draft_ticket(client, ticket, classification, evidence, input_artifacts, ctx.config.max_draft_chars)
+        drafts.append(draft)
+        if not draft.meta.fallback:
+            allowed = (
+                classification.resolution_action == ResolutionAction.NEEDS_HUMAN_ESCALATION
+                or classification.urgency == Urgency.CRITICAL
+                or classification.meta.fallback
+            )
+            flags.extend(check_grounding(ticket.ticket_id, draft.draft_response, [articles[c] for c in draft.citations], allowed, ticket.language))
+    ctx.data["drafts"] = {d.ticket_id: d for d in drafts}
+    ctx.data["grounding_flags"] = flags
+    atomic_write_json(ctx.path(DRAFTS), {"drafts": [d.model_dump(mode="json") for d in drafts]})
+    atomic_write_json(
+        ctx.path(GROUNDING_FLAGS),
+        {
+            "flags": [f.model_dump(mode="json") for f in flags],
+            "summary": {
+                "tickets_checked": sum(not d.meta.fallback for d in drafts),
+                "tickets_flagged": len({f.ticket_id for f in flags}),
+                "total_flags": len(flags),
+            },
+        },
+    )
+    ctx.manifest["counts"].update(
+        {
+            "draft_fallbacks": sum(d.meta.fallback for d in drafts),
+            "draft_retries": sum(d.meta.attempts - 1 for d in drafts if not d.meta.fallback),
+            "grounding_flags": len(flags),
+            "llm_calls": ctx.manifest["counts"].get("llm_calls", 0) + len(client.records),
+            "llm_cache_hits": ctx.manifest["counts"].get("llm_cache_hits", 0) + sum(r["cached"] for r in client.records),
+        }
+    )
+
+
+def escalations_decided(ctx: RunContext) -> None:
+    """Rule-based escalation and routing (SPEC §7.3). No LLM, so the same classifications always give the same file."""
+    articles = {a.article_id: a for a in ctx.data["articles"]}
+    escalations = []
+    for ticket in ctx.data["tickets"]:
+        evidence = [articles[hit.article_id] for hit in ctx.data["retrieval"][ticket.ticket_id].retrieved_articles]
+        escalations.append(decide(ctx.data["classifications"][ticket.ticket_id], evidence))
+    ctx.data["escalations"] = {e.ticket_id: e for e in escalations}
+    atomic_write_json(ctx.path(ESCALATIONS), {"escalations": [e.model_dump(mode="json") for e in escalations]})
+    queues: Counter[str] = Counter(e.target_queue.value for e in escalations)
+    ctx.manifest["counts"].update({"escalated": sum(e.escalate for e in escalations), "queues": dict(sorted(queues.items()))})
+
+
 def build_specs() -> list[StageSpec]:
     return [
         StageSpec(Stage.INIT, init, plan_stage=1),
@@ -216,8 +278,8 @@ def build_specs() -> list[StageSpec]:
         StageSpec(Stage.TICKETS_NORMALISED, tickets_normalised, plan_stage=1),
         StageSpec(Stage.EVIDENCE_RETRIEVED, evidence_retrieved, requires=(NORMALISED_TICKETS, KB_INDEX), plan_stage=2),
         StageSpec(Stage.TICKETS_CLASSIFIED, tickets_classified, requires=(RETRIEVAL_RESULTS,), plan_stage=3),
-        StageSpec(Stage.RESPONSES_DRAFTED, None, plan_stage=4),
-        StageSpec(Stage.ESCALATIONS_DECIDED, None, plan_stage=4),
+        StageSpec(Stage.RESPONSES_DRAFTED, responses_drafted, requires=(CLASSIFICATION, RETRIEVAL_RESULTS), plan_stage=4),
+        StageSpec(Stage.ESCALATIONS_DECIDED, escalations_decided, requires=(DRAFTS,), plan_stage=4),
         StageSpec(Stage.OUTPUTS_VALIDATED, None, plan_stage=5),
         StageSpec(Stage.RESULTS_FINALISED, None, plan_stage=5),
     ]

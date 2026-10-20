@@ -160,3 +160,46 @@ def scripted_llm(monkeypatch):
         return provider
 
     return install
+
+
+def draft_reply(ticket_id: str, text: str = "Thanks for reaching out. A support specialist will follow up.", citations=None) -> str:
+    import json
+
+    return json.dumps({"ticket_id": ticket_id, "draft_response": text, "citations": citations or []})
+
+
+def is_draft_prompt(messages) -> bool:
+    return "<classification>" in next(m["content"] for m in messages if m["role"] == "user")
+
+
+def first_evidence_id(messages) -> str | None:
+    import re
+
+    user = next(m["content"] for m in messages if m["role"] == "user")
+    found = re.findall(r"^\[(KB-[^\]]+)\]", user, re.MULTILINE)
+    return found[0] if found else None
+
+
+GOOD_TEXT = "Thanks for reaching out. We have escalated this to our specialist team. Never share your password or codes with anyone."
+
+
+def good_draft(messages, ticket_id: str) -> str:
+    """A reply that satisfies every hard drafting rule for any classification."""
+    evidence = first_evidence_id(messages)
+    return draft_reply(ticket_id, GOOD_TEXT, [evidence] if evidence else [])
+
+
+def route(classify=None, draft=None):
+    """Responder for ScriptedProvider: classification prompts and drafting prompts get different replies."""
+
+    def respond(messages):
+        ticket_id = ticket_id_from(messages)
+        if is_draft_prompt(messages):
+            return (draft or good_draft)(messages, ticket_id)
+        return classify(messages, ticket_id) if classify else valid_reply(ticket_id)
+
+    return respond
+
+
+def eval_gold() -> dict[str, dict]:
+    return {g["ticket_id"]: g for g in load(EVAL / "gold.json")["expectations"]}

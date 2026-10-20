@@ -132,7 +132,9 @@ flowchart TB
 | `classify.py` | Builds the prompt, calls the LLM, validates and retries, falls back | ❌ (LLM) |
 | `draft.py` | Builds the grounded prompt, calls the LLM, runs safety/citation checks, retries, falls back | ❌ (LLM) |
 | `escalate.py` | Rules engine: classification + KB evidence → escalate/queue/reason | ✅ |
-| `guards.py` | Unsafe-phrase detector, refund-promise detector, grounding (hallucination) guard | ✅ |
+| `guards.py` | Safety patterns S1–S3 (credential request, refund promise, escalation mention), credential-advice check, PII/placeholder checks | ✅ |
+| `grounding.py` | Grounding guard G1–G3: flags numbers, UI paths and commitments in a draft that its cited KB text doesn't support | ✅ |
+| `language.py` | Stopword language heuristic for en/es/fr/de/pt (V09, drafting eval) | ✅ |
 | `validation.py` | Cross-artifact checks → `validation_report.json` | ✅ |
 | `llm.py` | Provider abstraction (OpenAI, Ollama, stub), per-provider parameter adapter, timeouts, retries, JSON mode | — |
 | `cache.py` | Content-addressed read/write under `.cache/` | ✅ |
@@ -413,13 +415,13 @@ flowchart TD
 - **Output:** `{"draft_response": str, "citations": [article_id]}`.
 - **Post-checks, run by `guards.py` after each attempt:**
   1. `citations ⊆ retrieved_ids`. Invalid IDs are a violation (they're not silently dropped).
-  2. Safety filter: regex patterns for credential requests in multiple languages (§6.7).
+  2. Safety filter: regex patterns for credential requests in multiple languages (SPEC §7.4).
   3. Refund-promise detector, when `requires_refund_caution` is set.
   4. Escalation mention present when required.
   5. Non-empty, length ≤ `MAX_DRAFT_CHARS`.
   6. No raw PII and no `[TYPE_n]` placeholders (V13/V14 logic from `pii.py`).
   7. When a credential disclosure was detected (C5), the "never share your password" advice is present.
-- If a check fails, the drafter re-prompts with the violations (up to 2 retries). After that it uses a **deterministic fallback template** in the ticket language (en default) that acknowledges the issue, states escalation, and cites nothing beyond what was retrieved. It's marked `fallback=true`.
+- If a check fails, the drafter re-prompts with the violations (up to 2 retries; a rejected reply that contains PII is withheld from the retry prompt, never echoed). After that it uses a **deterministic fallback template** in the ticket language (en default) that acknowledges the issue, states escalation, and cites nothing beyond what was retrieved. It's marked `fallback=true`.
 - The **grounding guard** (§6.8) runs on the accepted draft and writes flags. It doesn't block, because it's a heuristic, but flags appear in the validation report.
 
 ### 6.6 Escalation rules engine (deterministic)
@@ -597,6 +599,8 @@ ticket-classification/
 │   ├── draft.py
 │   ├── escalate.py
 │   ├── guards.py
+│   ├── grounding.py
+│   ├── language.py
 │   ├── validation.py
 │   ├── cache.py
 │   ├── finalise.py

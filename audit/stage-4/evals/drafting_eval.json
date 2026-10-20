@@ -1,0 +1,29 @@
+{
+  "tickets": 23,
+  "models": {
+    "gpt-6.1-sol": {
+      "provider": "openai",
+      "judge_model": "deepseek-v4.1-flash",
+      "modes": {
+        "oracle": {
+          "drafts": 23
+        },
+        "e2e": {
+          "drafts": 23
+        }
+      }
+    },
+    "deepseek-v4.1-flash": {
+      "provider": "ollama",
+      "judge_model": "gpt-6.1-sol",
+      "modes": {
+        "oracle": {
+          "drafts": 23
+        },
+        "e2e": {
+          "drafts": 23
+        }
+      }
+    }
+  }
+}

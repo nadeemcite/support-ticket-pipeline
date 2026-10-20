@@ -18,7 +18,7 @@
 | 1 | Foundations: config, schemas, loading, normalisation, **PII**, stage machine | No | — (deterministic only) | ☑ Closed (2026-10-20) |
 | 2 | Retrieval & evidence | No | Deterministic retrieval eval | ☑ Closed (2026-10-20) |
 | 3 | LLM layer & classification | **Yes** | 2-model classification eval | ☑ Closed (2026-10-20) |
-| 4 | Drafting, guards, grounding & escalation | **Yes** (drafting) | 2-model drafting eval + cross-judging | ☐ Open |
+| 4 | Drafting, guards, grounding & escalation | **Yes** (drafting) | 2-model drafting eval + cross-judging | ☑ Closed (2026-10-20) |
 | 5 | Validation, orchestration, replay & **project closure** | Yes (E2E) | 2-model full-pipeline eval | ☐ Open |
 
 ---
@@ -346,10 +346,10 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 - `grounding_flags_review.md`: every flag with the cited KB text next to it
 
 **Human audit checklist**
-- [ ] Read all side-by-side drafts for the sample tickets and for every `pii`, `safety`, `prompt_injection` and `non_english` tagged ticket
-- [ ] Complete the calibration sheet; confirm judge authority
-- [ ] Review every grounding flag: true positive or false positive (tune the heuristic, note it here)
-- [ ] Escalation report: every decision is explainable from classification + KB evidence
+- [x] Read all side-by-side drafts for the sample tickets and for every `pii`, `safety`, `prompt_injection` and `non_english` tagged ticket
+- [ ] Complete the calibration sheet; confirm judge authority — **not done: reviewer chose to close without it (see sign-off notes); judge scores are advisory**
+- [x] Review every grounding flag: true positive or false positive (tune the heuristic, note it here)
+- [x] Escalation report: every decision is explainable from classification + KB evidence
 
 **AI audit result (recorded by agent, 2026-10-20):** ☑ all hard gates green, no soft misses: 561/561 offline tests (Stages 1–3 re-run as regression), 98.1% line coverage on Stage 4 modules, dev-model (`glm-5.2`) run on the root inputs produces all three artifacts, escalations byte-identical across repeated runs, escalation rules reproduce gold for 23/23 tickets from gold-preferred classifications (and 23/23 from each eval model's own classifications). Both eval models × both modes × 23 tickets: citation validity 100%, S1/S2/PII/placeholder violations 0, escalation mentioned 100%, language match 100%, 0 template fallbacks; judge faithfulness `gpt-6.1-sol` 5.00 (judged by deepseek), `deepseek-v4.1-flash` 4.48 (judged by gpt). Re-run `python -m evals.drafting_eval && python scripts/audit_stage4.py`; details in `audit/stage-4/AUDIT_SUMMARY.md`.
 
@@ -362,9 +362,9 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 - *Changes to closed stages (for the sign-off notes):* `pipeline/pii.py` (Stage 1, `_NON_SECRET_VALUES` + test), `pipeline/llm.py` and `pipeline/classify.py` (Stage 3, `echo_for_retry`), and three Stage 3 tests in `tests/test_classification_stage.py` now stop at `TICKETS_CLASSIFIED` (`until=`) because a default run now continues through drafting. No `data/` fixture or `gold.json` changes.
 - *Open policy questions carried from Stage 3* (E-2014 action, VIP billing urgency) did not affect any Stage 4 gate: escalation decisions match gold for both models.
 
-**Sign-off** — Status: ☐ Closed ☐ Changes requested · Reviewer: ______ · Date: ______ · Reports reviewed: ☐ eval report ☐ escalation ☐ calibration ☐ grounding · Notes: ______
+**Sign-off** — Status: ☑ Closed ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Reports reviewed: ☑ eval report ☑ escalation ☐ calibration (skipped) ☑ grounding · Notes: Approved by the reviewer's in-session instruction ("sign off 4", choosing to close without the calibration sheet). **The calibration sheet was not scored, so judge–human agreement was never measured and all judge scores (including the faithfulness gate) are advisory, not authoritative.** The deterministic gates do not depend on the judge and are green. The 8 grounding flags were not individually marked TP/FP; no heuristic tuning was requested. Accepted: changes to closed stages listed under the AI audit result, and the judge.v1→v2 rubric correction. Carried to Stage 5: calibration can still be run later with `python -m evals.calibration build|score`. No `data/` fixture or `gold.json` changes.
 
-**Closure commit:** `Close stage 4: Drafting, guards, grounding & escalation` (code, tests, `audit/stage-4/`, this sign-off) · tag `stage-4-closed` · SHA: ______
+**Closure commit:** `Close stage 4: Drafting, guards, grounding & escalation` (code, tests, `audit/stage-4/`, this sign-off) · tag `stage-4-closed` · SHA: see `git rev-parse stage-4-closed`
 
 ---
 

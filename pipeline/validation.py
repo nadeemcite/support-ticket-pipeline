@@ -274,6 +274,17 @@ def v11(c: Check, loaded: Loaded) -> None:
         esc = escalations.get(ticket_id)
         if esc is not None and not esc.get("escalate"):
             c.add("action is needs_human_escalation but escalate is false", ticket_id)
+    # the draft's wording must match the final decision for every rule (E1-E3, E6), not only the classification's own action
+    for ticket_id, esc in escalations.items():
+        draft = drafts.get(ticket_id)
+        text = (draft or {}).get("draft_response", "")
+        if draft is None:
+            continue
+        if esc.get("escalate") and not guards.s3_escalation_mention(text):
+            rules = ", ".join(esc.get("meta", {}).get("rules_fired", []))
+            c.add(f"escalated ({rules}) but the draft does not mention escalation (S3)", ticket_id)
+        if not esc.get("escalate") and guards.s3_claims_escalation(text):
+            c.add("not escalated but the draft says the case has been escalated (S3)", ticket_id)
 
 
 def v12(c: Check, loaded: Loaded) -> None:

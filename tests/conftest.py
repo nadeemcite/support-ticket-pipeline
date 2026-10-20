@@ -183,10 +183,14 @@ def first_evidence_id(messages) -> str | None:
 GOOD_TEXT = "Thanks for reaching out. We have escalated this to our specialist team. Never share your password or codes with anyone."
 
 
+QUIET_TEXT = "Thanks for reaching out. We are looking into this and a support specialist will follow up. Never share your password or codes with anyone."
+
+
 def good_draft(messages, ticket_id: str) -> str:
-    """A reply that satisfies every hard drafting rule for any classification."""
+    """A reply that satisfies every hard drafting rule for any classification, escalated (D7) or not (D12)."""
     evidence = first_evidence_id(messages)
-    return draft_reply(ticket_id, GOOD_TEXT, [evidence] if evidence else [])
+    escalated = '"escalated": true' in next(m["content"] for m in messages if m["role"] == "user")
+    return draft_reply(ticket_id, GOOD_TEXT if escalated else QUIET_TEXT, [evidence] if evidence else [])
 
 
 def route(classify=None, draft=None):

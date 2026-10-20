@@ -9,7 +9,7 @@ from pipeline.schemas import Classification, KBArticle, NormalisedTicket
 from pipeline.taxonomy import URGENCY_GUIDANCE, IssueType, ResolutionAction, Urgency
 
 CLASSIFY_VERSION = "classify.v1"
-DRAFT_VERSION = "draft.v1"
+DRAFT_VERSION = "draft.v2"
 
 ISSUE_TYPE_GUIDANCE: dict[IssueType, str] = {
     IssueType.BILLING: "payments, charges, refunds, invoices, subscriptions",
@@ -121,7 +121,7 @@ def retry_feedback(errors: list[str]) -> str:
     return f"Your previous output was rejected: {joined}. Return a corrected JSON object only, using only the allowed values."
 
 
-# --- Drafting (draft.v1, SPEC §7.2 D1-D11) -------------------------------------------------------------
+# --- Drafting (draft.v2, SPEC §7.2 D1-D11) -------------------------------------------------------------
 
 
 def draft_json_schema() -> dict:
@@ -148,7 +148,7 @@ Rules:
 - `citations` lists the IDs of the evidence articles you relied on. Cite only IDs shown in the evidence. When the action is `answer_from_kb` and evidence exists, cite at least one.
 - Never ask for a password, PIN, one-time or recovery code, CVV, or full card number.
 - If `requires_refund_caution` is true, never promise, guarantee or announce a refund, and never imply one is due. Say that the billing team will review whether a refund applies.
-- If `resolution_action` is `needs_human_escalation`, tell the customer their case has been escalated to a specialist team and that they will follow up.
+- If `escalated` is true, tell the customer their case has been escalated to a specialist team and that they will follow up. If `escalated` is false, do not say or imply that the case has been escalated or passed to another team.
 - If `resolution_action` is `request_more_info`, ask for at least one specific, safe detail (order number, date, screenshot, error message).
 - If `credential_disclosed` is true, tell the customer never to share their password or codes with anyone, and to change it if it was exposed.
 - Placeholders such as [EMAIL_1] or [CARD_NUMBER_1] stand for masked personal data. Never write them. Refer to the data generically ("the email address you provided").
@@ -158,7 +158,9 @@ Return only a JSON object with exactly these fields:
 {json.dumps(draft_json_schema(), indent=2)}"""
 
 
-def draft_user_prompt(ticket: NormalisedTicket, classification: Classification, evidence: list[KBArticle], credential_disclosed: bool) -> str:
+def draft_user_prompt(
+    ticket: NormalisedTicket, classification: Classification, evidence: list[KBArticle], credential_disclosed: bool, escalated: bool
+) -> str:
     ticket_view = {
         "ticket_id": ticket.ticket_id,
         "customer_tier": ticket.customer_tier,
@@ -173,6 +175,7 @@ def draft_user_prompt(ticket: NormalisedTicket, classification: Classification, 
         "customer_sensitive": classification.customer_sensitive,
         "requires_refund_caution": classification.requires_refund_caution,
         "credential_disclosed": credential_disclosed,
+        "escalated": escalated,
     }
     return (
         "<ticket>\n"
@@ -189,11 +192,12 @@ def draft_user_prompt(ticket: NormalisedTicket, classification: Classification, 
 
 
 def draft_messages(
-    ticket: NormalisedTicket, classification: Classification, evidence: list[KBArticle], credential_disclosed: bool, max_chars: int
+    ticket: NormalisedTicket, classification: Classification, evidence: list[KBArticle], credential_disclosed: bool, escalated: bool,
+    max_chars: int,
 ) -> list[dict[str, str]]:
     return [
         {"role": "system", "content": draft_system_prompt(max_chars)},
-        {"role": "user", "content": draft_user_prompt(ticket, classification, evidence, credential_disclosed)},
+        {"role": "user", "content": draft_user_prompt(ticket, classification, evidence, credential_disclosed, escalated)},
     ]
 
 

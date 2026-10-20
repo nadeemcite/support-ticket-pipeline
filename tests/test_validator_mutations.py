@@ -238,3 +238,38 @@ def test_v10_catches_refund_promise_phrasing(work, phrase):
 def test_v10_allows_credential_advice(work, phrase):
     checks, _ = check(work, lambda out: edit(out, "draft_responses.json", "drafts", lambda items: items[0].update(draft_response=phrase)))
     assert "V10" not in failing(checks)
+
+
+QUIET = "Thank you for contacting us. We are looking into your request and will be in touch."
+ESCALATED = "Thank you for contacting us. We have escalated your case to our specialist team."
+
+
+def _decide(rule):
+    """Make ticket 0 escalate by exactly ``rule`` (E1, E2, E3 or E6) and give it ``text`` as its draft."""
+
+    def classification(items):
+        item = items[0]
+        item.update(resolution_action="needs_human_escalation" if rule == "E1" else "answer_from_kb", urgency="critical" if rule == "E2" else "medium")
+        item["meta"]["fallback"] = rule == "E3"
+
+    def mutate(out, text, escalate=True):
+        edit(out, "ticket_classification.json", "classifications", classification)
+        edit(out, "escalations.json", "escalations", lambda i: i[0].update(escalate=escalate, target_queue="general_support" if escalate else "none", meta={**i[0]["meta"], "rules_fired": [rule] if escalate else ["E5"]}))
+        edit(out, "draft_responses.json", "drafts", lambda i: i[0].update(draft_response=text))
+
+    return mutate
+
+
+@pytest.mark.parametrize("rule", ["E1", "E2", "E3"])
+def test_v11_escalated_by_any_rule_needs_escalation_wording(work, rule):
+    checks, _ = check(work, lambda out: _decide(rule)(out, QUIET))
+    assert "V11" in failing(checks) and any(f"escalated ({rule})" in d["message"] for d in checks["V11"]["details"])
+    checks, _ = check(work, lambda out: _decide(rule)(out, ESCALATED))
+    assert "V11" not in failing(checks)
+
+
+def test_v11_not_escalated_must_not_claim_escalation(work):
+    checks, _ = check(work, lambda out: _decide("E5")(out, ESCALATED, escalate=False))
+    assert "V11" in failing(checks) and any("not escalated but the draft says" in d["message"] for d in checks["V11"]["details"])
+    checks, _ = check(work, lambda out: _decide("E5")(out, QUIET, escalate=False))
+    assert "V11" not in failing(checks)

@@ -408,7 +408,8 @@ Every applied override is appended to `meta.overrides` (e.g. `"C3: no evidence, 
 | D4 | `citations` non-empty when retrieved articles exist and action = `answer_from_kb` | block + retry |
 | D5 | No credential/sensitive-data requests (S1) | block + retry; V10 |
 | D6 | If `requires_refund_caution`: no refund promise (S2) | block + retry; V10 |
-| D7 | If action = `needs_human_escalation`: mentions escalation/specialist team (S3 positive pattern) | block + retry; V11 |
+| D7 | If the **final escalation decision** is `escalate = true` (E1, E2, E3 or E6, not only an `needs_human_escalation` action): mentions escalation/specialist team (S3 positive pattern) | block + retry; V11 |
+| D12 | If the decision is `escalate = false`: the draft does not say the case has been or is being escalated (S3 negative pattern; offers and conditionals such as "if X, this will be escalated" do not count) | block + retry; V11 |
 | D8 | If action = `request_more_info`: asks for at least one safe detail (order ID, date, screenshot, error message) | prompt; V11 (warn) |
 | D9 | `1 ≤ len(draft_response) ≤ MAX_DRAFT_CHARS` | block + retry |
 | D10 | If C5 fired: the draft includes the "never share your password" advice (matches the S1 negative-pattern list) | block + retry |
@@ -517,7 +518,7 @@ A `credential` detection also triggers C5 and D10.
 | V08 | Escalation invariant E-INV1; `target_queue` ∈ taxonomy | fail |
 | V09 | Draft language looks like `ticket.language` (stopword heuristic in `pipeline/language.py`; abstains for very short text). A ticket in an unsupported language must be escalated with E6 | fail |
 | V10 | No draft matches S1; no draft or reason matches S2 when `requires_refund_caution` | fail |
-| V11 | Drafts mention escalation (S3) when `resolution_action == needs_human_escalation`; consistency: `needs_human_escalation ⇒ escalate == true` | fail |
+| V11 | The draft's escalation wording matches the final decision for every rule: `escalate == true` ⇒ the draft mentions escalation (S3), `escalate == false` ⇒ it does not claim it; and `needs_human_escalation ⇒ escalate == true` | fail |
 | V12 | Grounding flags count (from `grounding_flags.json` when present); LLM log covers every ticket for both stages | warn |
 | V13 | PII leakage: the PII detector finds nothing in drafts, escalation reasons or `llm_calls.jsonl` (every string field except `prompt_hash` and `timestamp`, which are hex/digit runs) | fail |
 | V14 | No `[TYPE_n]` placeholders in drafts or escalation reasons | fail |
@@ -544,7 +545,7 @@ flowchart LR
 | L3 | Transport retries: 3, inside LiteLLM, on 429/5xx/timeout. A call that still fails counts as one of the 3 attempts (`transport_error`, same prompt retried). Content retries: up to 2, with validation errors fed back |
 | L4 | `prompt_hash = "sha256:" + sha256(canonical_json({provider, model, params, prompt_version, messages}))` |
 | L5 | Every attempt is logged per §6.8 **before** its result is used |
-| L6 | Prompt templates are versioned (`classify.v1`, `draft.v1`); changing a template requires bumping the version |
+| L6 | Prompt templates are versioned (`classify.v1`, `draft.v2`); changing a template requires bumping the version |
 | L7 | The `stub` provider is deterministic and network-free, and implements the same interface |
 | L8 | One provider layer, LiteLLM: Ollama Cloud via `ollama_chat/<model>` (`api_base` = `OLLAMA_BASE_URL` without `/v1`), OpenAI via `openai/<model>`. OpenAI gets a strict `json_schema`; Ollama gets `json_object` plus the schema in the prompt; markdown fences are stripped before parsing |
 | L9 | The client refuses a call whose messages contain raw PII (P-LLM) and a call made outside its stage (O3); both are fatal (exit 2) |

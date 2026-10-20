@@ -28,7 +28,7 @@ from pipeline.retrieval import (
     retrieve,
 )
 from pipeline.schemas import RetrievalResult
-from pipeline.taxonomy import ResolutionAction, Urgency
+
 from pipeline.stub import StubProvider
 from pipeline.validation import validate
 
@@ -230,11 +230,7 @@ def responses_drafted(ctx: RunContext) -> None:
         draft = draft_ticket(client, ticket, classification, evidence, input_artifacts, ctx.config.max_draft_chars)
         drafts.append(draft)
         if not draft.meta.fallback:
-            allowed = (
-                classification.resolution_action == ResolutionAction.NEEDS_HUMAN_ESCALATION
-                or classification.urgency == Urgency.CRITICAL
-                or classification.meta.fallback
-            )
+            allowed = decide(classification, evidence, ticket.language).escalate
             flags.extend(check_grounding(ticket.ticket_id, draft.draft_response, [articles[c] for c in draft.citations], allowed, ticket.language))
     ctx.data.setdefault("llm_records", []).extend(client.records)
     ctx.data["drafts"] = {d.ticket_id: d for d in drafts}

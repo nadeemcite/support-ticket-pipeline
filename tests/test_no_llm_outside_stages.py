@@ -12,7 +12,7 @@ pytestmark = pytest.mark.stage5
 
 EXPECTED = {
     "classification": ("classify.v1", "ticket_classification.json"),
-    "drafting": ("draft.v1", "draft_responses.json"),
+    "drafting": ("draft.v2", "draft_responses.json"),
 }
 
 

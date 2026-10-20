@@ -78,7 +78,7 @@ class StubProvider:
         if ids and classification["resolution_action"] == "answer_from_kb":
             body = evidence.split("\n", 1)[1].split("\n\n", 1)[0]
             parts.append(re.split(r"(?<=[.!?])\s+", body.strip())[0])
-        if classification["resolution_action"] == "needs_human_escalation":
+        if classification["escalated"]:
             parts.append(t["escalation"])
         if classification["resolution_action"] == "request_more_info":
             parts.append(t["more_info"])

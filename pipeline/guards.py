@@ -153,6 +153,29 @@ def s3_escalation_mention(text: str) -> bool:
     return bool(_S3_RE.search(text))
 
 
+_S3_CLAIM_RE = re.compile(
+    r"(?:has|have|had|'ve|is being|are being|been)\s+(?:been\s+)?(?:escalated|forwarded|passed|transferred|referred|handed)\b|"
+    r"\bescalated\s+(?:your|this|the|it)\b|\b(?:we|i)(?:'ve| have)?\s+escalated\b|"
+    r"hemos (?:escalado|derivado|transferido)|ha sido (?:escalado|derivado)|"
+    r"nous avons (?:transmis|transf[eé]r[eé])|a [eé]t[eé] (?:transmis|transf[eé]r[eé])|"
+    r"weitergeleitet|eskaliert|"
+    r"encaminhamos|escalamos|foi (?:encaminhado|escalado)",
+    re.IGNORECASE,
+)
+
+
+_CONDITIONAL = frozenset("if unless should whether wenn falls si se sinon".split())  # "if X, this will be escalated" is not a claim
+
+
+def s3_claims_escalation(text: str) -> bool:
+    """S3 (negative check): the text says the case HAS BEEN or IS BEING handed to a specialist team. Narrower than
+    ``s3_escalation_mention``: offers and KB wording such as "we can escalate to billing support" do not count."""
+    return any(
+        not negated_before(sentence[: m.start()]) and not _CONDITIONAL & set(_words(sentence[: m.start()]))
+        for sentence in sentences(text) for m in _S3_CLAIM_RE.finditer(sentence)
+    )
+
+
 def has_pii(text: str) -> bool:
     return pii.contains_pii(text)
 

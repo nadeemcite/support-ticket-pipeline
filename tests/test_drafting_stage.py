@@ -42,7 +42,7 @@ def test_log_covers_both_llm_stages(make_config):
     for stage in ("classification", "drafting"):
         assert len([r for r in log if r["stage"] == stage and r["status"] == "ok"]) == 23
     assert [r["stage"] for r in log][:23] == ["classification"] * 23  # drafting only after classification
-    assert {r["prompt_version"] for r in log} == {"classify.v1", "draft.v1"}
+    assert {r["prompt_version"] for r in log} == {"classify.v1", "draft.v2"}
     assert all(r["output_artifact"] in ("ticket_classification.json", "draft_responses.json") for r in log)
 
 
@@ -100,7 +100,7 @@ def test_prompt_contains_only_retrieved_articles(make_config, scripted_llm):  # 
 def test_drafting_call_refused_outside_its_stage(make_config, tmp_path):
     client = LLMClient(provider=None, max_tokens=1, temperature=0, log_path=tmp_path / "l.jsonl", clock=lambda: "t", current_stage=lambda: Stage.TICKETS_CLASSIFIED)
     with pytest.raises(LLMStageError):
-        client.call(LLMStage.DRAFTING, [{"role": "user", "content": "hi"}], "draft.v1", None)
+        client.call(LLMStage.DRAFTING, [{"role": "user", "content": "hi"}], "draft.v2", None)
 
 
 def test_grounding_flags_are_written_and_never_block(make_config, scripted_llm):

@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pydantic import ValidationError
 
 from pipeline import guards
+from pipeline.escalate import decide
 from pipeline.language import is_supported, language_code
 from pipeline.llm import CallResult, LLMClient, echo_for_retry, parse_json_object
 from pipeline.prompts import DRAFT_VERSION, draft_json_schema, draft_messages, draft_retry_feedback
@@ -84,11 +85,12 @@ def unsupported_language_draft(ticket: NormalisedTicket) -> DraftResponse:
     )
 
 
-def fallback_draft(ticket: NormalisedTicket, classification: Classification) -> DraftResponse:
+def fallback_draft(ticket: NormalisedTicket, classification: Classification, escalated: bool | None = None) -> DraftResponse:
     lang = template_language(ticket.language)
     t = TEMPLATES[lang]
+    escalated = classification.resolution_action == ResolutionAction.NEEDS_HUMAN_ESCALATION if escalated is None else escalated
     parts = [t["ack"]]
-    if classification.resolution_action == ResolutionAction.NEEDS_HUMAN_ESCALATION:
+    if escalated:
         parts.append(t["escalation"])
     if classification.resolution_action == ResolutionAction.REQUEST_MORE_INFO:
         parts.append(t["more_info"])
@@ -102,9 +104,13 @@ def fallback_draft(ticket: NormalisedTicket, classification: Classification) -> 
 
 
 def check_draft(
-    output: DraftOutput, ticket: NormalisedTicket, classification: Classification, retrieved_ids: list[str], max_chars: int
+    output: DraftOutput, ticket: NormalisedTicket, classification: Classification, retrieved_ids: list[str], max_chars: int,
+    escalated: bool | None = None,
 ) -> list[tuple[str, str]]:
-    """Hard-rule violations as (code, message). An empty list means the draft is acceptable."""
+    """Hard-rule violations as (code, message). An empty list means the draft is acceptable.
+
+    ``escalated`` is the final escalation decision (E1-E3, E6); it defaults to the classification's own action (E1)."""
+    escalated = classification.resolution_action == ResolutionAction.NEEDS_HUMAN_ESCALATION if escalated is None else escalated
     text = output.draft_response
     found: list[tuple[str, str]] = []
     if output.ticket_id != ticket.ticket_id:
@@ -118,8 +124,10 @@ def check_draft(
         found.append(("D5", "never ask for a password, PIN, code, CVV or full card number"))
     if classification.requires_refund_caution and guards.s2_refund_promise(text):
         found.append(("D6", "do not promise, guarantee or announce a refund; say the billing team will review"))
-    if classification.resolution_action == ResolutionAction.NEEDS_HUMAN_ESCALATION and not guards.s3_escalation_mention(text):
+    if escalated and not guards.s3_escalation_mention(text):
         found.append(("D7", "tell the customer the case has been escalated to a specialist team"))
+    if not escalated and guards.s3_claims_escalation(text):
+        found.append(("D12", "the case is not being escalated: do not say it has been escalated or passed to another team"))
     if not 1 <= len(text) <= max_chars:
         found.append(("D9", f"length must be between 1 and {max_chars} characters"))
     if credential_disclosed(ticket) and not guards.has_credential_advice(text):
@@ -136,7 +144,9 @@ class DraftAttempt:
     violations: list[tuple[str, str]]
 
 
-def _attempt(result: CallResult, ticket: NormalisedTicket, classification: Classification, retrieved_ids: list[str], max_chars: int) -> DraftAttempt:
+def _attempt(
+    result: CallResult, ticket: NormalisedTicket, classification: Classification, retrieved_ids: list[str], max_chars: int, escalated: bool
+) -> DraftAttempt:
     if result.error:
         return DraftAttempt("transport_error", None, [("T", result.error)])
     try:
@@ -147,7 +157,7 @@ def _attempt(result: CallResult, ticket: NormalisedTicket, classification: Class
         output = DraftOutput.model_validate(data)
     except ValidationError as exc:
         return DraftAttempt("schema_error", None, [("SCHEMA", f"{'.'.join(str(p) for p in err['loc'])}: {err['msg']}") for err in exc.errors()])
-    violations = check_draft(output, ticket, classification, retrieved_ids, max_chars)
+    violations = check_draft(output, ticket, classification, retrieved_ids, max_chars, escalated)
     return DraftAttempt("rule_violation" if violations else "ok", None if violations else output, violations)
 
 
@@ -158,12 +168,13 @@ def draft_ticket(
     if not is_supported(ticket.language):
         return unsupported_language_draft(ticket)
     retrieved_ids = [a.article_id for a in evidence]
-    messages = draft_messages(ticket, classification, evidence, credential_disclosed(ticket), max_chars)
+    escalated = decide(classification, evidence, ticket.language).escalate  # the final decision (E1-E3), so the wording matches it
+    messages = draft_messages(ticket, classification, evidence, credential_disclosed(ticket), escalated, max_chars)
     schema = draft_json_schema()
     seen: list[str] = []
     for attempt in range(1, MAX_ATTEMPTS + 1):
         result = client.call(LLMStage.DRAFTING, messages, DRAFT_VERSION, schema)
-        outcome = _attempt(result, ticket, classification, retrieved_ids, max_chars)
+        outcome = _attempt(result, ticket, classification, retrieved_ids, max_chars, escalated)
         client.log(
             llm_stage=LLMStage.DRAFTING, ticket_id=ticket.ticket_id, result=result, prompt_version=DRAFT_VERSION,
             input_artifacts=input_artifacts, output_artifact=OUTPUT_ARTIFACT, attempt=attempt, status=outcome.status,
@@ -177,6 +188,6 @@ def draft_ticket(
         if outcome.status != "transport_error":
             messages = [*messages, {"role": "assistant", "content": echo_for_retry(result.text)},
                         {"role": "user", "content": draft_retry_feedback([m for _, m in outcome.violations])}]
-    draft = fallback_draft(ticket, classification)
+    draft = fallback_draft(ticket, classification, escalated)
     draft.meta.violations_resolved = seen
     return draft

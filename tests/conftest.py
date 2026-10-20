@@ -4,11 +4,17 @@ from pathlib import Path
 import pytest
 
 from pipeline.config import Config
+from pipeline.orchestrator import Pipeline, Stage
+from pipeline.stages import build_specs
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 FIXTURES = DATA / "fixtures"
 EVAL = DATA / "eval"
+
+
+LATEST_STAGE = Pipeline(build_specs()).last_implemented()
+NEXT_UNBUILT = Stage(LATEST_STAGE + 1) if LATEST_STAGE < Stage.RESULTS_FINALISED else None
 
 
 def load(path: Path):
@@ -43,6 +49,15 @@ def offline(monkeypatch):
         raise AssertionError("tests must not create a real embedder; use the fake_embedder fixture")
 
     monkeypatch.setattr(stages, "make_embedder", no_network)
+
+    real_factory = stages.make_chat_provider
+
+    def stub_only(config):
+        if config.provider != "stub":
+            raise AssertionError("tests must not create a real LLM provider; use the scripted_llm fixture")
+        return real_factory(config)
+
+    monkeypatch.setattr(stages, "make_chat_provider", stub_only)
 
 
 class FakeEmbedder:
@@ -79,3 +94,69 @@ def fake_embedder(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "test-key-not-real")
     monkeypatch.setattr(stages, "make_embedder", lambda config: fake)
     return fake
+
+
+class ScriptedProvider:
+    """Fake LLM: replies come from a list (consumed in order) or a function of the messages."""
+
+    name = "scripted"
+    model = "scripted-1"
+
+    def __init__(self, replies=None, respond=None) -> None:
+        self.replies = list(replies or [])
+        self.respond = respond
+        self.calls: list[list[dict]] = []
+
+    def params(self, max_tokens, temperature):
+        return {"max_tokens": max_tokens, "temperature": temperature}
+
+    def complete(self, messages, params, json_schema):
+        from pipeline.llm import ChatResponse, LLMTransportError
+
+        self.calls.append(messages)
+        reply = self.respond(messages) if self.respond else self.replies.pop(0)
+        if isinstance(reply, Exception):
+            if isinstance(reply, LLMTransportError):
+                raise reply
+            raise LLMTransportError(str(reply))
+        return ChatResponse(text=reply, usage={"prompt_tokens": 10, "completion_tokens": 5})
+
+
+def valid_reply(ticket_id: str, **overrides) -> str:
+    import json
+
+    reply = {
+        "ticket_id": ticket_id,
+        "issue_type": "billing",
+        "urgency": "medium",
+        "resolution_action": "answer_from_kb",
+        "customer_sensitive": True,
+        "requires_refund_caution": False,
+        "rationale": "Matches KB-001.",
+    }
+    reply.update(overrides)
+    return json.dumps(reply)
+
+
+def ticket_id_from(messages) -> str:
+    import json
+    import re
+
+    user = next(m["content"] for m in messages if m["role"] == "user")
+    return json.loads(re.search(r"<ticket>\s*(\{.*?\})\s*</ticket>", user, re.DOTALL).group(1))["ticket_id"]
+
+
+@pytest.fixture
+def scripted_llm(monkeypatch):
+    """Install a ScriptedProvider for pipeline runs; credentials are faked so no network is used."""
+    from pipeline import stages
+
+    holder = {}
+
+    def install(replies=None, respond=None) -> ScriptedProvider:
+        provider = ScriptedProvider(replies, respond)
+        holder["provider"] = provider
+        monkeypatch.setattr(stages, "make_chat_provider", lambda config: provider)
+        return provider
+
+    return install

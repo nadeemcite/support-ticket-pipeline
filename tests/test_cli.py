@@ -3,7 +3,7 @@
 import pytest
 
 import run_pipeline
-from tests.conftest import FIXTURES, ROOT
+from tests.conftest import FIXTURES, LATEST_STAGE, NEXT_UNBUILT, ROOT
 
 pytestmark = pytest.mark.stage1
 
@@ -11,7 +11,7 @@ pytestmark = pytest.mark.stage1
 def test_cli_success(tmp_path, capsys):
     code = run_pipeline.main(["--provider", "stub", "--out-dir", str(tmp_path), "--tickets", str(ROOT / "tickets.json"), "--kb", str(ROOT / "kb_articles.json")])
     assert code == 0
-    assert "EVIDENCE_RETRIEVED" in capsys.readouterr().out
+    assert LATEST_STAGE.name in capsys.readouterr().out
     assert (tmp_path / "artifacts/normalised_tickets.json").is_file()
     assert (tmp_path / "retrieval_results.json").is_file()
 
@@ -28,7 +28,8 @@ def test_cli_fatal_on_bad_config(tmp_path, capsys, monkeypatch):
     assert "RETRIEVAL_TOP_K" in capsys.readouterr().err
 
 
+@pytest.mark.skipif(NEXT_UNBUILT is None, reason="every stage is implemented")
 def test_cli_until_unimplemented_stage(tmp_path, capsys):
-    code = run_pipeline.main(["--provider", "stub", "--out-dir", str(tmp_path), "--until", "TICKETS_CLASSIFIED"])
+    code = run_pipeline.main(["--provider", "stub", "--out-dir", str(tmp_path), "--until", NEXT_UNBUILT.name])
     assert code == 2
     assert "not implemented" in capsys.readouterr().err

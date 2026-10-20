@@ -7,8 +7,10 @@ stages), writes its artifact atomically, and records facts for the manifest.
 from collections import Counter
 
 from pipeline.cache import JsonCache
+from pipeline.classify import OUTPUT_ARTIFACT as CLASSIFICATION, classify_ticket
 from pipeline.config import Config
 from pipeline.io_utils import atomic_write_json, atomic_write_text, canonical_json, sha256_canonical
+from pipeline.llm import ChatProvider, LiteLLMProvider, LLMClient
 from pipeline.loader import load_inputs
 from pipeline.normalise import normalise_article, normalise_tickets
 from pipeline.orchestrator import RunContext, Stage, StageSpec, utc_now
@@ -22,6 +24,7 @@ from pipeline.retrieval import (
     retrieve,
 )
 from pipeline.schemas import RetrievalResult
+from pipeline.stub import StubProvider
 
 NORMALISED_TICKETS = "artifacts/normalised_tickets.json"
 KB_INDEX = "artifacts/kb_index.json"
@@ -34,6 +37,27 @@ LLM_CALLS = "llm_calls.jsonl"
 def make_embedder(config: Config) -> Embedder:
     """Factory for the embedding backend (tests replace it with an offline fake)."""
     return LiteLLMEmbedder(config.embedding_model, timeout_s=config.timeout_s)
+
+
+def make_chat_provider(config: Config) -> ChatProvider:
+    """Factory for the LLM backend (tests replace it with scripted fakes)."""
+    if config.provider == "stub":
+        return StubProvider()
+    return LiteLLMProvider(config.provider, config.model, timeout_s=config.timeout_s)
+
+
+def make_llm_client(ctx: RunContext) -> LLMClient:
+    config = ctx.config
+    return LLMClient(
+        provider=make_chat_provider(config),
+        max_tokens=config.max_tokens,
+        temperature=config.temperature,
+        log_path=ctx.path(LLM_CALLS),
+        clock=utc_now,
+        cache=JsonCache(config.cache_dir, read_enabled=not config.no_cache),
+        current_stage=lambda: ctx.entering,
+        prompts_dir=config.artifacts_dir / "prompts" if config.log_prompts else None,
+    )
 
 
 def init(ctx: RunContext) -> None:
@@ -160,6 +184,30 @@ def evidence_retrieved(ctx: RunContext) -> None:
     )
 
 
+def tickets_classified(ctx: RunContext) -> None:
+    """One validated classification per ticket (SPEC §7.1), grounded in its retrieved evidence."""
+    client = make_llm_client(ctx)
+    articles = {a.article_id: a for a in ctx.data["articles"]}
+    input_artifacts = [NORMALISED_TICKETS, RETRIEVAL_RESULTS, str(ctx.config.kb_path)]
+    classifications = []
+    for ticket in ctx.data["tickets"]:
+        evidence = [articles[hit.article_id] for hit in ctx.data["retrieval"][ticket.ticket_id].retrieved_articles]
+        classifications.append(classify_ticket(client, ticket, evidence, input_artifacts))
+    ctx.data["classifications"] = {c.ticket_id: c for c in classifications}
+    atomic_write_json(ctx.path(CLASSIFICATION), {"classifications": [c.model_dump(mode="json") for c in classifications]})
+    overrides: Counter[str] = Counter(o.split(":")[0] for c in classifications for o in c.meta.overrides)
+    ctx.manifest["counts"].update(
+        {
+            "classification_fallbacks": sum(c.meta.fallback for c in classifications),
+            "classification_retries": sum(c.meta.attempts - 1 for c in classifications),
+            "overrides": dict(sorted(overrides.items())),
+            "llm_calls": len(client.records),
+            "llm_cache_hits": sum(r["cached"] for r in client.records),
+        }
+    )
+    ctx.manifest["llm"] = {"provider": client.provider.name, "model": client.provider.model}
+
+
 def build_specs() -> list[StageSpec]:
     return [
         StageSpec(Stage.INIT, init, plan_stage=1),
@@ -167,7 +215,7 @@ def build_specs() -> list[StageSpec]:
         StageSpec(Stage.KB_INDEXED, kb_indexed, plan_stage=2),
         StageSpec(Stage.TICKETS_NORMALISED, tickets_normalised, plan_stage=1),
         StageSpec(Stage.EVIDENCE_RETRIEVED, evidence_retrieved, requires=(NORMALISED_TICKETS, KB_INDEX), plan_stage=2),
-        StageSpec(Stage.TICKETS_CLASSIFIED, None, plan_stage=3),
+        StageSpec(Stage.TICKETS_CLASSIFIED, tickets_classified, requires=(RETRIEVAL_RESULTS,), plan_stage=3),
         StageSpec(Stage.RESPONSES_DRAFTED, None, plan_stage=4),
         StageSpec(Stage.ESCALATIONS_DECIDED, None, plan_stage=4),
         StageSpec(Stage.OUTPUTS_VALIDATED, None, plan_stage=5),

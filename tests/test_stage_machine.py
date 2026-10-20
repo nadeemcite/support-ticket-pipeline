@@ -14,6 +14,7 @@ from pipeline.orchestrator import (
 )
 from pipeline.runner import EXIT_FATAL, run
 from pipeline.stages import build_specs
+from tests.conftest import LATEST_STAGE, NEXT_UNBUILT
 
 pytestmark = pytest.mark.stage1
 
@@ -107,10 +108,12 @@ def test_unparseable_required_artifact_blocks_stage(make_config):
         pipeline.run(RunContext(config=config))
 
 
+@pytest.mark.skipif(NEXT_UNBUILT is None, reason="every stage is implemented")
 def test_until_beyond_implemented_stage_is_refused(make_config):
     pipeline = Pipeline(build_specs())
-    with pytest.raises(StageNotImplementedError, match="PLAN Stage 3"):
-        pipeline.run(RunContext(config=make_config()), until=Stage.TICKETS_CLASSIFIED)
+    plan_stage = build_specs()[NEXT_UNBUILT].plan_stage
+    with pytest.raises(StageNotImplementedError, match=f"PLAN Stage {plan_stage}"):
+        pipeline.run(RunContext(config=make_config()), until=NEXT_UNBUILT)
     assert pipeline.machine.current is None  # refused before anything ran
 
 
@@ -125,9 +128,9 @@ def test_until_stops_early(make_config):
 def test_default_run_reaches_latest_implemented_stage(make_config):
     outcome = run(make_config())
     trail = outcome.manifest["stage_trail"]
-    assert [s["stage"] for s in trail] == ["INIT", "INPUTS_LOADED", "KB_INDEXED", "TICKETS_NORMALISED", "EVIDENCE_RETRIEVED"]
+    assert [s["stage"] for s in trail] == [stage.name for stage in Stage if stage <= LATEST_STAGE]
     assert not any(s["placeholder"] for s in trail)
-    assert outcome.manifest["final_stage"] == "EVIDENCE_RETRIEVED"
+    assert outcome.manifest["final_stage"] == LATEST_STAGE.name
 
 
 def test_placeholder_stage_is_passed_through_and_marked(make_config):
@@ -143,8 +146,9 @@ def test_placeholder_stage_is_passed_through_and_marked(make_config):
     ]
 
 
+@pytest.mark.skipif(NEXT_UNBUILT is None, reason="every stage is implemented")
 def test_runner_reports_not_implemented_as_fatal(make_config):
-    outcome = run(make_config(), until=Stage.RESPONSES_DRAFTED)
+    outcome = run(make_config(), until=NEXT_UNBUILT)
     assert outcome.exit_code == EXIT_FATAL
     assert outcome.manifest["final_stage"] == "FAILED"
 
@@ -155,4 +159,4 @@ def test_llm_stage_requires_credentials_unless_stub(make_config, monkeypatch):
     config = make_config(provider="ollama", model="glm-5.2")
     outcome = run(config, until=Stage.TICKETS_CLASSIFIED)
     assert outcome.exit_code == EXIT_FATAL and "OLLAMA_API_KEY" in outcome.error
-    assert run(config).exit_code == 0  # no LLM stage in range -> no key needed
+    assert run(config, until=Stage.EVIDENCE_RETRIEVED).exit_code == 0  # no LLM stage in range -> no key needed

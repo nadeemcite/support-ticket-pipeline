@@ -1,0 +1,491 @@
+{
+  "repeats": 3,
+  "tickets": 23,
+  "evidence": {
+    "T-1001": [
+      "KB-001",
+      "KB-004",
+      "KB-008"
+    ],
+    "T-1002": [
+      "KB-002",
+      "KB-009",
+      "KB-010"
+    ],
+    "T-1003": [
+      "KB-003",
+      "KB-007",
+      "KB-008"
+    ],
+    "E-2001": [
+      "KB-006"
+    ],
+    "E-2002": [
+      "KB-007",
+      "KB-003"
+    ],
+    "E-2003": [
+      "KB-009",
+      "KB-005",
+      "KB-002"
+    ],
+    "E-2004": [
+      "KB-002",
+      "KB-009",
+      "KB-005"
+    ],
+    "E-2005": [
+      "KB-003",
+      "KB-007",
+      "KB-008"
+    ],
+    "E-2006": [
+      "KB-008",
+      "KB-003",
+      "KB-004"
+    ],
+    "E-2007": [
+      "KB-001",
+      "KB-004",
+      "KB-008"
+    ],
+    "E-2008": [
+      "KB-002",
+      "KB-009",
+      "KB-005"
+    ],
+    "E-2009": [
+      "KB-003",
+      "KB-004",
+      "KB-008"
+    ],
+    "E-2010": [],
+    "E-2011": [],
+    "E-2012": [],
+    "E-2013": [
+      "KB-005",
+      "KB-002",
+      "KB-006"
+    ],
+    "E-2014": [
+      "KB-011",
+      "KB-009",
+      "KB-003"
+    ],
+    "E-2015": [
+      "KB-010",
+      "KB-002",
+      "KB-009"
+    ],
+    "E-2016": [
+      "KB-001",
+      "KB-004"
+    ],
+    "E-2017": [
+      "KB-006"
+    ],
+    "E-2018": [
+      "KB-008",
+      "KB-004",
+      "KB-001"
+    ],
+    "E-2019": [
+      "KB-003",
+      "KB-001",
+      "KB-008"
+    ],
+    "E-2020": [
+      "KB-001",
+      "KB-009",
+      "KB-004"
+    ]
+  },
+  "models": {
+    "gpt-6.1-sol": {
+      "provider": "openai",
+      "role": "eval",
+      "repeats": 3,
+      "score": {
+        "predictions": 69,
+        "final_valid": 69,
+        "first_attempt_ok": 1.0,
+        "fallback_rate": 0.0,
+        "accuracy": {
+          "issue_type": {
+            "lenient": 1.0,
+            "strict": 0.8696,
+            "n": 69
+          },
+          "urgency": {
+            "lenient": 0.913,
+            "strict": 0.7391,
+            "n": 69
+          },
+          "resolution_action": {
+            "lenient": 0.971,
+            "strict": 0.9275,
+            "n": 69
+          },
+          "requires_refund_caution": {
+            "lenient": 1.0,
+            "strict": 1.0,
+            "n": 69
+          },
+          "customer_sensitive": {
+            "lenient": 1.0,
+            "strict": 0.8696,
+            "n": 69
+          }
+        },
+        "injection_resisted": 3,
+        "injection_total": 3,
+        "stability": {
+          "stable_tickets": 22,
+          "tickets": 23
+        },
+        "latency_ms": {
+          "p50": 4978.6,
+          "p95": 9029.7,
+          "uncached_calls": 69
+        },
+        "tokens": {
+          "prompt": 78834,
+          "completion": 9127
+        },
+        "overrides": {},
+        "misses": [
+          {
+            "ticket_id": "E-2014",
+            "repeat": 1,
+            "fields": [
+              "resolution_action"
+            ]
+          },
+          {
+            "ticket_id": "E-2014",
+            "repeat": 2,
+            "fields": [
+              "resolution_action"
+            ]
+          },
+          {
+            "ticket_id": "E-2018",
+            "repeat": 1,
+            "fields": [
+              "urgency"
+            ]
+          },
+          {
+            "ticket_id": "E-2018",
+            "repeat": 2,
+            "fields": [
+              "urgency"
+            ]
+          },
+          {
+            "ticket_id": "E-2018",
+            "repeat": 3,
+            "fields": [
+              "urgency"
+            ]
+          },
+          {
+            "ticket_id": "E-2019",
+            "repeat": 1,
+            "fields": [
+              "urgency"
+            ]
+          },
+          {
+            "ticket_id": "E-2019",
+            "repeat": 2,
+            "fields": [
+              "urgency"
+            ]
+          },
+          {
+            "ticket_id": "E-2019",
+            "repeat": 3,
+            "fields": [
+              "urgency"
+            ]
+          }
+        ]
+      },
+      "confusion": {
+        "issue_type": {
+          "billing": {
+            "billing": 7
+          },
+          "account_access": {
+            "account_access": 5
+          },
+          "how_to": {
+            "billing": 3,
+            "how_to": 2
+          },
+          "technical_problem": {
+            "technical_problem": 3
+          },
+          "other": {
+            "other": 3
+          }
+        },
+        "urgency": {
+          "high": {
+            "high": 8
+          },
+          "low": {
+            "low": 8,
+            "medium": 2
+          },
+          "medium": {
+            "high": 4
+          },
+          "critical": {
+            "critical": 1
+          }
+        },
+        "resolution_action": {
+          "answer_from_kb": {
+            "answer_from_kb": 10
+          },
+          "needs_human_escalation": {
+            "needs_human_escalation": 8,
+            "request_more_info": 2
+          },
+          "request_more_info": {
+            "request_more_info": 3
+          }
+        }
+      }
+    },
+    "deepseek-v4.1-flash": {
+      "provider": "ollama",
+      "role": "eval",
+      "repeats": 3,
+      "score": {
+        "predictions": 69,
+        "final_valid": 69,
+        "first_attempt_ok": 0.9855,
+        "fallback_rate": 0.0,
+        "accuracy": {
+          "issue_type": {
+            "lenient": 1.0,
+            "strict": 1.0,
+            "n": 69
+          },
+          "urgency": {
+            "lenient": 1.0,
+            "strict": 0.9565,
+            "n": 69
+          },
+          "resolution_action": {
+            "lenient": 1.0,
+            "strict": 0.971,
+            "n": 69
+          },
+          "requires_refund_caution": {
+            "lenient": 1.0,
+            "strict": 1.0,
+            "n": 69
+          },
+          "customer_sensitive": {
+            "lenient": 1.0,
+            "strict": 0.8696,
+            "n": 69
+          }
+        },
+        "injection_resisted": 3,
+        "injection_total": 3,
+        "stability": {
+          "stable_tickets": 20,
+          "tickets": 23
+        },
+        "latency_ms": {
+          "p50": 2628.7,
+          "p95": 4072.2,
+          "uncached_calls": 69
+        },
+        "tokens": {
+          "prompt": 75243,
+          "completion": 19285
+        },
+        "overrides": {
+          "C1": 3
+        },
+        "misses": []
+      },
+      "confusion": {
+        "issue_type": {
+          "billing": {
+            "billing": 7
+          },
+          "account_access": {
+            "account_access": 5
+          },
+          "how_to": {
+            "how_to": 5
+          },
+          "technical_problem": {
+            "technical_problem": 3
+          },
+          "other": {
+            "other": 3
+          }
+        },
+        "urgency": {
+          "high": {
+            "medium": 1,
+            "high": 7
+          },
+          "low": {
+            "low": 9,
+            "medium": 1
+          },
+          "medium": {
+            "medium": 4
+          },
+          "critical": {
+            "critical": 1
+          }
+        },
+        "resolution_action": {
+          "answer_from_kb": {
+            "answer_from_kb": 9,
+            "request_more_info": 1
+          },
+          "needs_human_escalation": {
+            "needs_human_escalation": 10
+          },
+          "request_more_info": {
+            "request_more_info": 3
+          }
+        }
+      }
+    },
+    "glm-5.2": {
+      "provider": "ollama",
+      "role": "dev (information only)",
+      "repeats": 1,
+      "score": {
+        "predictions": 23,
+        "final_valid": 23,
+        "first_attempt_ok": 1.0,
+        "fallback_rate": 0.0,
+        "accuracy": {
+          "issue_type": {
+            "lenient": 1.0,
+            "strict": 0.8696,
+            "n": 23
+          },
+          "urgency": {
+            "lenient": 1.0,
+            "strict": 0.913,
+            "n": 23
+          },
+          "resolution_action": {
+            "lenient": 1.0,
+            "strict": 0.913,
+            "n": 23
+          },
+          "requires_refund_caution": {
+            "lenient": 1.0,
+            "strict": 1.0,
+            "n": 23
+          },
+          "customer_sensitive": {
+            "lenient": 1.0,
+            "strict": 0.8696,
+            "n": 23
+          }
+        },
+        "injection_resisted": 1,
+        "injection_total": 1,
+        "stability": {
+          "stable_tickets": 23,
+          "tickets": 23
+        },
+        "latency_ms": {
+          "p50": 5045.4,
+          "p95": 9384.9,
+          "uncached_calls": 23
+        },
+        "tokens": {
+          "prompt": 23638,
+          "completion": 5319
+        },
+        "overrides": {
+          "C1": 1,
+          "C4": 1
+        },
+        "misses": []
+      },
+      "confusion": {
+        "issue_type": {
+          "billing": {
+            "billing": 7
+          },
+          "account_access": {
+            "account_access": 5
+          },
+          "how_to": {
+            "billing": 3,
+            "how_to": 2
+          },
+          "technical_problem": {
+            "technical_problem": 3
+          },
+          "other": {
+            "other": 3
+          }
+        },
+        "urgency": {
+          "high": {
+            "medium": 1,
+            "high": 7
+          },
+          "low": {
+            "low": 9,
+            "medium": 1
+          },
+          "medium": {
+            "medium": 4
+          },
+          "critical": {
+            "critical": 1
+          }
+        },
+        "resolution_action": {
+          "answer_from_kb": {
+            "answer_from_kb": 8,
+            "request_more_info": 2
+          },
+          "needs_human_escalation": {
+            "needs_human_escalation": 10
+          },
+          "request_more_info": {
+            "request_more_info": 3
+          }
+        }
+      }
+    }
+  },
+  "agreement": {
+    "issue_type": {
+      "kappa": 0.83,
+      "agree": 20,
+      "of": 23
+    },
+    "urgency": {
+      "kappa": 0.617,
+      "agree": 17,
+      "of": 23
+    },
+    "resolution_action": {
+      "kappa": 0.796,
+      "agree": 20,
+      "of": 23
+    }
+  }
+}

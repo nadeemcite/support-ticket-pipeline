@@ -14,7 +14,9 @@ from pipeline.orchestrator import (
     StageOrderError,
     build_manifest,
 )
-from pipeline.retrieval import EmbeddingError, PIILeakError
+from pipeline.llm import LLMStageError
+from pipeline.pii import PIILeakError
+from pipeline.retrieval import EmbeddingError
 from pipeline.stages import build_specs
 
 MANIFEST = "artifacts/run_manifest.json"
@@ -25,7 +27,7 @@ EXIT_FATAL = 2
 
 FATAL_ERRORS = (
     ConfigError, InputError, StageOrderError, MissingArtifactError, StageNotImplementedError,
-    PIILeakError, EmbeddingError, OSError,
+    PIILeakError, EmbeddingError, LLMStageError, OSError,
 )
 
 LLM_STAGES = (Stage.TICKETS_CLASSIFIED, Stage.RESPONSES_DRAFTED)

@@ -82,6 +82,20 @@ class ClassificationMeta(BaseModel):
     evidence_ids: list[str] = Field(default_factory=list)
 
 
+class ClassificationOutput(BaseModel):
+    """What the model must return (SPEC §6.3 fields, no ``meta``). Validated before any override."""
+
+    model_config = STRICT
+
+    ticket_id: str
+    issue_type: IssueType
+    urgency: Urgency
+    resolution_action: ResolutionAction
+    customer_sensitive: bool
+    requires_refund_caution: bool
+    rationale: str = Field(min_length=1, max_length=500)
+
+
 class Classification(BaseModel):
     model_config = STRICT
 

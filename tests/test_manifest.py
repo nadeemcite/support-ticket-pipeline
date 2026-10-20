@@ -5,6 +5,7 @@ import json
 import pytest
 
 from pipeline.io_utils import sha256_file
+from pipeline.orchestrator import Stage
 from pipeline.runner import run
 from tests.conftest import FIXTURES, ROOT
 
@@ -69,7 +70,7 @@ def test_manifest_written_on_failure(make_config):
 )
 def test_artifacts_for_every_fixture(make_config, tickets, kb, accepted):
     config = make_config(tickets=tickets, kb=kb)
-    outcome = run(config)
+    outcome = run(config, until=Stage.TICKETS_NORMALISED)
     assert outcome.exit_code == 0
     normalised = json.loads((config.artifacts_dir / "normalised_tickets.json").read_text())
     assert len(normalised["tickets"]) == accepted

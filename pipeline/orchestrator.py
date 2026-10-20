@@ -96,6 +96,7 @@ class RunContext:
     data: dict[str, Any] = field(default_factory=dict)  # typed outputs handed from stage to stage
     manifest: dict[str, Any] = field(default_factory=dict)  # facts recorded for run_manifest.json
     stage_trail: list[dict[str, Any]] = field(default_factory=list)
+    entering: Stage | None = None  # the stage whose function is running (LLM stage guard, O3)
 
     def path(self, relative: str) -> Path:
         return self.config.out_dir / relative
@@ -132,7 +133,11 @@ class Pipeline:
             entered_at = utc_now()
             start = time.perf_counter()
             if spec.fn is not None:
-                spec.fn(ctx)
+                ctx.entering = spec.stage
+                try:
+                    spec.fn(ctx)
+                finally:
+                    ctx.entering = None
             self.machine.advance(spec.stage)
             ctx.stage_trail.append(
                 {

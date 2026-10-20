@@ -56,6 +56,10 @@ _NON_SECRET_QUALIFIERS = {
 _TRAILING_PUNCTUATION = ".,;:)\"'»]"
 
 
+class PIILeakError(RuntimeError):
+    """Raw PII reached a component that sends text to an external API (P-EXT, P-LLM). Always a bug."""
+
+
 @dataclass(frozen=True)
 class Detection:
     type: PIIType

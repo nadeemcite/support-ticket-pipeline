@@ -22,6 +22,7 @@ from typing import Any, Protocol
 from pipeline import pii
 from pipeline.cache import JsonCache
 from pipeline.io_utils import sha256_canonical, sha256_text
+from pipeline.pii import PIILeakError
 from pipeline.schemas import KBArticle, NormalisedTicket, RetrievalResult, RetrievedArticle
 
 RETRIEVAL_VERSION = "retrieval.v1"
@@ -44,10 +45,6 @@ _SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
 
 class EmbeddingError(RuntimeError):
     """The embedding API failed after retries (auth, network, quota). Fatal (exit 2)."""
-
-
-class PIILeakError(RuntimeError):
-    """Raw PII reached a component that sends text to an external API (P-EXT). Always a bug."""
 
 
 # --- Text processing ------------------------------------------------------------------------------

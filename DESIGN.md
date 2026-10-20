@@ -205,7 +205,7 @@ sequenceDiagram
 
     loop each ticket
         O->>C: classify(ticket, evidence)
-        C->>L: chat(json_schema prompt)
+        C->>L: call(classify.v1 prompt, masked)
         L->>FS: append llm_calls.jsonl
         L-->>C: raw JSON
         C->>C: Pydantic + taxonomy validation (retry ≤2)
@@ -334,51 +334,50 @@ flowchart LR
 ```mermaid
 classDiagram
     class LLMClient {
-        +provider: str
-        +model: str
-        +complete_json(stage, ticket_id, messages, schema, inputs, output) LLMResult
+        +provider: ChatProvider
+        +cache: JsonCache
+        +current_stage() Stage
+        +call(llm_stage, messages, prompt_version, schema) CallResult
+        +log(... attempt, status) appends llm_calls.jsonl
     }
-    class Provider {
+    class ChatProvider {
         <<interface>>
-        +chat(messages, schema, params) str
+        +params(max_tokens, temperature) dict
+        +complete(messages, params, schema) ChatResponse
     }
-    class OpenAIProvider {
-        base_url = api.openai.com/v1
-        response_format = json_schema
-        token param = max_completion_tokens
-    }
-    class OllamaProvider {
-        base_url = OLLAMA_BASE_URL (/v1)
-        response_format = json_object
-        token param = max_tokens
+    class LiteLLMProvider {
+        ollama: ollama_chat/MODEL, api_base = OLLAMA_BASE_URL without /v1, json_object
+        openai: openai/MODEL, strict json_schema, max_completion_tokens
+        drop_params, 3 transport retries
     }
     class StubProvider {
-        deterministic rule-based
+        deterministic keyword rules
         no network
     }
-    class LLMResult {
-        +raw_text: str
-        +parsed: dict
+    class CallResult {
+        +text: str
         +prompt_hash: str
         +cached: bool
-        +latency_ms: int
+        +latency_ms: float
+        +usage: dict
+        +error: str?
     }
-    LLMClient --> Provider
-    Provider <|.. OpenAIProvider
-    Provider <|.. OllamaProvider
-    Provider <|.. StubProvider
-    LLMClient --> LLMResult
-    LLMClient ..> CallLogger : logs every call
-    LLMClient ..> Cache : prompt_hash lookup
+    LLMClient --> ChatProvider
+    ChatProvider <|.. LiteLLMProvider
+    ChatProvider <|.. StubProvider
+    LLMClient --> CallResult
+    LLMClient ..> JsonCache : prompt_hash lookup
 ```
 
-- Both real providers use the official `openai` SDK; only `base_url`, `api_key` and `model` differ.
-- **Parameters:** `temperature=0`, `seed=42` (where supported), a token limit large enough for reasoning models (default 1500), 60 s timeout. A per-provider adapter sends it as `max_completion_tokens` to OpenAI and `max_tokens` to Ollama. Model IDs accept a `:cloud` suffix (Ollama CLI convention), which is stripped before the API call.
+- **One provider layer: LiteLLM.** Ollama Cloud models go through `ollama_chat/<model>` (that route returns clean JSON, while Ollama's OpenAI-compatible route wrapped JSON in markdown fences). OpenAI models go through `openai/<model>`. Keys are read from the environment by LiteLLM and never stored in config or artifacts. `litellm.drop_params` removes parameters a model rejects (some reasoning models reject `temperature`/`seed`).
+- **Parameters:** `temperature=0`, `seed=42` (where supported), a token limit large enough for reasoning models (default 1500), 60 s timeout. The adapter sends it as `max_completion_tokens` to OpenAI and `max_tokens` to Ollama. Model IDs accept a `:cloud` suffix (Ollama CLI convention), which is stripped.
 - **Models:** the pipeline default is `ollama` / `glm-5.2`; `openai` / `gpt-6.1-sol` is selectable. Evals always use two other models (§13), so the system is never graded by the model it was tuned on.
-- **Structured output:** OpenAI uses `response_format={"type":"json_schema", strict}` generated from the Pydantic model. Ollama uses `json_object`, and the schema is spelled out in the prompt. Either way, the **Pydantic validation in our code is the real gate**.
-- **Transport retries:** exponential backoff on 429/5xx/timeouts (3 attempts). These are separate from *content* retries (§6.4).
-- **`prompt_hash`** = `sha256(canonical_json({provider, model, params, messages, prompt_version}))`. It's used for cache keys and for the log.
-- **`StubProvider`:** a keyword-rule classifier and template drafter, so the pipeline and test suite run offline. It's selected with `LLM_PROVIDER=stub`, and its log entries say `provider: "stub"`.
+- **Structured output:** OpenAI gets a strict `json_schema` built from the taxonomy enums. Ollama gets `json_object`, with the same schema spelled out in the system prompt. Markdown fences are stripped defensively. Either way, the **Pydantic validation in our code is the real gate**.
+- **Guards inside the client:** the call is refused (programming error, exit 2) when the running stage isn't the one allowed for that kind of call (O3: classification only in `TICKETS_CLASSIFIED`, drafting only in `RESPONSES_DRAFTED`), and when any message contains raw PII (P-LLM).
+- **Transport vs content retries:** LiteLLM retries 429/5xx/timeouts 3 times. If it still fails, the client returns a `transport_error` result instead of raising, and the classifier spends one of its 3 attempts on it, retrying the same prompt. Content failures (bad JSON, schema, wrong `ticket_id`) retry with the errors fed back (§6.4).
+- **`prompt_hash`** = `sha256(canonical_json({provider, model, params, prompt_version, messages}))`. It's the LLM cache key and the log's link to the exact prompt. `llm_trace_sample.md` (Stage 3 audit) shows the hash being recomputed from re-built prompts.
+- **Cache:** results are stored by prompt hash (transport errors never are). A warm rerun makes no LLM calls and logs `cached: true`. The eval harness gives each (model, repeat) its own cache namespace so repeats are real calls.
+- **`StubProvider`:** a keyword-rule classifier, so the pipeline and test suite run offline. It's selected with `LLM_PROVIDER=stub`, and its log entries say `provider: "stub"`. It is not a quality baseline.
 
 ### 6.4 Classification
 
@@ -401,7 +400,7 @@ flowchart TD
 - **Prompt-injection hygiene:** ticket text goes inside clearly delimited `<ticket>` tags, with an instruction to treat it as data.
 - **Masked input only:** the ticket text in the prompt is the masked text from `normalised_tickets.json` (§6.11).
 - **Deterministic post-rules (code overrides the model):**
-  - The refund/charge lexicon in the ticket or evidence forces `requires_refund_caution=true`.
+  - The refund/charge lexicon in the **ticket** (en/es/fr/de/pt) forces `requires_refund_caution=true` (C1). Evidence isn't scanned: retrieval keeps loosely related articles, such as the refund-policy article next to an invoice question, which would wrongly force the flag.
   - `insufficient_content` forces `resolution_action=request_more_info`, unless the model escalates.
   - With zero retrieved articles, `answer_from_kb` is downgraded to `needs_human_escalation`, because nothing grounds the answer.
   - A disclosed credential (C5) forces `customer_sensitive=true`.
@@ -562,7 +561,7 @@ flowchart LR
 | Schemas | Pydantic v2 | Strict validation, JSON Schema generation for structured output |
 | Retrieval | OpenAI `text-embedding-3-small` via LiteLLM (+ pure-Python TF-IDF offline mode) | Cross-lingual; reproducible through the vector cache; TF-IDF keeps tests offline with no extra dependency |
 | Provider layer | LiteLLM | One client for OpenAI and Ollama models (embeddings now; LLM calls in Stage 3) |
-| LLM SDK | `openai` ≥ 1.x | One client for OpenAI and Ollama's `/v1` API |
+| LLM SDK | LiteLLM (`ollama_chat/`, `openai/` routes) | One client for Ollama Cloud and OpenAI, with retries and param dropping |
 | Default model | `glm-5.2` (Ollama Cloud) | Verified working; set by `LLM_PROVIDER=ollama` (default) |
 | Fast dev model | `glm-5.3-flash` (Ollama Cloud) | Substitute for the non-existent `glm-5.2-flash` |
 | Alt / eval model A | `gpt-6.1-sol` (OpenAI) | Verified working; needs `max_completion_tokens`; `LLM_PROVIDER=openai` |

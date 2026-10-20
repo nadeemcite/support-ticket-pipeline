@@ -325,7 +325,7 @@ One JSON object per line, one line per **attempt** (retries are separate lines):
 ```
 
 - Required fields (from the brief): `stage, ticket_id, timestamp, provider, model, prompt_hash, input_artifacts, output_artifact`.
-- `status` ∈ `ok · invalid_json · schema_error · rule_violation · transport_error`.
+- `status` ∈ `ok · invalid_json · schema_error · rule_violation · transport_error`. A `transport_error` line also has `error` (truncated provider message, no prompt text).
 - Drafting `input_artifacts` = `["artifacts/normalised_tickets.json","retrieval_results.json","ticket_classification.json","kb_articles.json"]`; `output_artifact` = `"draft_responses.json"`.
 - The file is truncated at `INIT`, so it reflects only the current run. Cache hits are logged with `cached: true`.
 - Prompts are never stored inline: only the hash (P-LOG). `--log-prompts` dumps the **masked** prompts only.
@@ -389,7 +389,7 @@ Validation and overrides (applied in order, after Pydantic validation passes):
 | ID | Rule |
 |---|---|
 | C0 | Output `ticket_id` must equal the input; enum fields must be taxonomy members; `rationale` non-empty (≤ 500 chars). Failure → content retry (max 2) with errors appended. |
-| C1 | If the ticket or evidence matches the refund/charge lexicon (`refund, charge(d), chargeback, double/duplicate charge, billed twice, money back, reimburse`) → `requires_refund_caution = true`. |
+| C1 | If the ticket's masked subject or message matches the refund/charge lexicon (`refund, charge(s/d), chargeback, billed twice, double/duplicate charge, money back, reimburse` + es/fr/de/pt equivalents, e.g. `reembolso`, `remboursement`, `Rückerstattung`, `Geld … zurück`) → `requires_refund_caution = true`. Evidence is **not** scanned: retrieval keeps loosely related articles (a refund-policy article next to an invoice question) that would wrongly force the flag. |
 | C2 | If `insufficient_content` and action = `answer_from_kb` → `request_more_info`. |
 | C3 | If zero articles were retrieved and action = `answer_from_kb` → `needs_human_escalation`. |
 | C4 | If `issue_type ∈ {billing, account_access}` → `customer_sensitive = true`. |
@@ -528,11 +528,13 @@ flowchart LR
 |---|---|
 | L1 | Calls only for `classification` and `drafting`. Exactly one successful call per ticket per stage (cache hits count as calls and are logged) |
 | L2 | `temperature=0`; `seed` set where supported; timeout `LLM_TIMEOUT_S` |
-| L3 | Transport retries: 3, with exponential backoff (1 s, 2 s, 4 s) on 429/5xx/timeout. Content retries: 2, with validation errors fed back |
+| L3 | Transport retries: 3, inside LiteLLM, on 429/5xx/timeout. A call that still fails counts as one of the 3 attempts (`transport_error`, same prompt retried). Content retries: up to 2, with validation errors fed back |
 | L4 | `prompt_hash = "sha256:" + sha256(canonical_json({provider, model, params, prompt_version, messages}))` |
 | L5 | Every attempt is logged per §6.8 **before** its result is used |
 | L6 | Prompt templates are versioned (`classify.v1`, `draft.v1`); changing a template requires bumping the version |
 | L7 | The `stub` provider is deterministic and network-free, and implements the same interface |
+| L8 | One provider layer, LiteLLM: Ollama Cloud via `ollama_chat/<model>` (`api_base` = `OLLAMA_BASE_URL` without `/v1`), OpenAI via `openai/<model>`. OpenAI gets a strict `json_schema`; Ollama gets `json_object` plus the schema in the prompt; markdown fences are stripped before parsing |
+| L9 | The client refuses a call whose messages contain raw PII (P-LLM) and a call made outside its stage (O3); both are fatal (exit 2) |
 | L8 | Prompts contain only masked ticket text (P-LLM). A test asserts that no PII from the eval set appears in any prompt |
 | L9 | The parameter adapter is per provider: `max_completion_tokens` for OpenAI, `max_tokens` for Ollama; a `:cloud` suffix is stripped from model IDs |
 

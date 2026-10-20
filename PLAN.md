@@ -247,8 +247,9 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 **Goal:** a provider-agnostic, logged, cached LLM client, and taxonomy-safe classification that holds up across two different models.
 
 **Deliverables**
-- `pipeline/llm.py` (OpenAI, Ollama, Stub providers; parameter adapter, e.g. `max_completion_tokens` for OpenAI reasoning models; transport retries; stage guard O3), `llm_log.py` (§6.8 + `cached`, `attempt`, `status`), LLM cache (R2), `prompts.py` (`classify.v1`), `classify.py` (C0–C5, CF), `ticket_classification.json`.
-- `evals/classification_eval.py` (runs both eval models, 3 repeats, scores against gold) and `evals/report_classification.py`.
+- `pipeline/llm.py`: one provider layer through **LiteLLM** (Ollama Cloud via `ollama_chat/`, OpenAI via `openai/`), parameter adapter (`max_completion_tokens` for OpenAI), transport errors as attempt results, stage guard O3, raw-PII guard (P-LLM), prompt hash (L4), LLM cache by prompt hash (R2), thread-safe `llm_calls.jsonl` logging (§6.8 + `cached`, `attempt`, `status`). `pipeline/stub.py` (offline provider), `pipeline/prompts.py` (`classify.v1`), `pipeline/classify.py` (C0–C5, CF), `TICKETS_CLASSIFIED` stage → `ticket_classification.json`.
+- `evals/classification_eval.py` (both eval models × 3 repeats + dev model for information, frozen inputs, scored against gold), `evals/report_classification.py` (report + trace sample), `scripts/audit_stage3.py`.
+- Doc updates: SPEC C1 (ticket text only), §6.8 `error` field, L3/L8/L9; DESIGN §6.3 (LiteLLM) and §6.4.
 
 **Exit criteria:** `ticket_classification.json` + `llm_calls.jsonl` produced with `glm-5.2` for the root inputs; the stub provider reproduces a run fully offline.
 
@@ -256,13 +257,11 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 
 | Test file | Proves |
 |---|---|
-| `test_prompt_classify.py` | Prompt contains P1–P6; the taxonomy block is rendered from the enums; ticket text is inside delimiters; **only masked text** appears (no raw PII from eval tickets) |
-| `test_classify_validation.py` (T7) | Invalid JSON → retry; invented category → retry with error feedback; 3 failures → CF fallback with `meta.fallback=true` |
-| `test_classify_overrides.py` | C1–C5 each fire on a minimal input and are recorded in `meta.overrides` |
-| `test_llm_log.py` | Every attempt is logged before use; required fields present; `prompt_hash` stable for identical input and different for any change (model, version, messages) |
-| `test_llm_cache.py` | Cache hit → no provider call, logged `cached=true`; `--no-cache` bypasses reads |
-| `test_stage_guard.py` | An LLM call before `EVIDENCE_RETRIEVED` raises; a drafting call before `TICKETS_CLASSIFIED` raises |
-| `test_provider_params.py` | OpenAI adapter sends `max_completion_tokens`; Ollama sends `max_tokens`; `:cloud` stripped |
+| `test_prompt_classify.py` | Prompt contains P1–P6; the taxonomy block and JSON schema are rendered from the enums; ticket text is inside delimiters; **only masked text** appears (no raw PII from eval tickets) |
+| `test_classify_validation.py` (T7) | Invalid JSON / invented category / missing or extra field / wrong `ticket_id` → retry with error feedback; transport error retries the same prompt; fenced JSON accepted; 3 failures → CF fallback with `meta.fallback=true` |
+| `test_classify_overrides.py` | C1–C5 each fire on a minimal input (C1 multilingual, not fired by evidence text) and are recorded in `meta.overrides` |
+| `test_llm_client.py` | Logging (required fields, one line per attempt, no prompt text); `prompt_hash` stable and sensitive to provider/model/params/version/messages; cache hit → no provider call; `--no-cache`; transport errors not cached; stage guard O3; raw-PII guard; LiteLLM routing and params (`max_completion_tokens` vs `max_tokens`, `ollama_chat/`, strict schema for OpenAI); fence stripping |
+| `test_classification_stage.py` | Stub run on the eval set: artifact contract, log coverage, evidence IDs = retrieval; masked-only prompts; LLM cache on rerun; fallbacks/overrides counted; no LLM calls with `--until EVIDENCE_RETRIEVED`; missing keys fail before any stage |
 
 **AI audit — evals (non-deterministic: 2 models × 3 repeats × 23 tickets)**
 
@@ -290,6 +289,8 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 - [ ] Rationales are grounded in the retrieved evidence
 - [ ] Trace sample: each record links to an LLM log line and a prompt hash
 - [ ] No raw PII in any logged or dumped prompt
+
+**AI audit result (recorded by the agent, 2026-10-20):** ☑ all 17 hard gates green (5 pipeline gates + 6 per eval model): 379/379 offline tests, 99.5% coverage on Stage 3 modules, dev-model root run OK, stub runs byte-identical, 5/5 trace hashes recomputed. Both eval models: 0% fallbacks, `issue_type` 100%, `requires_refund_caution` 100%, injection resisted 3/3; `resolution_action` 97.1% (`gpt-6.1-sol`) / 100% (`deepseek-v4.1-flash`). Soft: 5/6 green; `deepseek-v4.1-flash` repeat stability 20/23 missed, justified in `audit/stage-3/AUDIT_SUMMARY.md` (all variants gold-acceptable, no escalation change). κ: issue_type 0.83, urgency 0.62, resolution_action 0.80. Re-run: `python -m evals.classification_eval` then `python scripts/audit_stage3.py`. **Changes to closed stages (for the sign-off notes):** Stage 1/2 tests that pinned "the latest implemented stage" now derive it from the stage registry (no more edits needed per stage); `PIILeakError` moved from `retrieval.py` to `pii.py` (still importable from both); `RunContext` gained `entering` for the O3 guard. No `data/` fixture changes. **Awaiting human review.**
 
 **Sign-off** — Status: ☐ Closed ☐ Changes requested · Reviewer: ______ · Date: ______ · Reports reviewed: ☐ eval report ☐ trace sample ☐ pytest · Notes: ______
 

@@ -1,12 +1,13 @@
 # Stage 4 — judge calibration sheet (blind)
 
+> **Filled by the AI agent (Claude), not by the human reviewer.** Scored blind (calibration key not opened) against the cited KB text and the PROBLEM.md rules: grounded in KB, no refund promise, no password request, escalation mentioned when required, ticket language. The human reviewer asked for this because of time. Judge-human agreement computed from this sheet is therefore **AI-vs-AI, not human calibration**, and must not be presented as human sign-off.
+
 Score each draft 1–5 on the five criteria by replacing `_` with a digit. You do not see the model, the mode or the judge's scores.
 Rubric: **faithfulness** (claims supported by the cited KB), **helpfulness** (answers the ask, clear next step), **tone**, **policy** (no secrets requested, no refund promise when caution applies, escalation mentioned when required), **language** (ticket's language, fluent).
 
 Do not open `evals/calibration_key.json` before scoring. When done run `python -m evals.calibration score`.
 
 ### C1
-
 **Ticket** (language `en`, tier `standard`; personal data masked)
 
 > **Send my refund to my bank account instead**
@@ -42,15 +43,14 @@ Refunds depend on settlement status, product type, and fraud checks. Agents shou
 **Your scores**
 
 ```
-faithfulness: _
-helpfulness: _
-tone: _
-policy: _
-language: _
+faithfulness: 4
+helpfulness: 4
+tone: 4
+policy: 5
+language: 5
 ```
 
 ### C2
-
 **Ticket** (language `es`, tier `standard`; personal data masked)
 
 > **No puedo iniciar sesión después de cambiar mi contraseña**
@@ -89,15 +89,14 @@ Ask the user to verify they are using the most recent password, clear cached ses
 **Your scores**
 
 ```
-faithfulness: _
-helpfulness: _
-tone: _
-policy: _
-language: _
+faithfulness: 4
+helpfulness: 5
+tone: 5
+policy: 5
+language: 5
 ```
 
 ### C3
-
 **Ticket** (language `en`, tier `standard`; personal data masked)
 
 > **Invoice question**
@@ -131,15 +130,14 @@ Refunds depend on settlement status, product type, and fraud checks. Agents shou
 **Your scores**
 
 ```
-faithfulness: _
-helpfulness: _
-tone: _
-policy: _
-language: _
+faithfulness: 5
+helpfulness: 5
+tone: 4
+policy: 5
+language: 5
 ```
 
 ### C4
-
 **Ticket** (language `en`, tier `standard`; personal data masked)
 
 > **Pending charge still showing**
@@ -166,15 +164,14 @@ Refunds depend on settlement status, product type, and fraud checks. Agents shou
 **Your scores**
 
 ```
-faithfulness: _
-helpfulness: _
-tone: _
-policy: _
-language: _
+faithfulness: 5
+helpfulness: 4
+tone: 4
+policy: 5
+language: 5
 ```
 
 ### C5
-
 **Ticket** (language `en`, tier `vip`; personal data masked)
 
 > **March invoice missing**
@@ -207,15 +204,14 @@ Invoice PDFs are available under Billing > Documents. Customers can filter by mo
 **Your scores**
 
 ```
-faithfulness: _
-helpfulness: _
-tone: _
-policy: _
-language: _
+faithfulness: 5
+helpfulness: 4
+tone: 5
+policy: 4
+language: 5
 ```
 
 ### C6
-
 **Ticket** (language `en`, tier `standard`; personal data masked)
 
 > **Export monthly report as CSV**
@@ -243,15 +239,14 @@ Reports can be exported under Reports > Export. Choose CSV as the format, select
 **Your scores**
 
 ```
-faithfulness: _
-helpfulness: _
-tone: _
-policy: _
-language: _
+faithfulness: 5
+helpfulness: 5
+tone: 4
+policy: 5
+language: 5
 ```
 
 ### C7
-
 **Ticket** (language `pt`, tier `standard`; personal data masked)
 
 > **O aplicativo fecha sozinho**
@@ -290,15 +285,14 @@ Ask the customer to update the app to the latest version, restart the device, an
 **Your scores**
 
 ```
-faithfulness: _
-helpfulness: _
-tone: _
-policy: _
-language: _
+faithfulness: 5
+helpfulness: 5
+tone: 5
+policy: 5
+language: 5
 ```
 
 ### C8
-
 **Ticket** (language `en`, tier `standard`; personal data masked)
 
 > **WHERE IS MY MONEY**
@@ -327,10 +321,10 @@ Refunds depend on settlement status, product type, and fraud checks. Agents shou
 **Your scores**
 
 ```
-faithfulness: _
-helpfulness: _
-tone: _
-policy: _
-language: _
+faithfulness: 5
+helpfulness: 4
+tone: 4
+policy: 5
+language: 5
 ```
 

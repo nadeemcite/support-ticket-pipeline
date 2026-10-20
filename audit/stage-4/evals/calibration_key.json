@@ -1,0 +1,106 @@
+{
+  "C1": {
+    "model": "deepseek-v4.1-flash",
+    "mode": "oracle",
+    "ticket_id": "E-2018",
+    "judge": {
+      "faithfulness": 5,
+      "helpfulness": 5,
+      "tone": 5,
+      "policy": 5,
+      "language": 5,
+      "rationale": "The reply accurately reflects the cited refund policies, confirms escalation to billing operations, and provides a clear next step without promising a refund or requesting secrets."
+    }
+  },
+  "C2": {
+    "model": "deepseek-v4.1-flash",
+    "mode": "oracle",
+    "ticket_id": "E-2004",
+    "judge": {
+      "faithfulness": 3,
+      "helpfulness": 4,
+      "tone": 5,
+      "policy": 5,
+      "language": 5,
+      "rationale": "The reply introduces unsupported troubleshooting details by equating clearing cached sessions with closing and reopening the app and offering a regular browser as an alternative to incognito mode. These instructions may not clear cached sessions, reducing the usefulness of otherwise relevant guidance."
+    }
+  },
+  "C3": {
+    "model": "deepseek-v4.1-flash",
+    "mode": "e2e",
+    "ticket_id": "E-2009",
+    "judge": {
+      "faithfulness": 5,
+      "helpfulness": 5,
+      "tone": 5,
+      "policy": 5,
+      "language": 5,
+      "rationale": "The reply accurately explains invoice access using the cited KB and appropriately leaves refund eligibility to billing review without promising a refund. It is clear, professional, and fluent in English."
+    }
+  },
+  "C4": {
+    "model": "gpt-6.1-sol",
+    "mode": "oracle",
+    "ticket_id": "E-2016",
+    "judge": {
+      "faithfulness": 5,
+      "helpfulness": 5,
+      "tone": 5,
+      "policy": 5,
+      "language": 5,
+      "rationale": "All product facts (pending authorization, 3-5 business day window, escalation when two settled charges exist) are supported by KB-001, and the refund is framed conditionally rather than promised."
+    }
+  },
+  "C5": {
+    "model": "deepseek-v4.1-flash",
+    "mode": "e2e",
+    "ticket_id": "E-2019",
+    "judge": {
+      "faithfulness": 5,
+      "helpfulness": 5,
+      "tone": 5,
+      "policy": 5,
+      "language": 5,
+      "rationale": "The reply accurately reflects the KB, confirms escalation to a specialist team, and provides a clear next step without requesting secrets or making unsupported product claims."
+    }
+  },
+  "C6": {
+    "model": "gpt-6.1-sol",
+    "mode": "oracle",
+    "ticket_id": "E-2002",
+    "judge": {
+      "faithfulness": 5,
+      "helpfulness": 5,
+      "tone": 5,
+      "policy": 5,
+      "language": 5,
+      "rationale": "All steps and the 100,000-row/30-minute detail are directly supported by KB-007; the reply is clear, polite, and in English with no policy issues."
+    }
+  },
+  "C7": {
+    "model": "deepseek-v4.1-flash",
+    "mode": "e2e",
+    "ticket_id": "E-2017",
+    "judge": {
+      "faithfulness": 5,
+      "helpfulness": 5,
+      "tone": 5,
+      "policy": 5,
+      "language": 5,
+      "rationale": "A resposta segue as orientações da KB, reconhece as reinicializações já realizadas e solicita os dados necessários para encaminhamento caso a reinstalação não resolva."
+    }
+  },
+  "C8": {
+    "model": "gpt-6.1-sol",
+    "mode": "e2e",
+    "ticket_id": "E-2020",
+    "judge": {
+      "faithfulness": 5,
+      "helpfulness": 5,
+      "tone": 5,
+      "policy": 5,
+      "language": 5,
+      "rationale": "All product facts (3-5 business day pending authorization window, escalation to billing ops for two settled charges, refund review) are supported by the cited KB; the reply requests no sensitive data, promises no refund, and gives a clear next step in fluent English."
+    }
+  }
+}

@@ -4,7 +4,7 @@
 
 > A robot helper that reads customer messages, finds the right help-article, writes a safe reply, and knows when to call a human.
 
-**Status:** Stages 0–4 are closed (plan, foundations + PII masking, retrieval, LLM classification, drafting + safety + escalation). Stage 5 (validation, replay, final report) is next. See [Where are we?](#where-are-we) and the [plan](PLAN.md).
+**Status:** Stages 0–4 are closed (plan, foundations + PII masking, retrieval, LLM classification, drafting + safety + escalation). Stage 5 (validation, replay, final report) is in progress. See [Where are we?](#where-are-we) and the [plan](PLAN.md).
 
 ---
 
@@ -80,7 +80,7 @@ We build in **5 stages**. A stage is *closed* only after automatic checks pass *
 | 2 | Retrieval | ✅ Closed (`stage-2-closed`) |
 | 3 | LLM client + classification | ✅ Closed (`stage-3-closed`) |
 | 4 | Drafting, safety, escalation | ✅ Closed (`stage-4-closed`) |
-| 5 | Validation, replay, final report | 🚧 Next |
+| 5 | Validation, replay, final report | 🚧 In progress |
 
 ---
 
@@ -114,14 +114,14 @@ No keys? Use `LLM_PROVIDER=stub`: a built-in fake model plus TF-IDF retrieval. I
 
 ## Run
 
-> `run_pipeline.py` runs everything built so far: load, PII masking, retrieval, classification, drafting and escalation. Use `--until <STAGE>` to stop early. The standalone `validate.py` and the final validation stage arrive in Stage 5.
+> `run_pipeline.py` runs everything built so far: load, PII masking, retrieval, classification, drafting and escalation. Use `--until <STAGE>` to stop early. The standalone `validate.py` and the final validation stage are being built in Stage 5 and are not part of a closed stage yet.
 
 ```bash
 python run_pipeline.py                      # full run on tickets.json + kb_articles.json
 python run_pipeline.py --provider stub      # offline: fake model + TF-IDF retrieval, no keys
 python run_pipeline.py --retriever tfidf    # keep the real LLM but skip the embeddings API
 python run_pipeline.py --tickets data/eval/tickets.json --kb data/eval/kb_articles.json --out-dir /tmp/out
-python validate.py                          # re-check the artifacts on disk
+python validate.py                          # re-check the artifacts on disk (Stage 5, in progress)
 ```
 
 Exit codes: `0` all good · `1` validation failures · `2` fatal error. All flags are in [SPEC §2](SPEC.md).
@@ -148,6 +148,15 @@ python -m evals.drafting_eval         # Stage 4: drafting + cross-judging (--wor
 ```
 
 Reports land in `audit/stage-N/` and are committed. Gates and thresholds per stage: [PLAN.md](PLAN.md).
+
+**Judge calibration (Stage 4).** To check that the AI judge scores like a person, 8 drafts are scored blind on a 1–5 scale:
+
+```bash
+python -m evals.calibration build     # writes audit/stage-4/calibration_sheet.md (blind) + the answer key
+python -m evals.calibration score     # compares the sheet with the judge's scores
+```
+
+> ⚠️ The Stage 4 sheet was filled in by an AI agent (Claude) because of time, not by a human. Its 100% agreement is AI-vs-AI, so it is not human calibration and the judge scores should be read as advisory. The note is at the top of the sheet.
 
 ## Regenerate the banner
 

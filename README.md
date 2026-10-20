@@ -4,7 +4,7 @@
 
 > A robot helper that reads customer messages, finds the right help-article, writes a safe reply, and knows when to call a human.
 
-**Status:** Stages 0–4 are closed. Stage 5 (validation, replay, final report) is **built and all its automatic checks pass**. Only the human project sign-off in [PLAN.md](PLAN.md) is left, and it hasn't been recorded yet, so there is no `stage-5-closed` tag. Final roll-up: [`audit/FINAL_REPORT.md`](audit/FINAL_REPORT.md). See [Where are we?](#where-are-we) and the [plan](PLAN.md).
+**Status:** All stages (0–5) are closed; the project is complete (tag `stage-5-closed`, `v1.0.0`). Final roll-up: [`audit/FINAL_REPORT.md`](audit/FINAL_REPORT.md). See [Where are we?](#where-are-we) and the [plan](PLAN.md).
 
 ---
 
@@ -80,7 +80,7 @@ We build in **5 stages**. A stage is *closed* only after automatic checks pass *
 | 2 | Retrieval | ✅ Closed (`stage-2-closed`) |
 | 3 | LLM client + classification | ✅ Closed (`stage-3-closed`) |
 | 4 | Drafting, safety, escalation | ✅ Closed (`stage-4-closed`) |
-| 5 | Validation, replay, final report | 🚧 Built, awaiting human sign-off (closing it closes the project) |
+| 5 | Validation, replay, final report | ✅ Closed (`stage-5-closed`, `v1.0.0`) |
 
 ---
 

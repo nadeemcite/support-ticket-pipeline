@@ -19,7 +19,7 @@
 | 2 | Retrieval & evidence | No | Deterministic retrieval eval | ☑ Closed (2026-10-20) |
 | 3 | LLM layer & classification | **Yes** | 2-model classification eval | ☑ Closed (2026-10-20) |
 | 4 | Drafting, guards, grounding & escalation | **Yes** (drafting) | 2-model drafting eval + cross-judging | ☑ Closed (2026-10-20) |
-| 5 | Validation, orchestration, replay & **project closure** | Yes (E2E) | 2-model full-pipeline eval | ☐ Open |
+| 5 | Validation, orchestration, replay & **project closure** | Yes (E2E) | 2-model full-pipeline eval | ☑ Closed (2026-10-20) |
 
 ---
 
@@ -411,12 +411,12 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 - `sample_walkthrough.md`: T-1001/2/3 end to end (retrieval → classification → draft → escalation → validation), with every rule ID and LLM log reference
 
 **Human audit checklist (project closure)**
-- [ ] Fresh clone + `pip install -r requirements.txt && python run_pipeline.py && python validate.py` works on the reviewer's machine
-- [ ] Swap in a hand-written `tickets.json` (≥ 3 new tickets) → run succeeds and the outputs make sense
-- [ ] `sample_walkthrough.md` reviewed: each decision is explainable and grounded
-- [ ] No secrets or raw PII in any committed file or artifact (`.env` ignored; V13 passes)
-- [ ] All earlier stages show `Closed`, each with a closure commit and tag (`git tag -l 'stage-*'` lists `stage-0-closed` … `stage-4-closed`)
-- [ ] `FINAL_REPORT.md` known limitations accepted
+- [x] Fresh clone + `pip install -r requirements.txt && python run_pipeline.py && python validate.py` works on the reviewer's machine *(checked by the agent on the delegated sign-off: fresh clone of `origin`, new venv, no `.env`, `--provider stub --retriever tfidf` → validate pass 14/14; real-key run covered by A1)*
+- [x] Swap in a hand-written `tickets.json` (≥ 3 new tickets) → run succeeds and the outputs make sense *(4 new tickets incl. an en/es mix, a pasted password, an off-topic one; `glm-5.2` + tfidf; validate pass 14/14; billing and account tickets escalated to the KB-prescribed queues, es ticket answered in Spanish, off-topic not escalated; the pasted password and email appear in no artifact)*
+- [x] `sample_walkthrough.md` reviewed: each decision is explainable and grounded *(agent read-through only, not a manual line-by-line audit)*
+- [x] No secrets or raw PII in any committed file or artifact (`.env` ignored; V13 passes) *(tracked-file scan: the only detector hits are synthetic PII in `data/`, tests, docs and the Stage 1 masking report, plus digit-run false positives in two eval JSONL files)*
+- [x] All earlier stages show `Closed`, each with a closure commit and tag (`git tag -l 'stage-*'` lists `stage-0-closed` … `stage-4-closed`)
+- [x] `FINAL_REPORT.md` known limitations accepted
 
 **AI audit result (recorded by agent, 2026-10-20):** ☑ all hard gates green: 617 offline tests pass (3 skips are the "stage not built yet" guards, which no longer apply), 97.9% line coverage on Stage 5 modules, acceptance criteria A1–A5 verified on real runs (A1 with `glm-5.2` + embeddings, A5 from a clean copy with no `.env` or keys), replay matches `fixtures/replay/expected.json`, an identical rerun is 100% cache hits, a KB edit invalidates all retrieval entries, cold runs are byte-identical, no secrets or raw PII in committable files. End to end on the eval set with each eval model as the pipeline LLM (cold, no cache): `validate.py` pass, escalation vs gold 23/23 for both, sample tickets T-1001/2/3 3/3 for both, no hard metric worse than Stages 3/4, 0 classification and 0 draft fallbacks. Re-run `python -m evals.e2e_eval run --model <m> --cold` (per model), then `report`, then `python scripts/audit_stage5.py`; details in `audit/stage-5/AUDIT_SUMMARY.md` and `audit/FINAL_REPORT.md`.
 
@@ -428,7 +428,7 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 - *Leak-scan exemptions are listed* in `AUDIT_SUMMARY.md`: the Stage 1 masking report, the README privacy note and each `pytest.xml` contain synthetic PII on purpose.
 - *Validation warnings:* the `deepseek-v4.1-flash` run has one V12 warning (6 grounding flags). Warnings do not fail a run.
 
-**Project sign-off** — Status: ☐ **PROJECT CLOSED** ☐ Changes requested · Reviewer: ______ · Date: ______ · Notes: ______
+**Project sign-off** — Status: ☑ **PROJECT CLOSED** ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Notes: Closed on the reviewer's in-session instruction ("sign off manually fill the checklist using your judgement"). The checklist was completed by the agent, not by the reviewer: the fresh-clone and new-tickets checks were run by the agent in the agent's environment, and the walkthrough was not audited by hand. The judge was never calibrated by a human (Stage 4 sheet scored by an AI), so judge scores stay advisory. Known limitations in `audit/FINAL_REPORT.md` §6 are accepted as written. Open gold-policy questions (E-2014, VIP urgency) remain unresolved. No `data/` fixture or `gold.json` changes.
 
 **Closure commit:** `Close stage 5: Validation, orchestration, replay & project closure` (code, tests, `README.md`, `audit/stage-5/`, `audit/FINAL_REPORT.md`, this sign-off) · tag `stage-5-closed` (also `v1.0.0`) · SHA: ______
 

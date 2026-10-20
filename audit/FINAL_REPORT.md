@@ -15,9 +15,9 @@ A replayable batch pipeline: `tickets.json` + `kb_articles.json` → PII masking
 | 2 | Retrieval & evidence | ☑ Closed (2026-10-20) · `stage-2-closed` |
 | 3 | LLM layer & classification | ☑ Closed (2026-10-20) · `stage-3-closed` |
 | 4 | Drafting, guards, grounding & escalation | ☑ Closed (2026-10-20) · `stage-4-closed` |
-| 5 | Validation, orchestration, replay & **project closure** | ☐ Open |
+| 5 | Validation, orchestration, replay & **project closure** | ☑ Closed (2026-10-20) |
 
-Stage 5 closes only when a human completes its checklist in `PLAN.md`; until then its row shows ☐ Open.
+Stage 5 was closed on 2026-10-20 on the reviewer's instruction; the agent completed the checklist (see the sign-off notes in `PLAN.md`).
 
 ## 3. Gates by stage (AI audit)
 

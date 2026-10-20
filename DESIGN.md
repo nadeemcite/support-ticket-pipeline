@@ -565,7 +565,7 @@ flowchart LR
 | Retrieval | OpenAI `text-embedding-3-small` via LiteLLM (+ pure-Python TF-IDF offline mode) | Cross-lingual; reproducible through the vector cache; TF-IDF keeps tests offline with no extra dependency |
 | Provider layer | LiteLLM | One client for OpenAI and Ollama models (embeddings now; LLM calls in Stage 3) |
 | LLM SDK | LiteLLM (`ollama_chat/`, `openai/` routes) | One client for Ollama Cloud and OpenAI, with retries and param dropping |
-| Default model | `glm-5.2` (Ollama Cloud) | Verified working; set by `LLM_PROVIDER=ollama` (default) |
+| Default model | `glm-5.2` (Ollama Cloud) | Verified working; set by `LLM_PROVIDER=ollama` (auto-detected when only `OLLAMA_*` is set) |
 | Fast dev model | `glm-5.3-flash` (Ollama Cloud) | Substitute for the non-existent `glm-5.2-flash` |
 | Alt / eval model A | `gpt-6.1-sol` (OpenAI) | Verified working; needs `max_completion_tokens`; `LLM_PROVIDER=openai` |
 | Eval model B | `deepseek-v4.1-flash` (Ollama Cloud) | Verified working; used by the eval harness |

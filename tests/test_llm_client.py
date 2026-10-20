@@ -181,3 +181,34 @@ def test_litellm_errors_become_transport_errors(monkeypatch):
 def test_strip_fences(raw):
     assert llm.parse_json_object(raw) == {"a": 1}
     assert strip_fences(raw) == '{"a": 1}'
+
+
+def test_swap_token_param_only_for_token_limit_errors():
+    from pipeline.llm import swap_token_param
+
+    params = {"max_completion_tokens": 900, "temperature": 0.0}
+    assert swap_token_param(params, "Unsupported parameter: 'max_completion_tokens' is not supported with this model") == {"temperature": 0.0, "max_tokens": 900}
+    assert swap_token_param({"max_tokens": 5}, "Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens'") == {"max_completion_tokens": 5}
+    assert swap_token_param(params, "rate limit exceeded") is None
+    assert swap_token_param(params, "Unsupported parameter: 'temperature'") is None
+
+
+def test_provider_retries_once_with_the_other_token_parameter(monkeypatch):
+    import litellm
+
+    from pipeline.llm import LiteLLMProvider
+
+    seen = []
+
+    def fake(**kwargs):
+        seen.append(sorted(k for k in kwargs if "tokens" in k))
+        if "max_completion_tokens" in kwargs:
+            raise RuntimeError("Unsupported parameter: 'max_completion_tokens' is not supported with this model.")
+        from types import SimpleNamespace as NS
+
+        return NS(choices=[NS(message=NS(content="{}"))], usage=NS(prompt_tokens=1, completion_tokens=1))
+
+    monkeypatch.setattr(litellm, "completion", fake)
+    provider = LiteLLMProvider("openai", "gpt-4o-mini")
+    reply = provider.complete(MESSAGES, provider.params(100, 0.0), None)
+    assert reply.text == "{}" and seen == [["max_completion_tokens"], ["max_tokens"]]

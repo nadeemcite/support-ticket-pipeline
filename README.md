@@ -96,17 +96,20 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt   # runtime requirements plus pytest and coverage
 
-python run_pipeline.py --provider stub && python validate.py   # first run: offline, no keys needed
+export OPENAI_API_KEY=sk-...                  # your own key (OpenAI is all you need)
+python run_pipeline.py && python validate.py   # real model (gpt-4o-mini) + OpenAI embeddings
+
+python run_pipeline.py --provider stub && python validate.py   # offline option: no keys, repeatable
 
 cp .env.example .env                # only for real model runs; add the keys below
 ```
 
-With no API key configured, `python run_pipeline.py` does the same as `--provider stub` and prints a `note:` saying so. Setting `LLM_PROVIDER` or any key turns that off.
+The provider is auto-detected: `--provider`/`LLM_PROVIDER` if given, else `openai` when `OPENAI_API_KEY` is set (model `gpt-4o-mini`, or `OPENAI_MODEL`), else `ollama` when `OLLAMA_*` is set, else the offline `stub` with a `note:` on the console. With only `OPENAI_API_KEY`, nothing asks for Ollama variables; retrieval uses OpenAI embeddings.
 
 `.env` (never committed):
 
 ```bash
-LLM_PROVIDER=ollama                 # ollama (default) | openai | stub
+# LLM_PROVIDER=openai               # optional: openai | ollama | stub (auto-detected from the keys when unset)
 LLM_MODEL=glm-5.2
 OLLAMA_API_KEY=...
 OLLAMA_BASE_URL=...                 # OpenAI-compatible, ends with /v1
@@ -114,7 +117,7 @@ OPENAI_API_KEY=...                  # embeddings (default retriever), openai pro
 RETRIEVER=embedding                 # embedding (default, needs OPENAI_API_KEY) | tfidf (offline; default with stub)
 ```
 
-No keys? That is the default: the pipeline falls back to `stub` (or pass `--provider stub`): a built-in fake model plus TF-IDF retrieval. It works offline and gives repeatable answers. Real runs use OpenAI `text-embedding-3-small` for retrieval, so they need `OPENAI_API_KEY` unless you pass `--retriever tfidf`.
+No keys? The pipeline falls back to `stub` (or pass `--provider stub`): a built-in fake model plus TF-IDF retrieval. It works offline and gives repeatable answers. Real runs use OpenAI `text-embedding-3-small` for retrieval, so they need `OPENAI_API_KEY` unless you pass `--retriever tfidf`.
 
 ## Run
 

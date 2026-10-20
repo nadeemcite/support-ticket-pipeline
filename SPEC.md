@@ -48,12 +48,13 @@
 
 | Variable | Default | Notes |
 |---|---|---|
-| `LLM_PROVIDER` | `ollama` | `openai` · `ollama` · `stub` |
-| `LLM_MODEL` | `glm-5.2` (ollama) / `gpt-6.1-sol` (openai) | A `:cloud` suffix (Ollama CLI convention) is accepted and stripped |
-| `OPENAI_API_KEY` | — | Required when provider is `openai` |
+| `LLM_PROVIDER` | auto-detect: `openai` if `OPENAI_API_KEY` is set, else `ollama` if `OLLAMA_API_KEY`/`OLLAMA_BASE_URL` is set, else `stub` (with a console note) | `openai` · `ollama` · `stub` |
+| `LLM_MODEL` | `glm-5.2` (ollama) / `$OPENAI_MODEL` or `gpt-4o-mini` (openai) | A `:cloud` suffix (Ollama CLI convention) is accepted and stripped |
+| `OPENAI_API_KEY` | — | Required when provider is `openai` or the retriever is `embedding`. When unset and no retriever is chosen, retrieval falls back to TF-IDF |
+| `OPENAI_MODEL` | `gpt-4o-mini` | Model for the `openai` provider (`LLM_MODEL` and `--model` override it) |
 | `OLLAMA_API_KEY`, `OLLAMA_BASE_URL` | — | Required when provider is `ollama`; the base URL includes `/v1` |
 | `LLM_TEMPERATURE` | `0` | |
-| `LLM_MAX_TOKENS` | `1500` | Must leave room for reasoning tokens. Sent as `max_completion_tokens` to OpenAI and `max_tokens` to Ollama |
+| `LLM_MAX_TOKENS` | `1500` | Must leave room for reasoning tokens. Sent as `max_completion_tokens` to OpenAI and `max_tokens` to Ollama; if the API rejects the one sent, the call is retried once with the other |
 | `LLM_TIMEOUT_S` | `60` | Per request |
 | `RETRIEVER` | `embedding` (`tfidf` when provider is `stub`) | `embedding`: OpenAI embeddings via LiteLLM (needs `OPENAI_API_KEY`, also when the LLM provider is Ollama). `tfidf`: offline |
 | `EMBEDDING_MODEL` | `text-embedding-3-small` | |

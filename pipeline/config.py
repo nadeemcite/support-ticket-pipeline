@@ -23,7 +23,7 @@ DEFAULT_MIN_SCORE = {"embedding": 0.25, "tfidf": 0.07}
 
 DEFAULT_MODELS = {
     "ollama": "glm-5.2",
-    "openai": "gpt-6.1-sol",
+    "openai": "gpt-4o-mini",  # widely available; OPENAI_MODEL or LLM_MODEL overrides. The evals name their models explicitly.
     "stub": "stub",
 }
 
@@ -141,21 +141,34 @@ def load_config(
     notes: list[str] = []
     provider_set = "provider" in cli or bool(environ.get("LLM_PROVIDER"))
     default_provider = "ollama"
-    if not provider_set and not any(environ.get(var) for var in CREDENTIAL_VARS["ollama"] + ("OPENAI_API_KEY",)):
-        default_provider = "stub"
-        notes.append(
-            "no LLM API key configured (OLLAMA_API_KEY/OLLAMA_BASE_URL or OPENAI_API_KEY): "
-            "using the offline stub provider with TF-IDF retrieval; set LLM_PROVIDER and a key for real model runs"
-        )
+    if not provider_set:
+        # explicit choice > OPENAI_API_KEY > any Ollama variable > offline stub
+        if environ.get("OPENAI_API_KEY"):
+            default_provider = "openai"
+            notes.append("using the openai provider because OPENAI_API_KEY is set (override with --provider or LLM_PROVIDER)")
+        elif any(environ.get(var) for var in CREDENTIAL_VARS["ollama"]):
+            default_provider = "ollama"
+        else:
+            default_provider = "stub"
+            notes.append(
+                "no LLM API key configured (OPENAI_API_KEY, or OLLAMA_API_KEY/OLLAMA_BASE_URL): "
+                "using the offline stub provider with TF-IDF retrieval; export OPENAI_API_KEY for real model runs"
+            )
     provider = pick("provider", "LLM_PROVIDER", default_provider).strip().lower()
     if provider not in PROVIDERS:
         raise ConfigError(f"Unknown provider {provider!r}; expected one of {', '.join(PROVIDERS)}")
 
-    model = normalise_model_id(pick("model", "LLM_MODEL", DEFAULT_MODELS[provider]))
+    default_model = (environ.get("OPENAI_MODEL") or DEFAULT_MODELS["openai"]) if provider == "openai" else DEFAULT_MODELS[provider]
+    model = normalise_model_id(pick("model", "LLM_MODEL", default_model))
     fast_model = normalise_model_id(pick("fast_model", "LLM_FAST_MODEL", "glm-5.3-flash"))
 
-    # Offline by default with the stub provider; embeddings otherwise (OD-2).
-    retriever = pick("retriever", "RETRIEVER", "tfidf" if provider == "stub" else "embedding").strip().lower()
+    # Embeddings (OpenAI, OD-2) when OPENAI_API_KEY is available; TF-IDF otherwise, so an Ollama-only or keyless setup never
+    # fails on a key it was not given. An explicit --retriever/RETRIEVER is always honoured.
+    can_embed = bool(environ.get("OPENAI_API_KEY"))
+    retriever_set = "retriever" in cli or bool(environ.get("RETRIEVER"))
+    if not retriever_set and provider != "stub" and not can_embed:
+        notes.append("OPENAI_API_KEY is not set: using TF-IDF retrieval instead of embeddings")
+    retriever = pick("retriever", "RETRIEVER", "embedding" if provider != "stub" and can_embed else "tfidf").strip().lower()
     if retriever not in RETRIEVERS:
         raise ConfigError(f"Unknown retriever {retriever!r}; expected one of {', '.join(RETRIEVERS)}")
 

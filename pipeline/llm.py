@@ -89,15 +89,24 @@ class LiteLLMProvider:
             }
         else:
             response_format = {"type": "json_object"}
-        try:
-            response = litellm.completion(
+        def call(call_params: dict[str, Any]):
+            return litellm.completion(
                 messages=messages,
                 response_format=response_format,
                 timeout=self.timeout_s,
                 num_retries=TRANSPORT_RETRIES,
-                **params,
+                **call_params,
                 **self._route(),
             )
+
+        try:
+            try:
+                response = call(params)
+            except Exception as exc:
+                swapped = swap_token_param(params, str(exc))
+                if swapped is None:
+                    raise
+                response = call(swapped)  # the model wanted the other token-limit name: retry once
         except Exception as exc:  # LiteLLM raises provider-specific types; normalise them
             raise LLMTransportError(f"{type(exc).__name__}: {str(exc)[:200]}") from exc
         usage = getattr(response, "usage", None)
@@ -108,6 +117,18 @@ class LiteLLMProvider:
                 "completion_tokens": int(getattr(usage, "completion_tokens", 0) or 0),
             },
         )
+
+
+def swap_token_param(params: dict[str, Any], error: str) -> dict[str, Any] | None:
+    """``max_tokens`` <-> ``max_completion_tokens`` when the API says the one we sent is not supported (older chat models
+    reject ``max_completion_tokens``, reasoning models reject ``max_tokens``). None when the error is about something else."""
+    text = error.lower()
+    for sent, other in (("max_completion_tokens", "max_tokens"), ("max_tokens", "max_completion_tokens")):
+        if sent in params and sent in text and ("unsupported" in text or "not supported" in text or "unknown" in text or "unrecognized" in text):
+            swapped = {k: v for k, v in params.items() if k != sent}
+            swapped[other] = params[sent]
+            return swapped
+    return None
 
 
 def strip_fences(text: str) -> str:

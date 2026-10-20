@@ -20,7 +20,7 @@ from pipeline.config import DEFAULT_MIN_SCORE
 from pipeline.loader import load_inputs
 from pipeline.normalise import normalise_article, normalise_tickets
 from pipeline.orchestrator import utc_now
-from pipeline.retrieval import CachedEmbedder, LiteLLMEmbedder, build_retriever, retrieve
+from pipeline.retrieval import CachedEmbedder, LiteLLMEmbedder, build_retriever, gate_applies, retrieve
 from pipeline.schemas import NormalisedTicket
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -57,12 +57,13 @@ def rank_all(retriever, tickets: list[NormalisedTicket]) -> dict[str, list[dict[
     ranked = {}
     for ticket in tickets:
         _, debug = retrieve(retriever, ticket, top_k=TOP_K, min_score=0.0)
-        ranked[ticket.ticket_id] = debug["candidates"]
+        gated = gate_applies(ticket)
+        ranked[ticket.ticket_id] = [{**c, "gate_blocked": gated and not c["shared_terms"]} for c in debug["candidates"]]
     return ranked
 
 
 def kept(candidates: list[dict], min_score: float) -> list[str]:
-    return [c["article_id"] for c in candidates[:TOP_K] if c["score"] >= min_score]
+    return [c["article_id"] for c in candidates if c["score"] >= min_score and not c.get("gate_blocked")][:TOP_K]
 
 
 def score(ranked: dict[str, list[dict]], gold: dict[str, dict], tickets: list[NormalisedTicket], min_score: float) -> dict[str, Any]:

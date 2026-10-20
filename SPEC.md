@@ -59,7 +59,7 @@
 | `RETRIEVER` | `embedding` (`tfidf` when provider is `stub`) | `embedding`: OpenAI embeddings via LiteLLM (needs `OPENAI_API_KEY`, also when the LLM provider is Ollama). `tfidf`: offline |
 | `EMBEDDING_MODEL` | `text-embedding-3-small` | |
 | `RETRIEVAL_TOP_K` | `3` | The brief requires 3 |
-| `RETRIEVAL_MIN_SCORE` | `0.25` (embedding) / `0.07` (tfidf) | Below it → not a useful match. Chosen by the threshold sweep (`python -m evals.retrieval_eval`): TF-IDF metrics are flat up to 0.07 and recall@3 drops from 0.08 (E-2014/KB-011 scores 0.0766), so 0.07 is the highest loss-free value |
+| `RETRIEVAL_MIN_SCORE` | `0.25` (embedding) / `0.05` (tfidf) | Below it → not a useful match. Chosen by the threshold sweep (`python -m evals.retrieval_eval`). A higher TF-IDF value would drop T-1001's secondary evidence KB-004 (0.0526); off-topic text is rejected by the relevance gate (X6) instead |
 | `MAX_TICKET_CHARS` | `4000` | Message truncation |
 | `MAX_DRAFT_CHARS` | `1500` | |
 | `PII_HASH_SALT` | fixed non-secret string | Salt for the hashes in `pii_summary` (§6.10). Fixed by default so reruns are byte-identical |
@@ -189,7 +189,7 @@ All per-ticket artifacts are JSON objects with a top-level list, ordered by norm
 ```json
 {
   "config": {
-    "retrieval_version": "retrieval.v1", "method": "embedding", "provider": "openai", "model": "text-embedding-3-small",
+    "retrieval_version": "retrieval.v2", "method": "embedding", "provider": "openai", "model": "text-embedding-3-small",
     "article_text": "title. category. content", "query_text": "subject. message (PII-masked)",
     "explanation": "top_terms = lexical TF-IDF overlap; best_snippet = KB sentence with the highest embedding similarity",
     "embedding_dims": 1536, "top_k": 3, "min_score": 0.25, "kb_hash": "sha256:0e9ee05a…"
@@ -499,6 +499,7 @@ A `credential` detection also triggers C5 and D10.
 | X3 | Every vector is cached by `sha256(text)` per model under `.cache/embeddings/`. Reruns are byte-identical and make no API calls. A fresh re-embedding can drift in the 3rd–4th decimal; the threshold keeps a wide margin over that drift (Stage 2 audit: max drift 0.0011, same top-3 for 23/23 eval tickets) |
 | X4 | Offline mode `tfidf`: pure-Python TF-IDF (unigrams + bigrams, sublinear tf, smoothed idf, L2 norm; title ×3, category ×2, subject ×2). Default with the `stub` provider and in tests. English-only in practice |
 | X5 | Ranking: score desc, then `article_id` asc. Keep the top `RETRIEVAL_TOP_K` with score ≥ `RETRIEVAL_MIN_SCORE`. When nothing qualifies, retrieval returns `[]` and C3 escalates. Retrieval never guesses |
+| X6 | Relevance gate: for a ticket declared as English (`language` en, which is also the default when it is missing) an article is kept only if it shares at least one topical word with the ticket (stemmed, not a stopword, ≥ 3 characters, not a number, not in a short list of generic pleasantries such as `thank`, `help`, `support`). It stops embedding noise from becoming evidence. Tickets in other languages skip the gate (they share no words with the English KB; the embedding score decides, OD-2). `retrieval_debug.json` lists `shared_terms` per candidate, `gate_blocked` for kept-by-score articles it removed, and a `note` when nothing survived. `RETRIEVAL_VERSION` is `retrieval.v2` |
 | X6 | An empty ticket (no subject or message) is never sent to the API and retrieves `[]` |
 | X7 | Ticket queries are embedded in one batched API call per run. KB articles and KB sentences are one call each |
 | X8 | An embedding API failure (auth, network, quota, after 3 retries) is fatal: `EmbeddingError`, exit 2. A missing `OPENAI_API_KEY` stops the run before any stage, with a message suggesting `--retriever tfidf` |

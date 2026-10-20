@@ -29,7 +29,7 @@ def test_debug_structure_and_kept_flags(make_config, fake_embedder, retriever):
         assert [c["rank"] for c in candidates] == list(range(1, len(candidates) + 1))
         assert [c["article_id"] for c in candidates if c["kept"]] == kept_ids
         for c in candidates:
-            assert set(c) == {"article_id", "rank", "score", "lexical_score", "kept", "top_terms", "best_snippet"}
+            assert set(c) == {"article_id", "rank", "score", "lexical_score", "kept", "shared_terms", "top_terms", "best_snippet"}
             if c["kept"]:
                 assert c["best_snippet"], (entry["ticket_id"], c["article_id"])
         if not kept_ids:

@@ -25,7 +25,7 @@ from pipeline.io_utils import sha256_canonical, sha256_text
 from pipeline.pii import PIILeakError
 from pipeline.schemas import KBArticle, NormalisedTicket, RetrievalResult, RetrievedArticle
 
-RETRIEVAL_VERSION = "retrieval.v1"
+RETRIEVAL_VERSION = "retrieval.v2"  # v2: relevance gate (X6)
 
 FIELD_WEIGHTS = {"title": 3, "category": 2, "content": 1}
 SUBJECT_WEIGHT = 2
@@ -39,6 +39,8 @@ _STOPWORDS = frozenset(
     those through to too under until up very was we were what when where which while who whom why will with
     would you your yours yourself yesterday today now one""".split()
 )
+# Stemmed words that say nothing about the topic. They never count as the shared term in the relevance gate (X6).
+_GENERIC_TERMS = frozenset("thank hello great good help question support servic team need want know tell issu problem hi".split())
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 _SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
 
@@ -375,12 +377,37 @@ def query_terms(ticket: NormalisedTicket) -> list[str]:
     return list(dict.fromkeys(tokens(ticket_lexical_text(ticket))))
 
 
+def content_terms(text: str) -> set[str]:
+    """Stemmed, topical words: no stopwords, no placeholders, no numbers, no generic pleasantries."""
+    return {t for t in tokens(text) if len(t) >= 3 and not t.isdigit() and t not in _GENERIC_TERMS}
+
+
+def gate_applies(ticket: NormalisedTicket) -> bool:
+    """The relevance gate compares words, so it only makes sense for tickets declared as English (the KB's language).
+    Tickets in other languages share no words with the KB by construction and rely on the embedding score alone (OD-2).
+    The declared language is used on purpose: the stopword heuristic misreads short English ("how do I ..." looks Portuguese)."""
+    from pipeline.language import language_code
+
+    return language_code(ticket.language) == "en"
+
+
+def shared_terms(ticket: NormalisedTicket, article: KBArticle) -> list[str]:
+    return sorted(content_terms(ticket_lexical_text(ticket)) & content_terms(article_lexical_text(article)))
+
+
 def retrieve(
     retriever: Retriever, ticket: NormalisedTicket, top_k: int, min_score: float
 ) -> tuple[RetrievalResult, dict[str, Any]]:
-    """Rank all candidates (score desc, article_id asc), keep the top_k at or above min_score."""
+    """Rank all candidates (score desc, article_id asc), keep the top_k at or above min_score (X5) that pass the
+    relevance gate (X6): for English tickets the article must share at least one topical word with the ticket, so a
+    similarity score produced by embedding noise alone never becomes evidence."""
     ranked = sorted(retriever.candidates(ticket), key=lambda c: (-c.score, c.article_id))
-    kept_ids = {c.article_id for c in ranked[:top_k] if c.score >= min_score}
+    by_id = {a.article_id: a for a in retriever.articles}
+    gated = gate_applies(ticket)
+    shared = {c.article_id: shared_terms(ticket, by_id[c.article_id]) for c in ranked}
+    passing = [c for c in ranked if c.score >= min_score]
+    blocked = [c.article_id for c in passing if gated and not shared[c.article_id]]
+    kept_ids = {c.article_id for c in [c for c in passing if c.article_id not in blocked][:top_k]}
     result = RetrievalResult(
         ticket_id=ticket.ticket_id,
         retrieved_articles=[
@@ -399,6 +426,7 @@ def retrieve(
                 "score": c.score,
                 "lexical_score": c.lexical_score,
                 "kept": c.article_id in kept_ids,
+                "shared_terms": shared[c.article_id],
                 "top_terms": [{"term": t, "contribution": w} for t, w in c.top_terms],
                 "best_snippet": c.best_snippet,
             }
@@ -410,7 +438,11 @@ def retrieve(
             "empty ticket: nothing to match"
             if ticket.insufficient_content
             else f"no article reached min_score {min_score}"
+            if not blocked
+            else f"relevance gate: {', '.join(blocked)} scored >= {min_score} but share no topical word with the ticket"
         )
+    elif blocked:
+        debug["gate_blocked"] = blocked
     return result, debug
 
 

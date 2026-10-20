@@ -215,6 +215,11 @@ S2_PHRASES = [
     "We've processed your refund today.",
     "The refund was reversed this morning.",
     "Your refund has been issued.",
+    "Your payment will be reversed within 5 days.",
+    "We will reverse the charge.",
+    "We will credit the amount back to your card.",
+    "We have reimbursed you.",
+    "The money will be returned to your card.",
 ]
 
 
@@ -273,3 +278,13 @@ def test_v11_not_escalated_must_not_claim_escalation(work):
     assert "V11" in failing(checks) and any("not escalated but the draft says" in d["message"] for d in checks["V11"]["details"])
     checks, _ = check(work, lambda out: _decide("E5")(out, QUIET, escalate=False))
     assert "V11" not in failing(checks)
+
+
+@pytest.mark.parametrize("phrase", ["The billing team will review whether a refund applies.", "A pending authorization will be reversed automatically."])
+def test_v10_allows_safe_refund_wording(work, phrase):
+    def edit_both(out):
+        edit(out, "ticket_classification.json", "classifications", lambda items: items[0].update(requires_refund_caution=True))
+        edit(out, "draft_responses.json", "drafts", lambda items: items[0].update(draft_response=phrase))
+
+    checks, _ = check(work, edit_both)
+    assert "V10" not in failing(checks)

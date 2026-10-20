@@ -52,6 +52,11 @@ _S2_PATTERNS = [
     re.compile(rf"\b(?:we will|we'll|we are going to|you will|you'll|we shall)\s+(?:\w+\s+){{0,4}}?{_REFUND}\b", re.IGNORECASE),
     re.compile(rf"\b{_REFUND}\s+(?:has been|have been|was|were|is being|are being|will be|is going to be)\s+{_ISSUE_VERB}\b", re.IGNORECASE),
     re.compile(rf"\b{_DONE_VERB}\s+(?:\w+\s+){{0,3}}?{_REFUND}\b", re.IGNORECASE),
+    re.compile(r"\b(?:we|i)(?:'ll|'ve| will| shall| are going to| am going to| have| had)?\s+(?:\w+\s+){0,2}?(?:reverse|reversed|reimburse|reimbursed)\b", re.IGNORECASE),
+    re.compile(r"\b(?:will|shall|would|is going to|are going to|has been|have been|was|were)\s+be\s+(?:reversed|reimbursed|credited|paid back|sent back|returned to you)\b", re.IGNORECASE),
+    re.compile(r"\b(?:you|your \w+)\s+(?:will|would|'ll)\s+be\s+reimbursed\b|\breimburs(?:e|ed|ing)\s+(?:you|your|the|this)\b", re.IGNORECASE),
+    re.compile(r"\bcredit(?:ed|ing|s)?\s+(?:\w+\s+){0,3}?back\b", re.IGNORECASE),
+    re.compile(r"\b(?:money|funds|payment|amount|charge)\b(?:\W+\w+){0,3}?\s+(?:will|would|shall)\s+be\s+(?:returned|sent back|credited|reversed|paid back|refunded)\b", re.IGNORECASE),
     re.compile(r"\b(?:your |the )?money(?: is| will be)? back\b|\b(?:send|give|return|credit|pay|get|receive)\w*\s+(?:you |me )?(?:your |the )?money\b", re.IGNORECASE),
     re.compile(r"\b(?:has|have|had) been refunded\b|\bwe(?:'ve| have) refunded\b", re.IGNORECASE),
     re.compile(rf"\b(?:guarantee|promise)\w*\s+(?:\w+\s+){{0,3}}?{_REFUND}\b", re.IGNORECASE),
@@ -136,11 +141,17 @@ def _clause_prefix(prefix: str) -> str:
     return _CLAUSE_BREAK_RE.split(prefix)[-1]
 
 
+_HOLD_RE = re.compile(r"\bpending\b|\bauthori[sz]ation\b|\bhold\b", re.IGNORECASE)  # releasing a hold is not a refund (KB-001)
+_HOLD_SAFE = (3, 4, 7)  # indexes of the reversal/credit patterns that a hold sentence may match without being a promise
+
+
 def s2_refund_promise(text: str) -> bool:
     """S2: promises or announces a refund. A negation within 8 words before the trigger, in the same clause, or inside
     the match cancels it ("we cannot promise a refund", "I'm not able to confirm or promise a refund")."""
     for sentence in sentences(text):
-        for pattern in _S2_PATTERNS:
+        for index, pattern in enumerate(_S2_PATTERNS):
+            if index in _HOLD_SAFE and _HOLD_RE.search(sentence):
+                continue
             for match in pattern.finditer(sentence):
                 if negated_before(_clause_prefix(sentence[: match.start()]), window=S2_NEGATION_WINDOW) or negated_before(match.group(0), window=S2_NEGATION_WINDOW):
                     continue

@@ -11,8 +11,9 @@ pytestmark = pytest.mark.stage1
 def test_cli_success(tmp_path, capsys):
     code = run_pipeline.main(["--provider", "stub", "--out-dir", str(tmp_path), "--tickets", str(ROOT / "tickets.json"), "--kb", str(ROOT / "kb_articles.json")])
     assert code == 0
-    assert "TICKETS_NORMALISED" in capsys.readouterr().out
+    assert "EVIDENCE_RETRIEVED" in capsys.readouterr().out
     assert (tmp_path / "artifacts/normalised_tickets.json").is_file()
+    assert (tmp_path / "retrieval_results.json").is_file()
 
 
 def test_cli_fatal_on_bad_input(tmp_path, capsys):
@@ -28,6 +29,6 @@ def test_cli_fatal_on_bad_config(tmp_path, capsys, monkeypatch):
 
 
 def test_cli_until_unimplemented_stage(tmp_path, capsys):
-    code = run_pipeline.main(["--provider", "stub", "--out-dir", str(tmp_path), "--until", "EVIDENCE_RETRIEVED"])
+    code = run_pipeline.main(["--provider", "stub", "--out-dir", str(tmp_path), "--until", "TICKETS_CLASSIFIED"])
     assert code == 2
     assert "not implemented" in capsys.readouterr().err

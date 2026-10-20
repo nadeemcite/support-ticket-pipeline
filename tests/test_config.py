@@ -12,7 +12,10 @@ pytestmark = pytest.mark.stage1
 def test_defaults(tmp_path):
     config = load_config({}, env={}, dotenv_path=None)
     assert (config.provider, config.model, config.fast_model) == ("ollama", "glm-5.2", "glm-5.3-flash")
-    assert (config.top_k, config.min_score, config.temperature) == (3, 0.05, 0.0)
+    assert (config.top_k, config.temperature, config.retriever) == (3, 0.0, "embedding")
+    assert config.min_score is None and config.effective_min_score == 0.25
+    stub = load_config({"provider": "stub"}, env={}, dotenv_path=None)
+    assert (stub.retriever, stub.effective_min_score) == ("tfidf", 0.05)
 
 
 def test_precedence_cli_over_env_over_dotenv(tmp_path):

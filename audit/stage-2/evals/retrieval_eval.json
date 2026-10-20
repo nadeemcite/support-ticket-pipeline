@@ -1,0 +1,5566 @@
+{
+  "embedding_model": "text-embedding-3-small",
+  "top_k": 3,
+  "methods": {
+    "embedding": {
+      "default_min_score": 0.25,
+      "at_default": {
+        "min_score": 0.25,
+        "recall_at_3_english": [
+          16,
+          16
+        ],
+        "recall_at_3_non_english": [
+          4,
+          4
+        ],
+        "recall_at_3_all": [
+          20,
+          20
+        ],
+        "top1_accuracy": [
+          20,
+          20
+        ],
+        "mrr": 1.0,
+        "no_match_precision": [
+          3,
+          3
+        ],
+        "per_ticket": {
+          "T-1001": {
+            "language": "en",
+            "relevant": [
+              "KB-001",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-001",
+              "KB-004",
+              "KB-008"
+            ],
+            "scores": [
+              0.5553,
+              0.2895,
+              0.2742
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "T-1002": {
+            "language": "en",
+            "relevant": [
+              "KB-002"
+            ],
+            "retrieved": [
+              "KB-002",
+              "KB-009",
+              "KB-010"
+            ],
+            "scores": [
+              0.5529,
+              0.4109,
+              0.322
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "T-1003": {
+            "language": "en",
+            "relevant": [
+              "KB-003"
+            ],
+            "retrieved": [
+              "KB-003",
+              "KB-007",
+              "KB-008"
+            ],
+            "scores": [
+              0.7572,
+              0.409,
+              0.2532
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2001": {
+            "language": "en",
+            "relevant": [
+              "KB-006"
+            ],
+            "retrieved": [
+              "KB-006"
+            ],
+            "scores": [
+              0.5259
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2002": {
+            "language": "en",
+            "relevant": [
+              "KB-007"
+            ],
+            "retrieved": [
+              "KB-007",
+              "KB-003"
+            ],
+            "scores": [
+              0.7058,
+              0.3595
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2003": {
+            "language": "en",
+            "relevant": [
+              "KB-009"
+            ],
+            "retrieved": [
+              "KB-009",
+              "KB-005",
+              "KB-002"
+            ],
+            "scores": [
+              0.524,
+              0.3671,
+              0.3479
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2004": {
+            "language": "es",
+            "relevant": [
+              "KB-002"
+            ],
+            "retrieved": [
+              "KB-002",
+              "KB-009",
+              "KB-005"
+            ],
+            "scores": [
+              0.4123,
+              0.3262,
+              0.2942
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2005": {
+            "language": "fr",
+            "relevant": [
+              "KB-003"
+            ],
+            "retrieved": [
+              "KB-003",
+              "KB-007",
+              "KB-008"
+            ],
+            "scores": [
+              0.5917,
+              0.4029,
+              0.3025
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2006": {
+            "language": "de",
+            "relevant": [
+              "KB-008",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-008",
+              "KB-003",
+              "KB-004"
+            ],
+            "scores": [
+              0.5261,
+              0.2999,
+              0.2905
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2007": {
+            "language": "en",
+            "relevant": [
+              "KB-001",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-001",
+              "KB-004",
+              "KB-008"
+            ],
+            "scores": [
+              0.5528,
+              0.4034,
+              0.3116
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2008": {
+            "language": "en",
+            "relevant": [
+              "KB-002"
+            ],
+            "retrieved": [
+              "KB-002",
+              "KB-009",
+              "KB-005"
+            ],
+            "scores": [
+              0.4962,
+              0.4093,
+              0.3697
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2009": {
+            "language": "en",
+            "relevant": [
+              "KB-003"
+            ],
+            "retrieved": [
+              "KB-003",
+              "KB-004",
+              "KB-008"
+            ],
+            "scores": [
+              0.4627,
+              0.4508,
+              0.4189
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2010": {
+            "language": "en",
+            "relevant": [],
+            "retrieved": [],
+            "scores": [],
+            "hit": null,
+            "reciprocal_rank": null,
+            "top1_correct": null,
+            "empty_ok": true
+          },
+          "E-2011": {
+            "language": "en",
+            "relevant": [],
+            "retrieved": [],
+            "scores": [],
+            "hit": null,
+            "reciprocal_rank": null,
+            "top1_correct": null,
+            "empty_ok": true
+          },
+          "E-2012": {
+            "language": "en",
+            "relevant": [],
+            "retrieved": [],
+            "scores": [],
+            "hit": null,
+            "reciprocal_rank": null,
+            "top1_correct": null,
+            "empty_ok": true
+          },
+          "E-2013": {
+            "language": "en",
+            "relevant": [
+              "KB-005"
+            ],
+            "retrieved": [
+              "KB-005",
+              "KB-002",
+              "KB-006"
+            ],
+            "scores": [
+              0.6493,
+              0.3515,
+              0.3146
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2014": {
+            "language": "en",
+            "relevant": [
+              "KB-011"
+            ],
+            "retrieved": [
+              "KB-011",
+              "KB-009",
+              "KB-003"
+            ],
+            "scores": [
+              0.3992,
+              0.331,
+              0.2912
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2015": {
+            "language": "en",
+            "relevant": [
+              "KB-010"
+            ],
+            "retrieved": [
+              "KB-010",
+              "KB-002",
+              "KB-009"
+            ],
+            "scores": [
+              0.5801,
+              0.3171,
+              0.2934
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2016": {
+            "language": "en",
+            "relevant": [
+              "KB-001"
+            ],
+            "retrieved": [
+              "KB-001",
+              "KB-004"
+            ],
+            "scores": [
+              0.5953,
+              0.2568
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2017": {
+            "language": "pt",
+            "relevant": [
+              "KB-006"
+            ],
+            "retrieved": [
+              "KB-006"
+            ],
+            "scores": [
+              0.3889
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2018": {
+            "language": "en",
+            "relevant": [
+              "KB-008",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-008",
+              "KB-004",
+              "KB-001"
+            ],
+            "scores": [
+              0.415,
+              0.3429,
+              0.2742
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2019": {
+            "language": "en",
+            "relevant": [
+              "KB-003"
+            ],
+            "retrieved": [
+              "KB-003",
+              "KB-001",
+              "KB-008"
+            ],
+            "scores": [
+              0.5928,
+              0.3056,
+              0.2853
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2020": {
+            "language": "en",
+            "relevant": [
+              "KB-001",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-001",
+              "KB-009",
+              "KB-004"
+            ],
+            "scores": [
+              0.3657,
+              0.2725,
+              0.2719
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          }
+        }
+      },
+      "sweep": [
+        {
+          "min_score": 0.0,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            4,
+            4
+          ],
+          "recall_at_3_all": [
+            20,
+            20
+          ],
+          "top1_accuracy": [
+            20,
+            20
+          ],
+          "mrr": 1.0,
+          "no_match_precision": [
+            1,
+            3
+          ]
+        },
+        {
+          "min_score": 0.15,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            4,
+            4
+          ],
+          "recall_at_3_all": [
+            20,
+            20
+          ],
+          "top1_accuracy": [
+            20,
+            20
+          ],
+          "mrr": 1.0,
+          "no_match_precision": [
+            2,
+            3
+          ]
+        },
+        {
+          "min_score": 0.2,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            4,
+            4
+          ],
+          "recall_at_3_all": [
+            20,
+            20
+          ],
+          "top1_accuracy": [
+            20,
+            20
+          ],
+          "mrr": 1.0,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.22,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            4,
+            4
+          ],
+          "recall_at_3_all": [
+            20,
+            20
+          ],
+          "top1_accuracy": [
+            20,
+            20
+          ],
+          "mrr": 1.0,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.25,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            4,
+            4
+          ],
+          "recall_at_3_all": [
+            20,
+            20
+          ],
+          "top1_accuracy": [
+            20,
+            20
+          ],
+          "mrr": 1.0,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.28,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            4,
+            4
+          ],
+          "recall_at_3_all": [
+            20,
+            20
+          ],
+          "top1_accuracy": [
+            20,
+            20
+          ],
+          "mrr": 1.0,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.3,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            4,
+            4
+          ],
+          "recall_at_3_all": [
+            20,
+            20
+          ],
+          "top1_accuracy": [
+            20,
+            20
+          ],
+          "mrr": 1.0,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.35,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            4,
+            4
+          ],
+          "recall_at_3_all": [
+            20,
+            20
+          ],
+          "top1_accuracy": [
+            20,
+            20
+          ],
+          "mrr": 1.0,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.4,
+          "recall_at_3_english": [
+            14,
+            16
+          ],
+          "recall_at_3_non_english": [
+            3,
+            4
+          ],
+          "recall_at_3_all": [
+            17,
+            20
+          ],
+          "top1_accuracy": [
+            17,
+            20
+          ],
+          "mrr": 0.85,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        }
+      ],
+      "ranked": {
+        "T-1001": [
+          {
+            "article_id": "KB-001",
+            "rank": 1,
+            "score": 0.5553,
+            "lexical_score": 0.4019,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "charg",
+                "contribution": 0.1522
+              },
+              {
+                "term": "pend",
+                "contribution": 0.0678
+              },
+              {
+                "term": "order",
+                "contribution": 0.0545
+              },
+              {
+                "term": "card",
+                "contribution": 0.0545
+              },
+              {
+                "term": "two",
+                "contribution": 0.0321
+              }
+            ],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 2,
+            "score": 0.2895,
+            "lexical_score": 0.0526,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0526
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 3,
+            "score": 0.2742,
+            "lexical_score": 0.0306,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0306
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 4,
+            "score": 0.233,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 5,
+            "score": 0.1868,
+            "lexical_score": 0.0456,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "two",
+                "contribution": 0.0456
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 6,
+            "score": 0.1642,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 7,
+            "score": 0.1516,
+            "lexical_score": 0.0298,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "show",
+                "contribution": 0.0298
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 8,
+            "score": 0.1439,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 9,
+            "score": 0.1275,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 10,
+            "score": 0.1056,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          }
+        ],
+        "T-1002": [
+          {
+            "article_id": "KB-002",
+            "rank": 1,
+            "score": 0.5529,
+            "lexical_score": 0.3479,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "password",
+                "contribution": 0.1859
+              },
+              {
+                "term": "login",
+                "contribution": 0.081
+              },
+              {
+                "term": "reset",
+                "contribution": 0.081
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.4109,
+            "lexical_score": 0.1763,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "password",
+                "contribution": 0.0759
+              },
+              {
+                "term": "login",
+                "contribution": 0.0362
+              },
+              {
+                "term": "reset",
+                "contribution": 0.0362
+              },
+              {
+                "term": "chang",
+                "contribution": 0.028
+              }
+            ],
+            "best_snippet": "Advise them to reset their password immediately and sign out of all sessions under Settings > Security."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 3,
+            "score": 0.322,
+            "lexical_score": 0.1241,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "chang",
+                "contribution": 0.0753
+              },
+              {
+                "term": "link",
+                "contribution": 0.0488
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 4,
+            "score": 0.3114,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 5,
+            "score": 0.2266,
+            "lexical_score": 0.0263,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "link",
+                "contribution": 0.0263
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 6,
+            "score": 0.1879,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 7,
+            "score": 0.1342,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 8,
+            "score": 0.1187,
+            "lexical_score": 0.0282,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "chang",
+                "contribution": 0.0282
+              }
+            ],
+            "best_snippet": "Access continues until the end of the current billing period."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 9,
+            "score": 0.1123,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 10,
+            "score": 0.0738,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 11,
+            "score": 0.0623,
+            "lexical_score": 0.0276,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "link",
+                "contribution": 0.0276
+              }
+            ],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          }
+        ],
+        "T-1003": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.7572,
+            "lexical_score": 0.6835,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "invoic",
+                "contribution": 0.1789
+              },
+              {
+                "term": "download invoic",
+                "contribution": 0.1233
+              },
+              {
+                "term": "download",
+                "contribution": 0.1117
+              },
+              {
+                "term": "invoic pdf",
+                "contribution": 0.0875
+              },
+              {
+                "term": "pdf",
+                "contribution": 0.0875
+              }
+            ],
+            "best_snippet": "Customers can filter by month and download each invoice as PDF."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 2,
+            "score": 0.409,
+            "lexical_score": 0.0708,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "download",
+                "contribution": 0.0708
+              }
+            ],
+            "best_snippet": "Choose CSV as the format, select the date range, and click Download."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 3,
+            "score": 0.2532,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Subscriptions can be cancelled under Billing > Plan > Cancel subscription."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 4,
+            "score": 0.2311,
+            "lexical_score": 0.0245,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0245
+              }
+            ],
+            "best_snippet": "Ask the user to verify they are using the most recent password, clear cached sessions, and retry in an incognito window."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 5,
+            "score": 0.2075,
+            "lexical_score": 0.0367,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0367
+              }
+            ],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 6,
+            "score": 0.1847,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 7,
+            "score": 0.1657,
+            "lexical_score": 0.0307,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0307
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 8,
+            "score": 0.1646,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 9,
+            "score": 0.163,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Pending authorizations usually disappear within 3-5 business days."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 10,
+            "score": 0.1526,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 11,
+            "score": 0.1411,
+            "lexical_score": 0.0215,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0215
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          }
+        ],
+        "E-2001": [
+          {
+            "article_id": "KB-006",
+            "rank": 1,
+            "score": 0.5259,
+            "lexical_score": 0.4419,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "app",
+                "contribution": 0.1762
+              },
+              {
+                "term": "crash",
+                "contribution": 0.1151
+              },
+              {
+                "term": "app crash",
+                "contribution": 0.1012
+              },
+              {
+                "term": "restart",
+                "contribution": 0.0285
+              },
+              {
+                "term": "updat",
+                "contribution": 0.0208
+              }
+            ],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.1924,
+            "lexical_score": 0.0563,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "immediately",
+                "contribution": 0.0563
+              }
+            ],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 3,
+            "score": 0.1709,
+            "lexical_score": 0.0228,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "updat",
+                "contribution": 0.0228
+              }
+            ],
+            "best_snippet": "If an incident is listed, share the status page link and expected updates."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 4,
+            "score": 0.1557,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 5,
+            "score": 0.1412,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 6,
+            "score": 0.1408,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 7,
+            "score": 0.1118,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 8,
+            "score": 0.1056,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 9,
+            "score": 0.1029,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Agents should not guarantee same-day refunds unless policy explicitly allows it."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 10,
+            "score": 0.0966,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 11,
+            "score": 0.0876,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Cancelling does not trigger an automatic refund for the current period."
+          }
+        ],
+        "E-2002": [
+          {
+            "article_id": "KB-007",
+            "rank": 1,
+            "score": 0.7058,
+            "lexical_score": 0.594,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "export",
+                "contribution": 0.1572
+              },
+              {
+                "term": "csv",
+                "contribution": 0.1344
+              },
+              {
+                "term": "report csv",
+                "contribution": 0.1182
+              },
+              {
+                "term": "report",
+                "contribution": 0.1074
+              },
+              {
+                "term": "csv export",
+                "contribution": 0.0769
+              }
+            ],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 2,
+            "score": 0.3595,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Customers can filter by month and download each invoice as PDF."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 3,
+            "score": 0.2049,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Subscriptions can be cancelled under Billing > Plan > Cancel subscription."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 4,
+            "score": 0.1427,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 5,
+            "score": 0.1422,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 6,
+            "score": 0.1048,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 7,
+            "score": 0.103,
+            "lexical_score": 0.0417,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "report",
+                "contribution": 0.0417
+              }
+            ],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 8,
+            "score": 0.0704,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Never ask the customer to send their password."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 9,
+            "score": 0.0603,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 10,
+            "score": 0.037,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 11,
+            "score": 0.0341,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Agents should not guarantee same-day refunds unless policy explicitly allows it."
+          }
+        ],
+        "E-2003": [
+          {
+            "article_id": "KB-009",
+            "rank": 1,
+            "score": 0.524,
+            "lexical_score": 0.2507,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.2085
+              },
+              {
+                "term": "chang",
+                "contribution": 0.0422
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 2,
+            "score": 0.3671,
+            "lexical_score": 0.1221,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.1221
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 3,
+            "score": 0.3479,
+            "lexical_score": 0.1393,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.1393
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 4,
+            "score": 0.3353,
+            "lexical_score": 0.2875,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.174
+              },
+              {
+                "term": "chang",
+                "contribution": 0.1135
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 5,
+            "score": 0.1747,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Check the public status page for known incidents."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 6,
+            "score": 0.1596,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 7,
+            "score": 0.1505,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 8,
+            "score": 0.1354,
+            "lexical_score": 0.0425,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "chang",
+                "contribution": 0.0425
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 9,
+            "score": 0.1097,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 10,
+            "score": 0.0998,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 11,
+            "score": 0.0722,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          }
+        ],
+        "E-2004": [
+          {
+            "article_id": "KB-002",
+            "rank": 1,
+            "score": 0.4123,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.3262,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Advise them to reset their password immediately and sign out of all sessions under Settings > Security."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 3,
+            "score": 0.2942,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 4,
+            "score": 0.2625,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 5,
+            "score": 0.2306,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 6,
+            "score": 0.2268,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 7,
+            "score": 0.1133,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 8,
+            "score": 0.1124,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Access continues until the end of the current billing period."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 9,
+            "score": 0.0655,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Agents should not guarantee same-day refunds unless policy explicitly allows it."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 10,
+            "score": 0.0372,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 11,
+            "score": 0.016,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          }
+        ],
+        "E-2005": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.5917,
+            "lexical_score": 0.2234,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "pdf",
+                "contribution": 0.2234
+              }
+            ],
+            "best_snippet": "Invoice PDFs are available under Billing > Documents."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 2,
+            "score": 0.4029,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Choose CSV as the format, select the date range, and click Download."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 3,
+            "score": 0.3025,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Subscriptions can be cancelled under Billing > Plan > Cancel subscription."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 4,
+            "score": 0.1881,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 5,
+            "score": 0.174,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Never ask the customer to send their password."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 6,
+            "score": 0.1736,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 7,
+            "score": 0.1638,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Never ask the customer for one-time codes or recovery codes."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 8,
+            "score": 0.162,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 9,
+            "score": 0.156,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 10,
+            "score": 0.151,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 11,
+            "score": 0.1227,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          }
+        ],
+        "E-2006": [
+          {
+            "article_id": "KB-008",
+            "rank": 1,
+            "score": 0.5261,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Subscriptions can be cancelled under Billing > Plan > Cancel subscription."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 2,
+            "score": 0.2999,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Customers can filter by month and download each invoice as PDF."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 3,
+            "score": 0.2905,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 4,
+            "score": 0.2415,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 5,
+            "score": 0.2292,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds should not be promised unless two settled charges are confirmed."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 6,
+            "score": 0.1555,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 7,
+            "score": 0.1405,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 8,
+            "score": 0.1259,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 9,
+            "score": 0.1101,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 10,
+            "score": 0.0975,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Check the public status page for known incidents."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 11,
+            "score": 0.0944,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          }
+        ],
+        "E-2007": [
+          {
+            "article_id": "KB-001",
+            "rank": 1,
+            "score": 0.5528,
+            "lexical_score": 0.4885,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "charg",
+                "contribution": 0.1163
+              },
+              {
+                "term": "settl",
+                "contribution": 0.0705
+              },
+              {
+                "term": "settl charg",
+                "contribution": 0.0569
+              },
+              {
+                "term": "two settl",
+                "contribution": 0.0569
+              },
+              {
+                "term": "pend",
+                "contribution": 0.0518
+              }
+            ],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 2,
+            "score": 0.4034,
+            "lexical_score": 0.0402,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0402
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 3,
+            "score": 0.3116,
+            "lexical_score": 0.0234,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0234
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 4,
+            "score": 0.2477,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 5,
+            "score": 0.2331,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 6,
+            "score": 0.2219,
+            "lexical_score": 0.0369,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.0369
+              }
+            ],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 7,
+            "score": 0.2018,
+            "lexical_score": 0.0702,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "two",
+                "contribution": 0.0589
+              },
+              {
+                "term": "email",
+                "contribution": 0.0113
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 8,
+            "score": 0.2009,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 9,
+            "score": 0.1808,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Check the public status page for known incidents."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 10,
+            "score": 0.1249,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 11,
+            "score": 0.0635,
+            "lexical_score": 0.0135,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.0135
+              }
+            ],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          }
+        ],
+        "E-2008": [
+          {
+            "article_id": "KB-002",
+            "rank": 1,
+            "score": 0.4962,
+            "lexical_score": 0.2658,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "password",
+                "contribution": 0.144
+              },
+              {
+                "term": "send",
+                "contribution": 0.0609
+              },
+              {
+                "term": "send password",
+                "contribution": 0.0609
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.4093,
+            "lexical_score": 0.0588,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "password",
+                "contribution": 0.0588
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 3,
+            "score": 0.3697,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 4,
+            "score": 0.2724,
+            "lexical_score": 0.0263,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "check",
+                "contribution": 0.0263
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 5,
+            "score": 0.2615,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 6,
+            "score": 0.212,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 7,
+            "score": 0.1862,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 8,
+            "score": 0.1613,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Access continues until the end of the current billing period."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 9,
+            "score": 0.1473,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Pending authorizations usually disappear within 3-5 business days."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 10,
+            "score": 0.1462,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 11,
+            "score": 0.1038,
+            "lexical_score": 0.0314,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "check",
+                "contribution": 0.0314
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          }
+        ],
+        "E-2009": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.4627,
+            "lexical_score": 0.2774,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "invoic",
+                "contribution": 0.2343
+              },
+              {
+                "term": "bill",
+                "contribution": 0.0431
+              }
+            ],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 2,
+            "score": 0.4508,
+            "lexical_score": 0.0909,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0599
+              },
+              {
+                "term": "bill",
+                "contribution": 0.031
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 3,
+            "score": 0.4189,
+            "lexical_score": 0.1309,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "bill",
+                "contribution": 0.0429
+              },
+              {
+                "term": "refund",
+                "contribution": 0.0348
+              },
+              {
+                "term": "bill ops",
+                "contribution": 0.0266
+              },
+              {
+                "term": "ops",
+                "contribution": 0.0266
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 4,
+            "score": 0.4047,
+            "lexical_score": 0.1175,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "promis",
+                "contribution": 0.0296
+              },
+              {
+                "term": "bill",
+                "contribution": 0.028
+              },
+              {
+                "term": "bill ops",
+                "contribution": 0.0216
+              },
+              {
+                "term": "ops",
+                "contribution": 0.0216
+              },
+              {
+                "term": "refund",
+                "contribution": 0.0167
+              }
+            ],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 5,
+            "score": 0.3563,
+            "lexical_score": 0.1086,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "critical",
+                "contribution": 0.0362
+              },
+              {
+                "term": "ticket",
+                "contribution": 0.0362
+              },
+              {
+                "term": "ticket critical",
+                "contribution": 0.0362
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 6,
+            "score": 0.2489,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 7,
+            "score": 0.2344,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 8,
+            "score": 0.1886,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 9,
+            "score": 0.1751,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 10,
+            "score": 0.1749,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 11,
+            "score": 0.1718,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          }
+        ],
+        "E-2010": [
+          {
+            "article_id": "KB-004",
+            "rank": 1,
+            "score": 0.1244,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Agents should not guarantee same-day refunds unless policy explicitly allows it."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 2,
+            "score": 0.1243,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 3,
+            "score": 0.1119,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 4,
+            "score": 0.1111,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 5,
+            "score": 0.1085,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 6,
+            "score": 0.1085,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 7,
+            "score": 0.0925,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If an incident is listed, share the status page link and expected updates."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 8,
+            "score": 0.0847,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 9,
+            "score": 0.0837,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 10,
+            "score": 0.0785,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 11,
+            "score": 0.0359,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          }
+        ],
+        "E-2011": [],
+        "E-2012": [
+          {
+            "article_id": "KB-006",
+            "rank": 1,
+            "score": 0.1869,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 2,
+            "score": 0.1745,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 3,
+            "score": 0.1735,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 4,
+            "score": 0.1732,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Ask the user to verify they are using the most recent password, clear cached sessions, and retry in an incognito window."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 5,
+            "score": 0.1547,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 6,
+            "score": 0.107,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 7,
+            "score": 0.1061,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds should not be promised unless two settled charges are confirmed."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 8,
+            "score": 0.1056,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Cancelling does not trigger an automatic refund for the current period."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 9,
+            "score": 0.0641,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 10,
+            "score": 0.0394,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Choose CSV as the format, select the date range, and click Download."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 11,
+            "score": 0.0388,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Agents should not guarantee same-day refunds unless policy explicitly allows it."
+          }
+        ],
+        "E-2013": [
+          {
+            "article_id": "KB-005",
+            "rank": 1,
+            "score": 0.6493,
+            "lexical_score": 0.4042,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "lost",
+                "contribution": 0.1171
+              },
+              {
+                "term": "factor",
+                "contribution": 0.0692
+              },
+              {
+                "term": "two factor",
+                "contribution": 0.0692
+              },
+              {
+                "term": "two",
+                "contribution": 0.0505
+              },
+              {
+                "term": "2fa",
+                "contribution": 0.0491
+              }
+            ],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 2,
+            "score": 0.3515,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 3,
+            "score": 0.3146,
+            "lexical_score": 0.1506,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "app",
+                "contribution": 0.1506
+              }
+            ],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 4,
+            "score": 0.3036,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 5,
+            "score": 0.2777,
+            "lexical_score": 0.0363,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "new",
+                "contribution": 0.0363
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 6,
+            "score": 0.2189,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 7,
+            "score": 0.2035,
+            "lexical_score": 0.0357,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "two",
+                "contribution": 0.0357
+              }
+            ],
+            "best_snippet": "Pending authorizations usually disappear within 3-5 business days."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 8,
+            "score": 0.1785,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Subscriptions can be cancelled under Billing > Plan > Cancel subscription."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 9,
+            "score": 0.125,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 10,
+            "score": 0.0853,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 11,
+            "score": 0.037,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          }
+        ],
+        "E-2014": [
+          {
+            "article_id": "KB-011",
+            "rank": 1,
+            "score": 0.3992,
+            "lexical_score": 0.0766,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "fail",
+                "contribution": 0.0424
+              },
+              {
+                "term": "show",
+                "contribution": 0.0342
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.331,
+            "lexical_score": 0.0559,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "report",
+                "contribution": 0.0559
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 3,
+            "score": 0.2912,
+            "lexical_score": 0.1775,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "dashboard",
+                "contribution": 0.1775
+              }
+            ],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 4,
+            "score": 0.2831,
+            "lexical_score": 0.0423,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "fail",
+                "contribution": 0.0423
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 5,
+            "score": 0.2475,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 6,
+            "score": 0.242,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 7,
+            "score": 0.2387,
+            "lexical_score": 0.1441,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "report",
+                "contribution": 0.1441
+              }
+            ],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 8,
+            "score": 0.1857,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 9,
+            "score": 0.142,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Access continues until the end of the current billing period."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 10,
+            "score": 0.1146,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Agents should not guarantee same-day refunds unless policy explicitly allows it."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 11,
+            "score": 0.1108,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          }
+        ],
+        "E-2015": [
+          {
+            "article_id": "KB-010",
+            "rank": 1,
+            "score": 0.5801,
+            "lexical_score": 0.4863,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.1158
+              },
+              {
+                "term": "address",
+                "contribution": 0.0858
+              },
+              {
+                "term": "chang",
+                "contribution": 0.0821
+              },
+              {
+                "term": "email address",
+                "contribution": 0.0785
+              },
+              {
+                "term": "new",
+                "contribution": 0.0557
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 2,
+            "score": 0.3171,
+            "lexical_score": 0.1168,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "login",
+                "contribution": 0.0884
+              },
+              {
+                "term": "account",
+                "contribution": 0.0284
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 3,
+            "score": 0.2934,
+            "lexical_score": 0.1125,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0424
+              },
+              {
+                "term": "login",
+                "contribution": 0.0395
+              },
+              {
+                "term": "chang",
+                "contribution": 0.0305
+              }
+            ],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 4,
+            "score": 0.2681,
+            "lexical_score": 0.0603,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.0354
+              },
+              {
+                "term": "account",
+                "contribution": 0.0249
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 5,
+            "score": 0.2077,
+            "lexical_score": 0.02,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "updat",
+                "contribution": 0.02
+              }
+            ],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 6,
+            "score": 0.1886,
+            "lexical_score": 0.0307,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "chang",
+                "contribution": 0.0307
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 7,
+            "score": 0.1611,
+            "lexical_score": 0.0219,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "updat",
+                "contribution": 0.0219
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 8,
+            "score": 0.1589,
+            "lexical_score": 0.0425,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.0425
+              }
+            ],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 9,
+            "score": 0.1147,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 10,
+            "score": 0.1128,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 11,
+            "score": 0.1121,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          }
+        ],
+        "E-2016": [
+          {
+            "article_id": "KB-001",
+            "rank": 1,
+            "score": 0.5953,
+            "lexical_score": 0.3778,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "charg",
+                "contribution": 0.1471
+              },
+              {
+                "term": "pend",
+                "contribution": 0.121
+              },
+              {
+                "term": "two",
+                "contribution": 0.0273
+              },
+              {
+                "term": "complet",
+                "contribution": 0.0221
+              },
+              {
+                "term": "order",
+                "contribution": 0.0221
+              }
+            ],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 2,
+            "score": 0.2568,
+            "lexical_score": 0.0221,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "day",
+                "contribution": 0.0221
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 3,
+            "score": 0.2213,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Cancelling does not trigger an automatic refund for the current period."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 4,
+            "score": 0.1966,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 5,
+            "score": 0.195,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 6,
+            "score": 0.1723,
+            "lexical_score": 0.043,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "show",
+                "contribution": 0.043
+              }
+            ],
+            "best_snippet": "Check the public status page for known incidents."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 7,
+            "score": 0.1699,
+            "lexical_score": 0.0387,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "two",
+                "contribution": 0.0387
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 8,
+            "score": 0.1506,
+            "lexical_score": 0.0313,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "still",
+                "contribution": 0.0313
+              }
+            ],
+            "best_snippet": "Ask the user to verify they are using the most recent password, clear cached sessions, and retry in an incognito window."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 9,
+            "score": 0.1265,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 10,
+            "score": 0.121,
+            "lexical_score": 0.0286,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "still",
+                "contribution": 0.0286
+              }
+            ],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 11,
+            "score": 0.021,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          }
+        ],
+        "E-2017": [
+          {
+            "article_id": "KB-006",
+            "rank": 1,
+            "score": 0.3889,
+            "lexical_score": 0.3011,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "app",
+                "contribution": 0.3011
+              }
+            ],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 2,
+            "score": 0.1562,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Ask the user to verify they are using the most recent password, clear cached sessions, and retry in an incognito window."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 3,
+            "score": 0.1536,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 4,
+            "score": 0.1415,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If an incident is listed, share the status page link and expected updates."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 5,
+            "score": 0.1295,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Advise them to reset their password immediately and sign out of all sessions under Settings > Security."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 6,
+            "score": 0.1215,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "A confirmation link is sent to the new address and expires after 24 hours."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 7,
+            "score": 0.1122,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 8,
+            "score": 0.0851,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Cancelling does not trigger an automatic refund for the current period."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 9,
+            "score": 0.0844,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 10,
+            "score": 0.0829,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 11,
+            "score": 0.0659,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Choose CSV as the format, select the date range, and click Download."
+          }
+        ],
+        "E-2018": [
+          {
+            "article_id": "KB-008",
+            "rank": 1,
+            "score": 0.415,
+            "lexical_score": 0.3209,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "cancell",
+                "contribution": 0.0898
+              },
+              {
+                "term": "subscription",
+                "contribution": 0.0898
+              },
+              {
+                "term": "cancell subscription",
+                "contribution": 0.0722
+              },
+              {
+                "term": "refund",
+                "contribution": 0.0691
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 2,
+            "score": 0.3429,
+            "lexical_score": 0.1187,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.1187
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 3,
+            "score": 0.2742,
+            "lexical_score": 0.0918,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "card",
+                "contribution": 0.0587
+              },
+              {
+                "term": "refund",
+                "contribution": 0.0332
+              }
+            ],
+            "best_snippet": "Refunds should not be promised unless two settled charges are confirmed."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 4,
+            "score": 0.2581,
+            "lexical_score": 0.0643,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0643
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 5,
+            "score": 0.1981,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 6,
+            "score": 0.1909,
+            "lexical_score": 0.077,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.077
+              }
+            ],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 7,
+            "score": 0.1804,
+            "lexical_score": 0.1187,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "send",
+                "contribution": 0.0673
+              },
+              {
+                "term": "account",
+                "contribution": 0.0514
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 8,
+            "score": 0.1784,
+            "lexical_score": 0.0451,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0451
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 9,
+            "score": 0.1122,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 10,
+            "score": 0.1107,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 11,
+            "score": 0.1106,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          }
+        ],
+        "E-2019": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.5928,
+            "lexical_score": 0.4489,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "invoic",
+                "contribution": 0.2278
+              },
+              {
+                "term": "invoic miss",
+                "contribution": 0.0579
+              },
+              {
+                "term": "miss",
+                "contribution": 0.0579
+              },
+              {
+                "term": "bill",
+                "contribution": 0.0368
+              },
+              {
+                "term": "bill document",
+                "contribution": 0.0342
+              }
+            ],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 2,
+            "score": 0.3056,
+            "lexical_score": 0.024,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "bill",
+                "contribution": 0.024
+              }
+            ],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 3,
+            "score": 0.2853,
+            "lexical_score": 0.0367,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "bill",
+                "contribution": 0.0367
+              }
+            ],
+            "best_snippet": "Cancelling does not trigger an automatic refund for the current period."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 4,
+            "score": 0.2259,
+            "lexical_score": 0.0291,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "show",
+                "contribution": 0.0291
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 5,
+            "score": 0.2137,
+            "lexical_score": 0.0265,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "bill",
+                "contribution": 0.0265
+              }
+            ],
+            "best_snippet": "Agents should not guarantee same-day refunds unless policy explicitly allows it."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 6,
+            "score": 0.206,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 7,
+            "score": 0.1938,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 8,
+            "score": 0.1761,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 9,
+            "score": 0.1478,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 10,
+            "score": 0.1465,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 11,
+            "score": 0.0766,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          }
+        ],
+        "E-2020": [
+          {
+            "article_id": "KB-001",
+            "rank": 1,
+            "score": 0.3657,
+            "lexical_score": 0.2724,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "charg",
+                "contribution": 0.2724
+              }
+            ],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.2725,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support immediately."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 3,
+            "score": 0.2719,
+            "lexical_score": 0.0,
+            "kept": true,
+            "top_terms": [],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 4,
+            "score": 0.2504,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 5,
+            "score": 0.2411,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-003",
+            "rank": 6,
+            "score": 0.2331,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If invoices are missing, escalate to billing support."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 7,
+            "score": 0.2176,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 8,
+            "score": 0.2019,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 9,
+            "score": 0.1848,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 10,
+            "score": 0.1304,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 11,
+            "score": 0.0365,
+            "lexical_score": 0.0,
+            "kept": false,
+            "top_terms": [],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          }
+        ]
+      }
+    },
+    "tfidf": {
+      "default_min_score": 0.05,
+      "at_default": {
+        "min_score": 0.05,
+        "recall_at_3_english": [
+          16,
+          16
+        ],
+        "recall_at_3_non_english": [
+          2,
+          4
+        ],
+        "recall_at_3_all": [
+          18,
+          20
+        ],
+        "top1_accuracy": [
+          16,
+          20
+        ],
+        "mrr": 0.8417,
+        "no_match_precision": [
+          3,
+          3
+        ],
+        "per_ticket": {
+          "T-1001": {
+            "language": "en",
+            "relevant": [
+              "KB-001",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-001",
+              "KB-004"
+            ],
+            "scores": [
+              0.4019,
+              0.0526
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "T-1002": {
+            "language": "en",
+            "relevant": [
+              "KB-002"
+            ],
+            "retrieved": [
+              "KB-002",
+              "KB-009",
+              "KB-010"
+            ],
+            "scores": [
+              0.3479,
+              0.1763,
+              0.1241
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "T-1003": {
+            "language": "en",
+            "relevant": [
+              "KB-003"
+            ],
+            "retrieved": [
+              "KB-003",
+              "KB-007"
+            ],
+            "scores": [
+              0.6835,
+              0.0708
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2001": {
+            "language": "en",
+            "relevant": [
+              "KB-006"
+            ],
+            "retrieved": [
+              "KB-006",
+              "KB-009"
+            ],
+            "scores": [
+              0.4419,
+              0.0563
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2002": {
+            "language": "en",
+            "relevant": [
+              "KB-007"
+            ],
+            "retrieved": [
+              "KB-007"
+            ],
+            "scores": [
+              0.594
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2003": {
+            "language": "en",
+            "relevant": [
+              "KB-009"
+            ],
+            "retrieved": [
+              "KB-010",
+              "KB-009",
+              "KB-002"
+            ],
+            "scores": [
+              0.2875,
+              0.2507,
+              0.1393
+            ],
+            "hit": true,
+            "reciprocal_rank": 0.5,
+            "top1_correct": false,
+            "empty_ok": null
+          },
+          "E-2004": {
+            "language": "es",
+            "relevant": [
+              "KB-002"
+            ],
+            "retrieved": [],
+            "scores": [],
+            "hit": false,
+            "reciprocal_rank": 0.0,
+            "top1_correct": false,
+            "empty_ok": null
+          },
+          "E-2005": {
+            "language": "fr",
+            "relevant": [
+              "KB-003"
+            ],
+            "retrieved": [
+              "KB-003"
+            ],
+            "scores": [
+              0.2234
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2006": {
+            "language": "de",
+            "relevant": [
+              "KB-008",
+              "KB-004"
+            ],
+            "retrieved": [],
+            "scores": [],
+            "hit": false,
+            "reciprocal_rank": 0.0,
+            "top1_correct": false,
+            "empty_ok": null
+          },
+          "E-2007": {
+            "language": "en",
+            "relevant": [
+              "KB-001",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-001",
+              "KB-005"
+            ],
+            "scores": [
+              0.4885,
+              0.0702
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2008": {
+            "language": "en",
+            "relevant": [
+              "KB-002"
+            ],
+            "retrieved": [
+              "KB-002",
+              "KB-009"
+            ],
+            "scores": [
+              0.2658,
+              0.0588
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2009": {
+            "language": "en",
+            "relevant": [
+              "KB-003"
+            ],
+            "retrieved": [
+              "KB-003",
+              "KB-008",
+              "KB-001"
+            ],
+            "scores": [
+              0.2774,
+              0.1309,
+              0.1175
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2010": {
+            "language": "en",
+            "relevant": [],
+            "retrieved": [],
+            "scores": [],
+            "hit": null,
+            "reciprocal_rank": null,
+            "top1_correct": null,
+            "empty_ok": true
+          },
+          "E-2011": {
+            "language": "en",
+            "relevant": [],
+            "retrieved": [],
+            "scores": [],
+            "hit": null,
+            "reciprocal_rank": null,
+            "top1_correct": null,
+            "empty_ok": true
+          },
+          "E-2012": {
+            "language": "en",
+            "relevant": [],
+            "retrieved": [],
+            "scores": [],
+            "hit": null,
+            "reciprocal_rank": null,
+            "top1_correct": null,
+            "empty_ok": true
+          },
+          "E-2013": {
+            "language": "en",
+            "relevant": [
+              "KB-005"
+            ],
+            "retrieved": [
+              "KB-005",
+              "KB-006"
+            ],
+            "scores": [
+              0.4042,
+              0.1506
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2014": {
+            "language": "en",
+            "relevant": [
+              "KB-011"
+            ],
+            "retrieved": [
+              "KB-003",
+              "KB-007",
+              "KB-011"
+            ],
+            "scores": [
+              0.1775,
+              0.1441,
+              0.0766
+            ],
+            "hit": true,
+            "reciprocal_rank": 0.3333333333333333,
+            "top1_correct": false,
+            "empty_ok": null
+          },
+          "E-2015": {
+            "language": "en",
+            "relevant": [
+              "KB-010"
+            ],
+            "retrieved": [
+              "KB-010",
+              "KB-002",
+              "KB-009"
+            ],
+            "scores": [
+              0.4863,
+              0.1168,
+              0.1125
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2016": {
+            "language": "en",
+            "relevant": [
+              "KB-001"
+            ],
+            "retrieved": [
+              "KB-001"
+            ],
+            "scores": [
+              0.3778
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2017": {
+            "language": "pt",
+            "relevant": [
+              "KB-006"
+            ],
+            "retrieved": [
+              "KB-006"
+            ],
+            "scores": [
+              0.3011
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2018": {
+            "language": "en",
+            "relevant": [
+              "KB-008",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-008",
+              "KB-002",
+              "KB-004"
+            ],
+            "scores": [
+              0.3209,
+              0.1187,
+              0.1187
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2019": {
+            "language": "en",
+            "relevant": [
+              "KB-003"
+            ],
+            "retrieved": [
+              "KB-003"
+            ],
+            "scores": [
+              0.4489
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          },
+          "E-2020": {
+            "language": "en",
+            "relevant": [
+              "KB-001",
+              "KB-004"
+            ],
+            "retrieved": [
+              "KB-001"
+            ],
+            "scores": [
+              0.2724
+            ],
+            "hit": true,
+            "reciprocal_rank": 1.0,
+            "top1_correct": true,
+            "empty_ok": null
+          }
+        }
+      },
+      "sweep": [
+        {
+          "min_score": 0.0,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            2,
+            4
+          ],
+          "recall_at_3_all": [
+            18,
+            20
+          ],
+          "top1_accuracy": [
+            16,
+            20
+          ],
+          "mrr": 0.8417,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.02,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            2,
+            4
+          ],
+          "recall_at_3_all": [
+            18,
+            20
+          ],
+          "top1_accuracy": [
+            16,
+            20
+          ],
+          "mrr": 0.8417,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.05,
+          "recall_at_3_english": [
+            16,
+            16
+          ],
+          "recall_at_3_non_english": [
+            2,
+            4
+          ],
+          "recall_at_3_all": [
+            18,
+            20
+          ],
+          "top1_accuracy": [
+            16,
+            20
+          ],
+          "mrr": 0.8417,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.1,
+          "recall_at_3_english": [
+            15,
+            16
+          ],
+          "recall_at_3_non_english": [
+            2,
+            4
+          ],
+          "recall_at_3_all": [
+            17,
+            20
+          ],
+          "top1_accuracy": [
+            16,
+            20
+          ],
+          "mrr": 0.825,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.15,
+          "recall_at_3_english": [
+            15,
+            16
+          ],
+          "recall_at_3_non_english": [
+            2,
+            4
+          ],
+          "recall_at_3_all": [
+            17,
+            20
+          ],
+          "top1_accuracy": [
+            16,
+            20
+          ],
+          "mrr": 0.825,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        },
+        {
+          "min_score": 0.2,
+          "recall_at_3_english": [
+            15,
+            16
+          ],
+          "recall_at_3_non_english": [
+            2,
+            4
+          ],
+          "recall_at_3_all": [
+            17,
+            20
+          ],
+          "top1_accuracy": [
+            16,
+            20
+          ],
+          "mrr": 0.825,
+          "no_match_precision": [
+            3,
+            3
+          ]
+        }
+      ],
+      "ranked": {
+        "T-1001": [
+          {
+            "article_id": "KB-001",
+            "rank": 1,
+            "score": 0.4019,
+            "lexical_score": 0.4019,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "charg",
+                "contribution": 0.1522
+              },
+              {
+                "term": "pend",
+                "contribution": 0.0678
+              },
+              {
+                "term": "order",
+                "contribution": 0.0545
+              },
+              {
+                "term": "card",
+                "contribution": 0.0545
+              },
+              {
+                "term": "two",
+                "contribution": 0.0321
+              }
+            ],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 2,
+            "score": 0.0526,
+            "lexical_score": 0.0526,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0526
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 3,
+            "score": 0.0456,
+            "lexical_score": 0.0456,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "two",
+                "contribution": 0.0456
+              }
+            ],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 4,
+            "score": 0.0306,
+            "lexical_score": 0.0306,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0306
+              }
+            ],
+            "best_snippet": "Cancelling does not trigger an automatic refund for the current period."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 5,
+            "score": 0.0298,
+            "lexical_score": 0.0298,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "show",
+                "contribution": 0.0298
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          }
+        ],
+        "T-1002": [
+          {
+            "article_id": "KB-002",
+            "rank": 1,
+            "score": 0.3479,
+            "lexical_score": 0.3479,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "password",
+                "contribution": 0.1859
+              },
+              {
+                "term": "login",
+                "contribution": 0.081
+              },
+              {
+                "term": "reset",
+                "contribution": 0.081
+              }
+            ],
+            "best_snippet": "Login issues after password reset"
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.1763,
+            "lexical_score": 0.1763,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "password",
+                "contribution": 0.0759
+              },
+              {
+                "term": "login",
+                "contribution": 0.0362
+              },
+              {
+                "term": "reset",
+                "contribution": 0.0362
+              },
+              {
+                "term": "chang",
+                "contribution": 0.028
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 3,
+            "score": 0.1241,
+            "lexical_score": 0.1241,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "chang",
+                "contribution": 0.0753
+              },
+              {
+                "term": "link",
+                "contribution": 0.0488
+              }
+            ],
+            "best_snippet": "The change takes effect once the link is confirmed."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 4,
+            "score": 0.0282,
+            "lexical_score": 0.0282,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "chang",
+                "contribution": 0.0282
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 5,
+            "score": 0.0276,
+            "lexical_score": 0.0276,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "link",
+                "contribution": 0.0276
+              }
+            ],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 6,
+            "score": 0.0263,
+            "lexical_score": 0.0263,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "link",
+                "contribution": 0.0263
+              }
+            ],
+            "best_snippet": "If an incident is listed, share the status page link and expected updates."
+          }
+        ],
+        "T-1003": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.6835,
+            "lexical_score": 0.6835,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "invoic",
+                "contribution": 0.1789
+              },
+              {
+                "term": "download invoic",
+                "contribution": 0.1233
+              },
+              {
+                "term": "download",
+                "contribution": 0.1117
+              },
+              {
+                "term": "invoic pdf",
+                "contribution": 0.0875
+              },
+              {
+                "term": "pdf",
+                "contribution": 0.0875
+              }
+            ],
+            "best_snippet": "Customers can filter by month and download each invoice as PDF."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 2,
+            "score": 0.0708,
+            "lexical_score": 0.0708,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "download",
+                "contribution": 0.0708
+              }
+            ],
+            "best_snippet": "Choose CSV as the format, select the date range, and click Download."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 3,
+            "score": 0.0367,
+            "lexical_score": 0.0367,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0367
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 4,
+            "score": 0.0307,
+            "lexical_score": 0.0307,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0307
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 5,
+            "score": 0.0245,
+            "lexical_score": 0.0245,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0245
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 6,
+            "score": 0.0215,
+            "lexical_score": 0.0215,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0215
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          }
+        ],
+        "E-2001": [
+          {
+            "article_id": "KB-006",
+            "rank": 1,
+            "score": 0.4419,
+            "lexical_score": 0.4419,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "app",
+                "contribution": 0.1762
+              },
+              {
+                "term": "crash",
+                "contribution": 0.1151
+              },
+              {
+                "term": "app crash",
+                "contribution": 0.1012
+              },
+              {
+                "term": "restart",
+                "contribution": 0.0285
+              },
+              {
+                "term": "updat",
+                "contribution": 0.0208
+              }
+            ],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.0563,
+            "lexical_score": 0.0563,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "immediately",
+                "contribution": 0.0563
+              }
+            ],
+            "best_snippet": "Advise them to reset their password immediately and sign out of all sessions under Settings > Security."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 3,
+            "score": 0.0228,
+            "lexical_score": 0.0228,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "updat",
+                "contribution": 0.0228
+              }
+            ],
+            "best_snippet": "If an incident is listed, share the status page link and expected updates."
+          }
+        ],
+        "E-2002": [
+          {
+            "article_id": "KB-007",
+            "rank": 1,
+            "score": 0.594,
+            "lexical_score": 0.594,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "export",
+                "contribution": 0.1572
+              },
+              {
+                "term": "csv",
+                "contribution": 0.1344
+              },
+              {
+                "term": "report csv",
+                "contribution": 0.1182
+              },
+              {
+                "term": "report",
+                "contribution": 0.1074
+              },
+              {
+                "term": "csv export",
+                "contribution": 0.0769
+              }
+            ],
+            "best_snippet": "Exporting reports to CSV"
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.0417,
+            "lexical_score": 0.0417,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "report",
+                "contribution": 0.0417
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          }
+        ],
+        "E-2003": [
+          {
+            "article_id": "KB-010",
+            "rank": 1,
+            "score": 0.2875,
+            "lexical_score": 0.2875,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.174
+              },
+              {
+                "term": "chang",
+                "contribution": 0.1135
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.2507,
+            "lexical_score": 0.2507,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.2085
+              },
+              {
+                "term": "chang",
+                "contribution": 0.0422
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 3,
+            "score": 0.1393,
+            "lexical_score": 0.1393,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.1393
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 4,
+            "score": 0.1221,
+            "lexical_score": 0.1221,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.1221
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 5,
+            "score": 0.0425,
+            "lexical_score": 0.0425,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "chang",
+                "contribution": 0.0425
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          }
+        ],
+        "E-2004": [],
+        "E-2005": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.2234,
+            "lexical_score": 0.2234,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "pdf",
+                "contribution": 0.2234
+              }
+            ],
+            "best_snippet": "Invoice PDFs are available under Billing > Documents."
+          }
+        ],
+        "E-2006": [],
+        "E-2007": [
+          {
+            "article_id": "KB-001",
+            "rank": 1,
+            "score": 0.4885,
+            "lexical_score": 0.4885,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "charg",
+                "contribution": 0.1163
+              },
+              {
+                "term": "settl",
+                "contribution": 0.0705
+              },
+              {
+                "term": "settl charg",
+                "contribution": 0.0569
+              },
+              {
+                "term": "two settl",
+                "contribution": 0.0569
+              },
+              {
+                "term": "pend",
+                "contribution": 0.0518
+              }
+            ],
+            "best_snippet": "Refunds should not be promised unless two settled charges are confirmed."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 2,
+            "score": 0.0702,
+            "lexical_score": 0.0702,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "two",
+                "contribution": 0.0589
+              },
+              {
+                "term": "email",
+                "contribution": 0.0113
+              }
+            ],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 3,
+            "score": 0.0402,
+            "lexical_score": 0.0402,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0402
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 4,
+            "score": 0.0369,
+            "lexical_score": 0.0369,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.0369
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 5,
+            "score": 0.0234,
+            "lexical_score": 0.0234,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0234
+              }
+            ],
+            "best_snippet": "Cancelling does not trigger an automatic refund for the current period."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 6,
+            "score": 0.0135,
+            "lexical_score": 0.0135,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.0135
+              }
+            ],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          }
+        ],
+        "E-2008": [
+          {
+            "article_id": "KB-002",
+            "rank": 1,
+            "score": 0.2658,
+            "lexical_score": 0.2658,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "password",
+                "contribution": 0.144
+              },
+              {
+                "term": "send",
+                "contribution": 0.0609
+              },
+              {
+                "term": "send password",
+                "contribution": 0.0609
+              }
+            ],
+            "best_snippet": "Never ask the customer to send their password."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 2,
+            "score": 0.0588,
+            "lexical_score": 0.0588,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "password",
+                "contribution": 0.0588
+              }
+            ],
+            "best_snippet": "Advise them to reset their password immediately and sign out of all sessions under Settings > Security."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 3,
+            "score": 0.0314,
+            "lexical_score": 0.0314,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "check",
+                "contribution": 0.0314
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 4,
+            "score": 0.0263,
+            "lexical_score": 0.0263,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "check",
+                "contribution": 0.0263
+              }
+            ],
+            "best_snippet": "Check the public status page for known incidents."
+          }
+        ],
+        "E-2009": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.2774,
+            "lexical_score": 0.2774,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "invoic",
+                "contribution": 0.2343
+              },
+              {
+                "term": "bill",
+                "contribution": 0.0431
+              }
+            ],
+            "best_snippet": "Invoice PDFs are available under Billing > Documents."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 2,
+            "score": 0.1309,
+            "lexical_score": 0.1309,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "bill",
+                "contribution": 0.0429
+              },
+              {
+                "term": "refund",
+                "contribution": 0.0348
+              },
+              {
+                "term": "bill ops",
+                "contribution": 0.0266
+              },
+              {
+                "term": "ops",
+                "contribution": 0.0266
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 3,
+            "score": 0.1175,
+            "lexical_score": 0.1175,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "promis",
+                "contribution": 0.0296
+              },
+              {
+                "term": "bill",
+                "contribution": 0.028
+              },
+              {
+                "term": "bill ops",
+                "contribution": 0.0216
+              },
+              {
+                "term": "ops",
+                "contribution": 0.0216
+              },
+              {
+                "term": "refund",
+                "contribution": 0.0167
+              }
+            ],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 4,
+            "score": 0.1086,
+            "lexical_score": 0.1086,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "critical",
+                "contribution": 0.0362
+              },
+              {
+                "term": "ticket",
+                "contribution": 0.0362
+              },
+              {
+                "term": "ticket critical",
+                "contribution": 0.0362
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 5,
+            "score": 0.0909,
+            "lexical_score": 0.0909,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.0599
+              },
+              {
+                "term": "bill",
+                "contribution": 0.031
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          }
+        ],
+        "E-2010": [],
+        "E-2011": [],
+        "E-2012": [],
+        "E-2013": [
+          {
+            "article_id": "KB-005",
+            "rank": 1,
+            "score": 0.4042,
+            "lexical_score": 0.4042,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "lost",
+                "contribution": 0.1171
+              },
+              {
+                "term": "factor",
+                "contribution": 0.0692
+              },
+              {
+                "term": "two factor",
+                "contribution": 0.0692
+              },
+              {
+                "term": "two",
+                "contribution": 0.0505
+              },
+              {
+                "term": "2fa",
+                "contribution": 0.0491
+              }
+            ],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 2,
+            "score": 0.1506,
+            "lexical_score": 0.1506,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "app",
+                "contribution": 0.1506
+              }
+            ],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 3,
+            "score": 0.0363,
+            "lexical_score": 0.0363,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "new",
+                "contribution": 0.0363
+              }
+            ],
+            "best_snippet": "A confirmation link is sent to the new address and expires after 24 hours."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 4,
+            "score": 0.0357,
+            "lexical_score": 0.0357,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "two",
+                "contribution": 0.0357
+              }
+            ],
+            "best_snippet": "Refunds should not be promised unless two settled charges are confirmed."
+          }
+        ],
+        "E-2014": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.1775,
+            "lexical_score": 0.1775,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "dashboard",
+                "contribution": 0.1775
+              }
+            ],
+            "best_snippet": "Downloading invoices from the dashboard"
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 2,
+            "score": 0.1441,
+            "lexical_score": 0.1441,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "report",
+                "contribution": 0.1441
+              }
+            ],
+            "best_snippet": "Reports can be exported under Reports > Export."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 3,
+            "score": 0.0766,
+            "lexical_score": 0.0766,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "fail",
+                "contribution": 0.0424
+              },
+              {
+                "term": "show",
+                "contribution": 0.0342
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 4,
+            "score": 0.0559,
+            "lexical_score": 0.0559,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "report",
+                "contribution": 0.0559
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 5,
+            "score": 0.0423,
+            "lexical_score": 0.0423,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "fail",
+                "contribution": 0.0423
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          }
+        ],
+        "E-2015": [
+          {
+            "article_id": "KB-010",
+            "rank": 1,
+            "score": 0.4863,
+            "lexical_score": 0.4863,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.1158
+              },
+              {
+                "term": "address",
+                "contribution": 0.0858
+              },
+              {
+                "term": "chang",
+                "contribution": 0.0821
+              },
+              {
+                "term": "email address",
+                "contribution": 0.0785
+              },
+              {
+                "term": "new",
+                "contribution": 0.0557
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 2,
+            "score": 0.1168,
+            "lexical_score": 0.1168,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "login",
+                "contribution": 0.0884
+              },
+              {
+                "term": "account",
+                "contribution": 0.0284
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 3,
+            "score": 0.1125,
+            "lexical_score": 0.1125,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0424
+              },
+              {
+                "term": "login",
+                "contribution": 0.0395
+              },
+              {
+                "term": "chang",
+                "contribution": 0.0305
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 4,
+            "score": 0.0603,
+            "lexical_score": 0.0603,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.0354
+              },
+              {
+                "term": "account",
+                "contribution": 0.0249
+              }
+            ],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-007",
+            "rank": 5,
+            "score": 0.0425,
+            "lexical_score": 0.0425,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "email",
+                "contribution": 0.0425
+              }
+            ],
+            "best_snippet": "Exports larger than 100,000 rows are sent by email as a download link within 30 minutes."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 6,
+            "score": 0.0307,
+            "lexical_score": 0.0307,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "chang",
+                "contribution": 0.0307
+              }
+            ],
+            "best_snippet": "Requests to change where a refund is paid must be escalated to billing ops."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 7,
+            "score": 0.0219,
+            "lexical_score": 0.0219,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "updat",
+                "contribution": 0.0219
+              }
+            ],
+            "best_snippet": "If an incident is listed, share the status page link and expected updates."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 8,
+            "score": 0.02,
+            "lexical_score": 0.02,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "updat",
+                "contribution": 0.02
+              }
+            ],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          }
+        ],
+        "E-2016": [
+          {
+            "article_id": "KB-001",
+            "rank": 1,
+            "score": 0.3778,
+            "lexical_score": 0.3778,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "charg",
+                "contribution": 0.1471
+              },
+              {
+                "term": "pend",
+                "contribution": 0.121
+              },
+              {
+                "term": "two",
+                "contribution": 0.0273
+              },
+              {
+                "term": "complet",
+                "contribution": 0.0221
+              },
+              {
+                "term": "order",
+                "contribution": 0.0221
+              }
+            ],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 2,
+            "score": 0.043,
+            "lexical_score": 0.043,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "show",
+                "contribution": 0.043
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 3,
+            "score": 0.0387,
+            "lexical_score": 0.0387,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "two",
+                "contribution": 0.0387
+              }
+            ],
+            "best_snippet": "If a customer has lost access to their two-factor authentication (2FA) device, support agents must not disable 2FA from chat or email."
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 4,
+            "score": 0.0313,
+            "lexical_score": 0.0313,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "still",
+                "contribution": 0.0313
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-006",
+            "rank": 5,
+            "score": 0.0286,
+            "lexical_score": 0.0286,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "still",
+                "contribution": 0.0286
+              }
+            ],
+            "best_snippet": "If the app still crashes after reinstalling, escalate to general support with the collected details."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 6,
+            "score": 0.0221,
+            "lexical_score": 0.0221,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "day",
+                "contribution": 0.0221
+              }
+            ],
+            "best_snippet": "Agents should not guarantee same-day refunds unless policy explicitly allows it."
+          }
+        ],
+        "E-2017": [
+          {
+            "article_id": "KB-006",
+            "rank": 1,
+            "score": 0.3011,
+            "lexical_score": 0.3011,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "app",
+                "contribution": 0.3011
+              }
+            ],
+            "best_snippet": "Ask the customer to update the app to the latest version, restart the device, and reinstall the app."
+          }
+        ],
+        "E-2018": [
+          {
+            "article_id": "KB-008",
+            "rank": 1,
+            "score": 0.3209,
+            "lexical_score": 0.3209,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "cancell",
+                "contribution": 0.0898
+              },
+              {
+                "term": "subscription",
+                "contribution": 0.0898
+              },
+              {
+                "term": "cancell subscription",
+                "contribution": 0.0722
+              },
+              {
+                "term": "refund",
+                "contribution": 0.0691
+              }
+            ],
+            "best_snippet": "Cancelling a subscription"
+          },
+          {
+            "article_id": "KB-002",
+            "rank": 2,
+            "score": 0.1187,
+            "lexical_score": 0.1187,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "send",
+                "contribution": 0.0673
+              },
+              {
+                "term": "account",
+                "contribution": 0.0514
+              }
+            ],
+            "best_snippet": "If the reset succeeded but login still fails, escalate to account support."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 3,
+            "score": 0.1187,
+            "lexical_score": 0.1187,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "refund",
+                "contribution": 0.1187
+              }
+            ],
+            "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 4,
+            "score": 0.0918,
+            "lexical_score": 0.0918,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "card",
+                "contribution": 0.0587
+              },
+              {
+                "term": "refund",
+                "contribution": 0.0332
+              }
+            ],
+            "best_snippet": "Refunds should not be promised unless two settled charges are confirmed."
+          },
+          {
+            "article_id": "KB-009",
+            "rank": 5,
+            "score": 0.077,
+            "lexical_score": 0.077,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.077
+              }
+            ],
+            "best_snippet": "If a customer reports logins they do not recognise or account details they did not change, treat the ticket as critical."
+          },
+          {
+            "article_id": "KB-010",
+            "rank": 6,
+            "score": 0.0643,
+            "lexical_score": 0.0643,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0643
+              }
+            ],
+            "best_snippet": "The account email address can be changed under Settings > Profile > Email."
+          },
+          {
+            "article_id": "KB-005",
+            "rank": 7,
+            "score": 0.0451,
+            "lexical_score": 0.0451,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "account",
+                "contribution": 0.0451
+              }
+            ],
+            "best_snippet": "Escalate to account support so the customer's identity can be verified."
+          }
+        ],
+        "E-2019": [
+          {
+            "article_id": "KB-003",
+            "rank": 1,
+            "score": 0.4489,
+            "lexical_score": 0.4489,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "invoic",
+                "contribution": 0.2278
+              },
+              {
+                "term": "invoic miss",
+                "contribution": 0.0579
+              },
+              {
+                "term": "miss",
+                "contribution": 0.0579
+              },
+              {
+                "term": "bill",
+                "contribution": 0.0368
+              },
+              {
+                "term": "bill document",
+                "contribution": 0.0342
+              }
+            ],
+            "best_snippet": "Invoice PDFs are available under Billing > Documents."
+          },
+          {
+            "article_id": "KB-008",
+            "rank": 2,
+            "score": 0.0367,
+            "lexical_score": 0.0367,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "bill",
+                "contribution": 0.0367
+              }
+            ],
+            "best_snippet": "Subscriptions can be cancelled under Billing > Plan > Cancel subscription."
+          },
+          {
+            "article_id": "KB-011",
+            "rank": 3,
+            "score": 0.0291,
+            "lexical_score": 0.0291,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "show",
+                "contribution": 0.0291
+              }
+            ],
+            "best_snippet": "If the status page shows no incident but several features are failing, escalate to general support."
+          },
+          {
+            "article_id": "KB-004",
+            "rank": 4,
+            "score": 0.0265,
+            "lexical_score": 0.0265,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "bill",
+                "contribution": 0.0265
+              }
+            ],
+            "best_snippet": ""
+          },
+          {
+            "article_id": "KB-001",
+            "rank": 5,
+            "score": 0.024,
+            "lexical_score": 0.024,
+            "kept": false,
+            "top_terms": [
+              {
+                "term": "bill",
+                "contribution": 0.024
+              }
+            ],
+            "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+          }
+        ],
+        "E-2020": [
+          {
+            "article_id": "KB-001",
+            "rank": 1,
+            "score": 0.2724,
+            "lexical_score": 0.2724,
+            "kept": true,
+            "top_terms": [
+              {
+                "term": "charg",
+                "contribution": 0.2724
+              }
+            ],
+            "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          }
+        ]
+      }
+    }
+  },
+  "stability": {
+    "tickets": 23,
+    "same_top3": 23,
+    "max_score_diff": 0.0011,
+    "byte_identical_rankings": false,
+    "closest_top3_score_to_threshold": 0.0032,
+    "api_calls": 3
+  },
+  "embedding_calls_logged": 67
+}

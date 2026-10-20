@@ -4,7 +4,9 @@ import argparse
 import sys
 from pathlib import Path
 
-from pipeline.config import PROVIDERS, ConfigError, load_config
+from dotenv import load_dotenv
+
+from pipeline.config import PROVIDERS, RETRIEVERS, ConfigError, load_config
 from pipeline.orchestrator import Stage
 from pipeline.runner import EXIT_FATAL, run
 
@@ -13,6 +15,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Support ticket triage pipeline")
     parser.add_argument("--provider", choices=PROVIDERS)
     parser.add_argument("--model")
+    parser.add_argument("--retriever", choices=RETRIEVERS, help="embedding (default) or tfidf (offline)")
     parser.add_argument("--tickets", help="path to tickets.json (default: ./tickets.json)")
     parser.add_argument("--kb", help="path to kb_articles.json (default: ./kb_articles.json)")
     parser.add_argument("--out-dir", dest="out_dir", help="where artifacts are written (default: .)")
@@ -29,6 +32,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     cli = {key: value for key, value in vars(args).items() if key != "until"}
+    load_dotenv(Path(".env"), override=False)  # API keys for LiteLLM; never copied into artifacts
     try:
         config = load_config(cli, dotenv_path=Path(".env"))
     except ConfigError as exc:

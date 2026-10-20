@@ -8,7 +8,7 @@
 - **Ten stages, strictly ordered** (§5). Each stage has typed inputs, an output artifact, and pre/postconditions.
 - **Eight required artifacts + three optional ones** (§6), each with a fixed JSON schema. Every ticket appears in every per-ticket artifact, in input order.
 - **Labels are closed sets defined in code** (§4). Any value outside them is rejected, never coerced silently.
-- **Rules are explicit and numbered:** classification overrides `C*`, drafting constraints `D*`, escalation rules `E*`, safety patterns `S*`, grounding checks `G*`, PII rules `P*`, retrieval expansion `X*`, validation checks `V*`. Artifacts reference these IDs.
+- **Rules are explicit and numbered:** classification overrides `C*`, drafting constraints `D*`, escalation rules `E*`, safety patterns `S*`, grounding checks `G*`, PII rules `P*`, retrieval rules `X*`, validation checks `V*`. Artifacts reference these IDs.
 - **PII never reaches an LLM:** tickets are masked deterministically in `TICKETS_NORMALISED` (§7.6); drafts, reasons and logs are checked for leakage (V13/V14).
 - **Default model:** `glm-5.2` on Ollama Cloud (`openai` and `stub` selectable). Models are compared offline by the eval harness (§15), never inside `run_pipeline.py`.
 - **Acceptance (§12):** a clean checkout plus valid keys → exit 0, all `V*` checks pass, and the three sample tickets resolve as specified.
@@ -36,6 +36,9 @@
 | `python run_pipeline.py` | Full run, ending with validation | `0` valid · `1` validation failures · `2` fatal error |
 | `python run_pipeline.py --provider {openai,ollama,stub}` | Override the provider | same |
 | `python run_pipeline.py --model <name>` | Override the model | same |
+| `python run_pipeline.py --retriever {embedding,tfidf}` | Retrieval method (default `embedding`; `tfidf` is offline) | same |
+| `python run_pipeline.py --until <STAGE>` | Stop after a stage (default: the latest implemented stage) | same |
+| `python run_pipeline.py --out-dir <dir>` | Write artifacts somewhere other than the repo root | same |
 | `python run_pipeline.py --no-cache` | Ignore `.cache/` (full recompute) | same |
 | `python run_pipeline.py --tickets <path> --kb <path>` | Alternate input paths (default: repo root) | same |
 | `python run_pipeline.py --log-prompts` | Also dump full prompts to `artifacts/prompts/` | same |
@@ -52,8 +55,10 @@
 | `LLM_TEMPERATURE` | `0` | |
 | `LLM_MAX_TOKENS` | `1500` | Must leave room for reasoning tokens. Sent as `max_completion_tokens` to OpenAI and `max_tokens` to Ollama |
 | `LLM_TIMEOUT_S` | `60` | Per request |
+| `RETRIEVER` | `embedding` (`tfidf` when provider is `stub`) | `embedding`: OpenAI embeddings via LiteLLM (needs `OPENAI_API_KEY`, also when the LLM provider is Ollama). `tfidf`: offline |
+| `EMBEDDING_MODEL` | `text-embedding-3-small` | |
 | `RETRIEVAL_TOP_K` | `3` | The brief requires 3 |
-| `RETRIEVAL_MIN_SCORE` | `0.05` | Below it → not a useful match |
+| `RETRIEVAL_MIN_SCORE` | `0.25` (embedding) / `0.05` (tfidf) | Below it → not a useful match. Chosen by the Stage 2 threshold sweep |
 | `MAX_TICKET_CHARS` | `4000` | Message truncation |
 | `MAX_DRAFT_CHARS` | `1500` | |
 | `PII_HASH_SALT` | fixed non-secret string | Salt for the hashes in `pii_summary` (§6.10). Fixed by default so reruns are byte-identical |
@@ -137,9 +142,9 @@ flowchart LR
 |---|---|---|---|---|
 | 0 | `INIT` | config resolved; provider credentials present (unless `stub`) | creates `artifacts/`, opens a fresh `llm_calls.jsonl` | run ID assigned |
 | 1 | `INPUTS_LOADED` | `INIT` | parses + schema-checks inputs (I1–I9) | `tickets[]`, `articles[]` in memory; input hashes in manifest |
-| 2 | `KB_INDEXED` | `INPUTS_LOADED` | builds TF-IDF index | `artifacts/kb_index.json` (vocab size, doc ids, config hash) |
+| 2 | `KB_INDEXED` | `INPUTS_LOADED` | normalises articles; embeds every article and KB sentence (cached), or builds the TF-IDF index | `artifacts/kb_index.json` (method, model, dims/vocab size, article ids, `kb_hash`, `config_hash`) |
 | 3 | `TICKETS_NORMALISED` | `KB_INDEXED` | normalisation (DESIGN §6.1) **and PII detection + masking** (§7.6) | `artifacts/normalised_tickets.json` (masked text + `pii_summary`) |
-| 4 | `EVIDENCE_RETRIEVED` | `TICKETS_NORMALISED` | top-k search per ticket on masked text, with query expansion (§7.7) | `retrieval_results.json`, `retrieval_debug.json` |
+| 4 | `EVIDENCE_RETRIEVED` | `TICKETS_NORMALISED` | top-k search per ticket on **masked** text (§7.7), reusing cached results for unchanged tickets (R1) | `retrieval_results.json`, `retrieval_debug.json`, `artifacts/embedding_calls.jsonl` |
 | 5 | `TICKETS_CLASSIFIED` | `EVIDENCE_RETRIEVED` | LLM classification + validation + C-rules | `ticket_classification.json` |
 | 6 | `RESPONSES_DRAFTED` | `TICKETS_CLASSIFIED` **and** `EVIDENCE_RETRIEVED` | LLM drafting + D/S checks + G flags | `draft_responses.json`, `grounding_flags.json` |
 | 7 | `ESCALATIONS_DECIDED` | `RESPONSES_DRAFTED` | E-rules | `escalations.json` |
@@ -167,8 +172,8 @@ All per-ticket artifacts are JSON objects with a top-level list, ordered by norm
     {
       "ticket_id": "T-1001",
       "retrieved_articles": [
-        { "article_id": "KB-001", "score": 0.4123, "title": "Duplicate card charges and pending authorizations" },
-        { "article_id": "KB-004", "score": 0.1877, "title": "Refund policy overview" }
+        { "article_id": "KB-001", "score": 0.5553, "title": "Duplicate card charges and pending authorizations" },
+        { "article_id": "KB-004", "score": 0.2895, "title": "Refund policy overview" }
       ]
     }
   ]
@@ -176,23 +181,32 @@ All per-ticket artifacts are JSON objects with a top-level list, ordered by norm
 ```
 
 - `0 ≤ len(retrieved_articles) ≤ 3`; sorted by `score` desc, then `article_id` asc.
-- `score` is cosine similarity in `[0, 1]`, rounded to 4 decimals; every score is `≥ RETRIEVAL_MIN_SCORE`.
+- `score` is cosine similarity in `[0, 1]` (negative values clamped to 0), rounded to 4 decimals; every score is `≥ RETRIEVAL_MIN_SCORE`.
 
 ### 6.2 `retrieval_debug.json` (optional, implemented)
 
 ```json
 {
-  "config": { "method": "tfidf", "ngram_range": [1, 2], "field_weights": {"title": 3, "category": 2, "content": 1}, "min_score": 0.05, "expansion_lexicon": "v1" },
+  "config": {
+    "retrieval_version": "retrieval.v1", "method": "embedding", "provider": "openai", "model": "text-embedding-3-small",
+    "article_text": "title. category. content", "query_text": "subject. message (PII-masked)",
+    "explanation": "top_terms = lexical TF-IDF overlap; best_snippet = KB sentence with the highest embedding similarity",
+    "embedding_dims": 1536, "top_k": 3, "min_score": 0.25, "kb_hash": "sha256:0e9ee05a…"
+  },
   "results": [
     {
       "ticket_id": "T-1001",
-      "query_terms": ["charg", "twice", "order", "card", "pend", "refund"],
-      "expanded_terms": [],
+      "query_terms": ["charg", "twic", "order", "plac", "card", "show", "two", "complet", "pend", "refund"],
       "candidates": [
         {
-          "article_id": "KB-001", "rank": 1, "score": 0.4123, "kept": true,
-          "top_terms": [ {"term": "charg", "contribution": 0.152}, {"term": "pend", "contribution": 0.101} ],
-          "best_snippet": "Customers may see both a completed charge and a temporary pending authorization."
+          "article_id": "KB-001", "rank": 1, "score": 0.5553, "lexical_score": 0.4221, "kept": true,
+          "top_terms": [ {"term": "charg", "contribution": 0.1548}, {"term": "pend", "contribution": 0.0689} ],
+          "best_snippet": "Escalate to billing ops if two settled charges exist for the same order."
+        },
+        {
+          "article_id": "KB-004", "rank": 2, "score": 0.2895, "lexical_score": 0.0589, "kept": true,
+          "top_terms": [ {"term": "refund", "contribution": 0.0589} ],
+          "best_snippet": "Refunds depend on settlement status, product type, and fraud checks."
         }
       ]
     }
@@ -200,8 +214,16 @@ All per-ticket artifacts are JSON objects with a top-level list, ordered by norm
 }
 ```
 
-- `candidates` lists **every** article with score > 0 (not only kept ones), so you can see why an article was dropped.
-- `expanded_terms` lists the terms added by the query-expansion lexicon (X3), empty for English tickets with no expansion.
+- `candidates` lists **every** article with score > 0 (not only kept ones), ranked, so you can see why an article was dropped.
+- `score` is the ranking score (embedding cosine, or TF-IDF cosine in `tfidf` mode). `lexical_score` and `top_terms` are the TF-IDF overlap, shown for explainability. Non-English tickets often have none, which is why embeddings rank them.
+- `best_snippet` is the KB sentence most similar to the ticket (the article title when only the title matched).
+- `query_terms` are the ticket's stemmed tokens, with PII placeholders removed.
+- A ticket with no kept article has a `note`: `"empty ticket: nothing to match"` or `"no article reached min_score <x>"`.
+
+### 6.2a `artifacts/embedding_calls.jsonl` and `artifacts/kb_index.json` (intermediate)
+
+- `embedding_calls.jsonl`: one line per distinct text embedded in the run: `{timestamp, purpose: kb_article|kb_sentence|ticket, provider, model, text_hash, chars, cached}`. Hashes only, never text (P-LOG). Empty in `tfidf` mode.
+- `kb_index.json`: retrieval settings (`method`, `model`, `embedding_dims` or `vocabulary_size`, `top_k`, `min_score`, `retrieval_version`), `kb_hash`, `config_hash`, and the indexed articles (`article_id`, `category`, `title`). No vectors.
 
 ### 6.3 `ticket_classification.json` (required)
 
@@ -453,17 +475,18 @@ Unsupported claims are written to `grounding_flags.json`. They never block the d
 
 A `credential` detection also triggers C5 and D10.
 
-### 7.7 Retrieval query expansion (`X*`)
+### 7.7 Retrieval (`X*`)
 
 | ID | Rule |
 |---|---|
-| X1 | A small, versioned lexicon (`pipeline/lexicon/query_expansion.v1.json`) maps es/fr/de/pt support vocabulary to the English terms used in the KB (e.g. `contraseña → password`, `factura → invoice`). It is data, not code, and needs no LLM or network |
-| X2 | Expansion is deterministic: matched terms are appended to the query in sorted order. English tickets are expanded only if they contain lexicon terms |
-| X3 | Added terms appear in `retrieval_debug.json` under `expanded_terms` |
-| X4 | The lexicon version is part of `RETRIEVAL_VERSION`, so editing it invalidates retrieval cache keys (R1) |
-| X5 | When expansion still yields no match, retrieval returns `[]` and C3 escalates. Retrieval never guesses |
-
----
+| X1 | Default retriever: OpenAI `text-embedding-3-small` via LiteLLM, cosine similarity between the masked ticket (`subject. message`) and each article (`title. category. content`). It matches es/fr/de/pt tickets to the English KB without translation (decision OD-2) |
+| X2 | **P-EXT:** only PII-masked text is sent to the embeddings API. The embedder refuses any text in which the PII detector finds a value (`PIILeakError`, exit 2) |
+| X3 | Every vector is cached by `sha256(text)` per model under `.cache/embeddings/`. Reruns are byte-identical and make no API calls. A fresh re-embedding can drift in the 3rd–4th decimal; the threshold keeps a wide margin over that drift (Stage 2 audit: max drift 0.0011, same top-3 for 23/23 eval tickets) |
+| X4 | Offline mode `tfidf`: pure-Python TF-IDF (unigrams + bigrams, sublinear tf, smoothed idf, L2 norm; title ×3, category ×2, subject ×2). Default with the `stub` provider and in tests. English-only in practice |
+| X5 | Ranking: score desc, then `article_id` asc. Keep the top `RETRIEVAL_TOP_K` with score ≥ `RETRIEVAL_MIN_SCORE`. When nothing qualifies, retrieval returns `[]` and C3 escalates. Retrieval never guesses |
+| X6 | An empty ticket (no subject or message) is never sent to the API and retrieves `[]` |
+| X7 | Ticket queries are embedded in one batched API call per run. KB articles and KB sentences are one call each |
+| X8 | An embedding API failure (auth, network, quota, after 3 retries) is fatal: `EmbeddingError`, exit 2. A missing `OPENAI_API_KEY` stops the run before any stage, with a message suggesting `--retriever tfidf` |
 
 ## 8. Validation checks (`V*`)
 
@@ -519,7 +542,7 @@ flowchart LR
 
 | ID | Requirement |
 |---|---|
-| R1 | Retrieval cache key: `sha256(kb canonical) / sha256(retrieval config + RETRIEVAL_VERSION) / sha256(normalised ticket subject+message)` |
+| R1 | Retrieval cache key: `kb_hash` (canonical normalised KB) / `config_hash` (method, model, top_k, min_score, `RETRIEVAL_VERSION`) / the ticket's `content_hash` (§6.10). Embedding vectors are cached separately by `sha256(text)` per model (X3) |
 | R2 | LLM cache key: `prompt_hash` (L4). It includes the model and template version, so changing either invalidates the cache |
 | R3 | Artifacts are always fully rewritten from current inputs; the cache only skips computation |
 | R4 | `--no-cache` bypasses reads (but still writes). `.cache/` is git-ignored |
@@ -548,7 +571,7 @@ Fatal errors print one actionable message (e.g. `OLLAMA_API_KEY not set — expo
 - A2: Deleting all generated artifacts and rerunning recreates them; outputs are not static files.
 - A3: Swapping in a different but structurally equivalent `tickets.json`/`kb_articles.json` → the run succeeds, and V04 coverage matches the new IDs.
 - A4: `python validate.py` independently reproduces the same `validation_report.json` status.
-- A5: `LLM_PROVIDER=stub python run_pipeline.py` succeeds with no network access.
+- A5: `LLM_PROVIDER=stub python run_pipeline.py` succeeds with no network access (the `stub` provider defaults to `RETRIEVER=tfidf`).
 
 ### 12.2 Sample tickets (expected outcomes)
 
@@ -590,7 +613,7 @@ Fatal errors print one actionable message (e.g. `OLLAMA_API_KEY not set — expo
 | T9 | e2e (stub) | Rerun after changing one ticket → only that ticket misses the cache |
 | T10 | e2e (live, optional) | Full run on the default provider (and each eval model); sample expectations in §12.2 hold |
 | T11 | unit | PII detection, masking, idempotency, `unmask(mask(x)) == x` and false-positive guards on `data/fixtures/pii_cases.json`; no raw PII in any prompt or artifact |
-| T12 | unit | Query expansion is deterministic and versioned; expanded terms appear in the debug output |
+| T12 | unit | Embedding path: only masked text reaches the API (X2), empty tickets aren't sent (X6), calls are batched and logged (X7), API failures are fatal (X8). Real-API quality is measured by `evals/retrieval_eval.py`, not unit tests |
 
 Run with `pytest -q`. Tests T1–T9, T11 and T12 need no network. Tests carry the markers `stage1`…`stage5` and `live`; the per-stage test files are listed in [PLAN.md](PLAN.md).
 
@@ -600,7 +623,7 @@ Run with `pytest -q`. Tests T1–T9, T11 and T12 need no network. Tests carry th
 
 | PROBLEM.md requirement | Spec section |
 |---|---|
-| Deterministic retrieval, top 3, empty list OK | §6.1, §3.3 I8, §7.7, §12.3 |
+| Deterministic retrieval, top 3, empty list OK (the brief allows embeddings; determinism comes from the vector cache, X3) | §6.1, §3.3 I8, §7.7, §12.3 |
 | Classification prompt contents, no invented categories | §7.1 P1–P6, C0 |
 | Grounded drafts: language, no refund promises, no passwords, mention escalation | §7.2 D1–D9, §7.4 |
 | Escalation record + `none` rule + refund caution + login rule | §6.5, §7.3 |

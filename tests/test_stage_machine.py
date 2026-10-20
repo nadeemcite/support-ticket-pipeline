@@ -109,8 +109,8 @@ def test_unparseable_required_artifact_blocks_stage(make_config):
 
 def test_until_beyond_implemented_stage_is_refused(make_config):
     pipeline = Pipeline(build_specs())
-    with pytest.raises(StageNotImplementedError, match="PLAN Stage 2"):
-        pipeline.run(RunContext(config=make_config()), until=Stage.EVIDENCE_RETRIEVED)
+    with pytest.raises(StageNotImplementedError, match="PLAN Stage 3"):
+        pipeline.run(RunContext(config=make_config()), until=Stage.TICKETS_CLASSIFIED)
     assert pipeline.machine.current is None  # refused before anything ran
 
 
@@ -122,16 +122,29 @@ def test_until_stops_early(make_config):
     assert [s["stage"] for s in ctx.stage_trail] == ["INIT", "INPUTS_LOADED"]
 
 
-def test_placeholder_stages_are_marked_in_trail(make_config):
+def test_default_run_reaches_latest_implemented_stage(make_config):
     outcome = run(make_config())
     trail = outcome.manifest["stage_trail"]
-    assert [s["stage"] for s in trail] == ["INIT", "INPUTS_LOADED", "KB_INDEXED", "TICKETS_NORMALISED"]
-    assert [s["placeholder"] for s in trail] == [False, False, True, False]
-    assert outcome.manifest["final_stage"] == "TICKETS_NORMALISED"
+    assert [s["stage"] for s in trail] == ["INIT", "INPUTS_LOADED", "KB_INDEXED", "TICKETS_NORMALISED", "EVIDENCE_RETRIEVED"]
+    assert not any(s["placeholder"] for s in trail)
+    assert outcome.manifest["final_stage"] == "EVIDENCE_RETRIEVED"
+
+
+def test_placeholder_stage_is_passed_through_and_marked(make_config):
+    specs = _specs_with(Stage.INPUTS_LOADED)
+    specs[Stage.INPUTS_LOADED] = StageSpec(Stage.INPUTS_LOADED, None, plan_stage=1)
+    specs[Stage.INPUTS_LOADED + 1:] = [StageSpec(s.stage, None, plan_stage=s.plan_stage) for s in specs[Stage.INPUTS_LOADED + 1:]]
+    specs[Stage.KB_INDEXED] = StageSpec(Stage.KB_INDEXED, lambda ctx: None, plan_stage=2)
+    pipeline = Pipeline(specs)
+    ctx = RunContext(config=make_config())
+    pipeline.run(ctx)
+    assert [(s["stage"], s["placeholder"]) for s in ctx.stage_trail] == [
+        ("INIT", False), ("INPUTS_LOADED", True), ("KB_INDEXED", False)
+    ]
 
 
 def test_runner_reports_not_implemented_as_fatal(make_config):
-    outcome = run(make_config(), until=Stage.TICKETS_CLASSIFIED)
+    outcome = run(make_config(), until=Stage.RESPONSES_DRAFTED)
     assert outcome.exit_code == EXIT_FATAL
     assert outcome.manifest["final_stage"] == "FAILED"
 

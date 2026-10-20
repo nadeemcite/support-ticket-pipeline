@@ -5,7 +5,7 @@
 ## TL;DR
 
 - **What it is:** a batch CLI pipeline (`python run_pipeline.py`) that reads `tickets.json` + `kb_articles.json` from disk and regenerates every artifact from scratch: retrieval → classification → drafting → escalation → validation.
-- **Deterministic where it can be, LLM only where it must be.** PII masking, retrieval (TF-IDF), escalation (rules engine), safety filtering, grounding checks and validation are pure Python and reproducible. The LLM is used for exactly two stages: **classification** and **drafting**.
+- **Deterministic where it can be, LLM only where it must be.** PII masking, escalation (rules engine), safety filtering, grounding checks and validation are pure Python and reproducible. Retrieval uses OpenAI embeddings (masked text only), made reproducible by a content-addressed vector cache, with offline TF-IDF as a fallback mode. The LLM is used for exactly two stages: **classification** and **drafting**.
 - **A stage machine enforces order in code.** `INIT → … → RESULTS_FINALISED`. A stage can't run unless the previous one finished and its artifact is on disk. Drafting can't run before retrieval and classification.
 - **PII never reaches an LLM.** A deterministic detector masks emails, phones, cards (Luhn), IBANs (mod-97) and disclosed credentials in `TICKETS_NORMALISED`. Prompts only contain `[TYPE_n]` placeholders, and the validator checks drafts, reasons and logs for leakage.
 - **Every LLM output is untrusted until validated.** The model is asked for structured JSON, the output is parsed with Pydantic models built from the code-defined taxonomy, checked against business rules (citations ⊆ retrieved, no password requests, no refund promises), and retried with error feedback or replaced with a safe fallback.
@@ -79,7 +79,7 @@ flowchart TB
             LOAD[loader.py]
             NORM[normalise.py]
             PII[pii.py<br/>detect + mask]
-            RET[retrieval.py<br/>TF-IDF index + search]
+            RET[retrieval.py<br/>embeddings or TF-IDF<br/>+ search + diagnostics]
             CLS[classify.py]
             DRF[draft.py]
             ESC[escalate.py<br/>rules engine]
@@ -127,7 +127,8 @@ flowchart TB
 | `loader.py` | Reads and structurally validates the two input files | ✅ |
 | `normalise.py` | Cleans tickets (whitespace, NFC, language default, dedupe, truncation), then calls `pii.py` | ✅ |
 | `pii.py` | PII detection (email, phone, Luhn card, mod-97 IBAN, credential), stable masking, `unmask`, leakage scan used by the validator | ✅ |
-| `retrieval.py` | Builds the TF-IDF index, applies the query-expansion lexicon, top-3 search, score threshold, debug terms | ✅ |
+| `retrieval.py` | Embeds KB + tickets (cached, masked text only) or builds the TF-IDF index; top-3 search, score threshold, debug terms + snippets | ✅ given the vector cache |
+| `cache.py` | Content-addressed JSON cache (embedding vectors, per-ticket retrieval results) | ✅ |
 | `classify.py` | Builds the prompt, calls the LLM, validates and retries, falls back | ❌ (LLM) |
 | `draft.py` | Builds the grounded prompt, calls the LLM, runs safety/citation checks, retries, falls back | ❌ (LLM) |
 | `escalate.py` | Rules engine: classification + KB evidence → escalate/queue/reason | ✅ |
@@ -147,7 +148,7 @@ flowchart TB
 stateDiagram-v2
     [*] --> INIT
     INIT --> INPUTS_LOADED: load + schema-check inputs
-    INPUTS_LOADED --> KB_INDEXED: build TF-IDF index
+    INPUTS_LOADED --> KB_INDEXED: embed KB (or TF-IDF index)
     KB_INDEXED --> TICKETS_NORMALISED: clean + dedupe + mask PII
     TICKETS_NORMALISED --> EVIDENCE_RETRIEVED: top-3 per ticket
     EVIDENCE_RETRIEVED --> TICKETS_CLASSIFIED: LLM + taxonomy validation
@@ -296,32 +297,37 @@ flowchart LR
   - PII detection and masking (§6.11) runs last, so every later stage only sees masked text.
 - Normalisation never changes meaning. It only exists to make the next stages robust. It is idempotent: `normalise(normalise(x)) == normalise(x)`.
 
-### 6.2 Retrieval (deterministic)
+### 6.2 Retrieval (embeddings, cached; TF-IDF offline)
 
 ```mermaid
 flowchart LR
-    A[KB article] --> F["Field text:<br/>title ×3 + category ×2 + content"]
-    F --> TOK[tokenise<br/>lowercase, strip punctuation,<br/>stopwords, light stemming]
-    TOK --> VEC[TF-IDF vectoriser<br/>unigrams + bigrams<br/>sublinear tf, L2 norm]
-    VEC --> M[(Doc-term matrix)]
-
-    Q[Masked ticket subject ×2 + message<br/>+ expansion terms] --> TOK2[same tokeniser] --> QV[query vector]
-    QV --> COS[cosine similarity]
-    M --> COS
-    COS --> SORT["sort: score desc,<br/>then article_id asc (tie-break)"]
-    SORT --> TH{score ≥ MIN_SCORE?}
-    TH -->|yes| TOP[take top 3]
-    TH -->|no| EMPTY[drop]
-    TOP --> OUT[retrieved_articles]
-    EMPTY --> OUT
+    A[KB article] --> AT["title. category. content"]
+    A --> SEN[KB sentences]
+    AT --> EMB
+    SEN --> EMB
+    Q["masked ticket<br/>subject. message"] --> GUARD{"raw PII?<br/>(P-EXT)"}
+    GUARD -->|yes| STOP[PIILeakError, exit 2]
+    GUARD -->|no| EMB["CachedEmbedder<br/>key = sha256(text)"]
+    EMB -->|miss| API{{"OpenAI text-embedding-3-small<br/>via LiteLLM (batched)"}}
+    EMB -->|hit| VC[(.cache/embeddings)]
+    API --> VC
+    VC --> COS[cosine similarity]
+    COS --> SORT["sort: score desc,<br/>then article_id asc"]
+    SORT --> TH{"top 3 and<br/>score ≥ 0.25?"}
+    TH -->|yes| OUT[retrieved_articles]
+    TH -->|no| DROP["dropped (kept=false in debug)"]
+    COS --> SNIP["best_snippet = most similar KB sentence"]
+    LEX[TF-IDF overlap] --> TERMS[top_terms + lexical_score]
 ```
 
-- **Why TF-IDF over embeddings:** fully deterministic, no extra API calls or model downloads, transparent for the debug artifact, and strong enough on a small KB with distinctive vocabulary (`invoice`, `password`, `charge`). The retriever sits behind a `Retriever` protocol, so a BM25 or embedding retriever can be swapped in later.
-- **Implementation:** `scikit-learn` `TfidfVectorizer` with a fixed vocabulary order (sorted). Same inputs → same scores, bit for bit.
-- **Field weighting:** fields are repeated (title ×3, category ×2) because titles are short and highly informative.
-- **Non-English tickets:** TF-IDF cannot match es/fr/de/pt text to the English KB. A small, versioned, deterministic lexicon (`pipeline/lexicon/query_expansion.v1.json`, e.g. `contraseña → password`, `factura → invoice`) appends English KB terms to the query. It needs no LLM call and no download, and the added terms are shown in `retrieval_debug.json`. Multilingual embeddings were rejected as heavier and less explainable. If expansion finds nothing, retrieval returns `[]` and C3 escalates.
-- **Threshold:** `MIN_SCORE = 0.05` (configurable; the Stage 2 threshold sweep justifies the final value). Below it, an article is "no useful match". A ticket can end up with **0–3** articles; an empty list is valid and handled downstream.
-- **Diagnostics:** for each hit, the top contributing terms (`q_weight × d_weight`) and a matched snippet (the KB sentence with the most query-term overlap) go to `retrieval_debug.json`.
+- **Why embeddings (decision OD-2):** the eval set has es/fr/de/pt tickets and an English KB. Lexical retrieval can't bridge languages: TF-IDF found a relevant article for only 2 of 4 non-English tickets. `text-embedding-3-small` found one for 4/4, kept 16/16 English recall, MRR 1.0, and returned `[]` for all three no-match tickets (Stage 2 audit). PROBLEM.md explicitly allows embeddings.
+- **Reproducibility:** the embeddings API is not bit-for-bit deterministic. A fresh re-embedding drifted scores by up to 0.0011, with the same top 3 for 23/23 tickets. So every vector is cached by `sha256(text)` per model: reruns are byte-identical and make no API calls. A clean checkout re-embeds once; the threshold sits about 40× the observed drift away from the nearest score.
+- **PII:** only masked text is embedded. `CachedEmbedder` runs the PII detector on every text and refuses to send one with a hit (P-EXT), so masking can't be bypassed even by a bug upstream.
+- **Cost and latency:** three API calls per cold run (all articles, all KB sentences, all ticket queries, each batched). Zero calls on a warm rerun. Per-ticket results are also cached (R1), so a changed `tickets.json` only re-embeds the changed tickets.
+- **Explainability:** a vector score explains nothing on its own, so the debug artifact adds the KB sentence most similar to the ticket (`best_snippet`), plus the TF-IDF lexical overlap (`top_terms`, `lexical_score`). Non-English tickets usually show no lexical overlap, which is itself the explanation for using embeddings.
+- **Threshold:** `0.25`, chosen by the Stage 2 sweep. Every value in [0.20, 0.35] was perfect on the eval set; 0.25 leaves margin above the highest no-match score (~0.21) and below the lowest relevant top-1 (~0.39). It also keeps useful secondary evidence such as KB-004 for T-1001. A ticket can end up with **0–3** articles; an empty list is valid and handled downstream (C3).
+- **Offline mode (`--retriever tfidf`, default with `--provider stub`):** pure-Python TF-IDF (unigrams + bigrams, sublinear tf, smoothed idf, L2 norm; title ×3, category ×2, subject ×2; light stemming so charge/charges/charged match). No network, used by the test suite. Threshold `0.05`.
+- **Failures:** a missing `OPENAI_API_KEY` stops the run before any stage (exit 2, suggesting `--retriever tfidf`). An API failure after LiteLLM's 3 retries raises `EmbeddingError` (exit 2). Retrieval never silently falls back to TF-IDF, because results would differ by environment.
 
 ### 6.3 LLM client
 
@@ -554,7 +560,8 @@ flowchart LR
 |---|---|---|
 | Language | Python 3.11+ (dev on 3.14) | Preferred by the brief; `StrEnum`, modern typing |
 | Schemas | Pydantic v2 | Strict validation, JSON Schema generation for structured output |
-| Retrieval | scikit-learn `TfidfVectorizer` | Deterministic, explainable, no network |
+| Retrieval | OpenAI `text-embedding-3-small` via LiteLLM (+ pure-Python TF-IDF offline mode) | Cross-lingual; reproducible through the vector cache; TF-IDF keeps tests offline with no extra dependency |
+| Provider layer | LiteLLM | One client for OpenAI and Ollama models (embeddings now; LLM calls in Stage 3) |
 | LLM SDK | `openai` ≥ 1.x | One client for OpenAI and Ollama's `/v1` API |
 | Default model | `glm-5.2` (Ollama Cloud) | Verified working; set by `LLM_PROVIDER=ollama` (default) |
 | Fast dev model | `glm-5.3-flash` (Ollama Cloud) | Substitute for the non-existent `glm-5.2-flash` |
@@ -594,8 +601,6 @@ ticket-classification/
 │   ├── validation.py
 │   ├── cache.py
 │   ├── finalise.py
-│   └── lexicon/
-│       └── query_expansion.v1.json
 ├── tests/                     # unit + end-to-end (stub provider), markers stage1…stage5
 ├── evals/                     # offline eval harness (never run by run_pipeline.py)
 ├── scripts/                   # audit_stage<N>.py: runs a stage's AI audit, writes audit/stage-N/
@@ -626,7 +631,7 @@ ticket-classification/
 | # | Decision | Alternative | Rationale |
 |---|---|---|---|
 | D1 | Escalation via a deterministic rules engine | LLM decides escalation | Brief requires grounding in classification + evidence; rules are auditable and reproducible |
-| D2 | TF-IDF retrieval | Embeddings | Determinism, explainability, zero setup; swappable behind a protocol |
+| D2 | Embedding retrieval (OpenAI, cached), TF-IDF offline mode | TF-IDF only | Only embeddings handle non-English tickets (4/4 vs 2/4); the cache restores reproducibility; TF-IDF keeps tests offline |
 | D3 | One LLM call per ticket per stage | Batch calls | Simple per-ticket validation, retry and traceability; ticket counts are small |
 | D4 | Code-level overrides of LLM fields | Trust the model | Safety-critical flags (refund caution, no-evidence) shouldn't depend on model compliance |
 | D5 | Grounding guard flags, doesn't block | Block on any flag | Heuristic has false positives; blocking would cause needless fallbacks |
@@ -634,7 +639,7 @@ ticket-classification/
 | D7 | Safe fallback instead of crashing | Fail the run | Every ticket must appear in every artifact; fallbacks are explicit and counted |
 | D8 | Taxonomy rendered into prompts from enums | Hard-coded prompt text | Prompt and validator can never disagree |
 | D9 | Mask PII before any LLM or retrieval sees it | Redact only in outputs / trust the provider | Raw PII then exists nowhere downstream; leakage becomes checkable |
-| D10 | Multilingual query-expansion lexicon for retrieval | Multilingual embeddings | Stays deterministic and explainable; no model download. Embeddings remain a swap-in behind the `Retriever` protocol |
+| D10 | No silent fallback from embeddings to TF-IDF | Fall back on API failure | Results would depend on network health; a fatal, clear error is easier to audit |
 | D11 | Evals use two models different from the dev model, cross-judged, offline | Grade with the dev model / run evals in the pipeline | Avoids self-preference and tuning on the grader; keeps the pipeline run deterministic and cheap |
 
 ---
@@ -650,7 +655,9 @@ ticket-classification/
 | Prompt injection inside ticket text | Delimited data blocks; deterministic guards run regardless of model output |
 | PII sent to a provider or leaked into drafts/logs | Deterministic masking before retrieval and prompts; V13/V14 validation; hashes instead of prompts in logs |
 | PII detector misses a format or over-masks (order IDs, amounts) | Fixture-driven tests incl. false-positive guards; the Stage 1 human audit reviews the masking report |
-| Non-English ticket matches nothing in an English KB | Versioned expansion lexicon; C3 escalates when still empty |
+| Non-English ticket matches nothing in an English KB | Multilingual embeddings (4/4 in the eval); C3 escalates when still empty |
+| Embedding API drift or outage | Vector cache (byte-identical reruns); wide threshold margin; fatal `EmbeddingError` instead of a silent fallback |
+| Ticket text sent to a third party | Only PII-masked text is embedded; `CachedEmbedder` refuses raw PII (P-EXT) |
 | Provider outage / rate limits | Backoff retries; cache; `stub` provider for offline runs |
 | Non-determinism between runs | `temperature=0`, seed, cache; deterministic stages around the LLM |
 

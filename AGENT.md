@@ -4,7 +4,7 @@ Read this first, then [README.md](README.md) (overview), [PLAN.md](PLAN.md) (wha
 
 ## What this repo is
 
-A batch pipeline that triages support tickets: load → normalise + mask PII → TF-IDF retrieval → LLM classify → LLM draft → rule-based escalation → validation. Only classification and drafting use an LLM. Everything else is deterministic Python.
+A batch pipeline that triages support tickets: load → normalise + mask PII → embedding retrieval (OpenAI, cached; TF-IDF offline) → LLM classify → LLM draft → rule-based escalation → validation. Only classification and drafting use an LLM. Retrieval calls the OpenAI embeddings API with masked text only (vectors cached, so reruns are byte-identical). Everything else is deterministic Python.
 
 ## First things to do each session
 
@@ -19,7 +19,8 @@ source .venv/bin/activate
 pytest -q                      # all tests (offline)
 pytest -m stageN               # one stage (also run earlier markers as regression)
 pytest -m "not live"           # skip real-model tests
-python run_pipeline.py --provider stub    # offline run; runs the stages built so far (--until <STAGE>, --out-dir <dir>)
+python run_pipeline.py --provider stub    # offline run (TF-IDF retrieval); runs the stages built so far (--until <STAGE>, --out-dir <dir>)
+python run_pipeline.py                    # real run: embeddings need OPENAI_API_KEY in .env
 python validate.py                        # validate artifacts on disk (Stage 5+)
 python -m evals.<name>                    # offline evals (need keys), Stages 2-5
 ```
@@ -39,6 +40,7 @@ Commands marked with a stage don't exist until that stage is built. Check before
 | **Keep deterministic stages deterministic**: sorted iteration, fixed tie-breaks, canonical JSON, no clocks or randomness in artifacts (except `timestamp`, `run_id`, `latency_ms`) | Byte-identical reruns are tested |
 | **Writes are atomic** (`io_utils`), and artifacts are fully rewritten each run | Idempotency |
 | **No LLM call outside classification/drafting**, none before `EVIDENCE_RETRIEVED` | Stage guard O3 |
+| **Only masked text goes to the embeddings API**, through `CachedEmbedder` (never call LiteLLM directly from a stage). Tests use the `fake_embedder` fixture; the autouse `offline` fixture blocks real network | P-EXT, offline tests |
 | **Don't edit `data/` fixtures or `gold.json` to make a test pass.** A fixture change is a reviewed change, noted in the stage sign-off | They are the answer key |
 | **Evals are never part of `run_pipeline.py`** | Keeps the run cheap and deterministic |
 | **Don't grade a model with the model it was tuned on.** Dev model is `glm-5.2`; eval models are `gpt-6.1-sol` and `deepseek-v4.1-flash` | Avoid self-preference |

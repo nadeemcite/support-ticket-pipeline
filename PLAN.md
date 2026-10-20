@@ -16,7 +16,7 @@
 |---|---|---|---|---|
 | 0 | Plan approval (this document + data files) | — | — | ☑ Closed (2026-10-20) |
 | 1 | Foundations: config, schemas, loading, normalisation, **PII**, stage machine | No | — (deterministic only) | ☑ Closed (2026-10-20) |
-| 2 | Retrieval & evidence | No | Deterministic retrieval eval | ☐ Open |
+| 2 | Retrieval & evidence | No | Deterministic retrieval eval | ☑ Closed (2026-10-20) |
 | 3 | LLM layer & classification | **Yes** | 2-model classification eval | ☐ Open |
 | 4 | Drafting, guards, grounding & escalation | **Yes** (drafting) | 2-model drafting eval + cross-judging | ☐ Open |
 | 5 | Validation, orchestration, replay & **project closure** | Yes (E2E) | 2-model full-pipeline eval | ☐ Open |
@@ -188,51 +188,57 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 
 ---
 
-## Stage 2 — Retrieval & evidence (deterministic)
+## Stage 2 — Retrieval & evidence (embeddings, cached)
 
-**Goal:** deterministic, explainable top-3 retrieval with diagnostics and a retrieval cache, and a decided approach for non-English tickets.
+**Goal:** explainable top-3 retrieval that works across languages, reproducible on rerun, with diagnostics and a retrieval cache.
 
 **Deliverables**
-- `pipeline/retrieval.py` (TF-IDF, field weights, `MIN_SCORE`, tie-break), `retrieval_results.json`, `retrieval_debug.json` (all candidates, top terms, best snippet), `cache.py` (retrieval keys, R1).
-- Implementation of the **OD-2** decision (recommended: a small, versioned, deterministic multilingual query-expansion lexicon for es/fr/de/pt support vocabulary, e.g. `contraseña→password`, `factura→invoice`. No LLM call is added).
-- `evals/retrieval_eval.py`: deterministic scorer against `gold.relevant_articles`.
+- `pipeline/retrieval.py`: OpenAI `text-embedding-3-small` via LiteLLM (decision **OD-2**), with a content-addressed vector cache and a PII guard (P-EXT); pure-Python TF-IDF as the offline mode; tie-break; threshold; diagnostics (lexical top terms + most similar KB sentence).
+- `pipeline/cache.py` (vector cache + per-ticket retrieval cache, R1); `KB_INDEXED` and `EVIDENCE_RETRIEVED` stages; `retrieval_results.json`, `retrieval_debug.json`, `artifacts/kb_index.json`, `artifacts/embedding_calls.jsonl`; `--retriever` flag.
+- `evals/retrieval_eval.py`: deterministic scorer against `gold.relevant_articles` for both retrievers, threshold sweep, fresh re-embedding stability check. `scripts/audit_stage2.py` writes `audit/stage-2/`.
+- Doc updates: SPEC §2, §5, §6.1–6.2a, §7.7 (`X*` = retrieval rules), §10 R1; DESIGN §6.2, D2, D10, risks; AGENT.md.
 
-**Exit criteria:** both retrieval artifacts are produced for the root and eval inputs; `empty_kb` produces `[]` for every ticket without errors.
+**Exit criteria:** both retrieval artifacts are produced for the root and eval inputs (embedding and TF-IDF); `empty_kb` produces `[]` for every ticket without errors.
 
-**AI audit — pytest (deterministic)**
+**AI audit — pytest (deterministic, offline; the real embedder is replaced by a fake)**
 
 | Test file | Proves |
 |---|---|
-| `test_retrieval_determinism.py` (T2) | Two runs produce byte-identical `retrieval_results.json` / `retrieval_debug.json`; tie-break by `article_id` |
-| `test_retrieval_samples.py` | T-1001→KB-001, T-1002→KB-002, T-1003→KB-003 as top 1 |
-| `test_retrieval_contract.py` | ≤ 3 hits, sorted, scores in `[MIN_SCORE, 1]`, IDs exist in the KB (V06); empty KB → `[]`; no-match ticket → `[]` |
-| `test_retrieval_debug.py` | Every kept hit has top terms + snippet; dropped candidates are listed with `kept=false` |
-| `test_retrieval_cache.py` | Same inputs → cache hit; editing one KB article invalidates all retrieval keys; editing one ticket invalidates only that ticket |
-| `test_query_expansion.py` | Lexicon is deterministic and versioned; expansion terms appear in debug output |
+| `test_retrieval_determinism.py` (T2) | Two runs produce byte-identical `retrieval_results.json` / `retrieval_debug.json` / `kb_index.json` (TF-IDF and embedding); tie-break by `article_id` |
+| `test_retrieval_samples.py` | T-1001→KB-001, T-1002→KB-002, T-1003→KB-003 as top 1 (TF-IDF, fake embedding; plus one `live` test with real OpenAI embeddings) |
+| `test_retrieval_contract.py` | ≤ 3 hits, sorted, scores in `[min_score, 1]`, IDs exist in the KB (V06); empty KB / empty tickets → `[]`; no-match and empty tickets → `[]` |
+| `test_retrieval_debug.py` | Every candidate ranked; kept flags match results; every kept hit has a snippet (TF-IDF: and top terms); dropped candidates listed; `kb_index.json` contents |
+| `test_retrieval_cache.py` | Rerun → 100% hits with identical output; changed/added tickets miss only (replay fixture); KB edit or settings change invalidates all; `--no-cache`; corrupt entry = miss; embedding cache → no API calls on rerun |
+| `test_embedding_retriever.py` | Only masked text reaches the embedder; raw PII refused (P-EXT); batching + memo; embedding log artifact; missing key and API failure are fatal (exit 2) with clear messages |
+| `test_text_processing.py` | Stemming, accent folding, placeholder stripping, bigrams, sentence split |
 
-**AI audit — retrieval eval (deterministic, against gold)**
+**AI audit — retrieval eval (deterministic scoring against gold; real embeddings, cached)**
 
 | Metric | Gate |
 |---|---|
 | Recall@3, English tickets with relevant articles | ≥ 0.95 (hard) |
-| Recall@3, non-English tickets (E-2004/5/6/17) | ≥ 0.75 (soft, depends on OD-2) |
-| MRR, all tickets with relevant articles | ≥ 0.85 (soft) |
 | No-match precision (E-2010/11/12 → `[]`) | 3/3 (hard) |
-| Threshold sweep `MIN_SCORE ∈ {0, .02, .05, .1, .15, .2}` | reported; chosen value justified |
+| Same top 3 after a fresh re-embedding (empty cache) | 23/23 (hard) |
+| No LLM calls in this stage (`llm_calls.jsonl` empty) | 0 (hard) |
+| Recall@3, non-English tickets (E-2004/5/6/17) | ≥ 0.75 (soft) |
+| MRR, all tickets with relevant articles | ≥ 0.85 (soft) |
+| Threshold sweep (embedding 0–0.4, TF-IDF 0–0.2), TF-IDF comparison, max score drift | reported; chosen value justified |
 
 **Reports for human review (`audit/stage-2/`)**
-- `retrieval_eval_report.md`: per ticket: top 3 with scores, top terms, snippet, gold relevance ✅/❌; per-language slice; threshold sweep table
-- `pytest_summary.md` + `coverage.txt`
+- `retrieval_eval_report.md`: per ticket: kept top 3 with scores, snippet, top terms, gold relevance ✅/❌; per-language slice; threshold sweep; stability; TF-IDF vs embedding disagreements
+- `AUDIT_SUMMARY.md`, `pytest_summary.md`, `coverage.txt`, `evals/retrieval_eval.json`
 
 **Human audit checklist**
-- [ ] Rankings make sense for every eval ticket (debug terms explain them)
-- [ ] `MIN_SCORE` choice is justified by the sweep
-- [ ] Non-English handling (OD-2) is acceptable and deterministic
-- [ ] No LLM/API calls in this stage (check that `llm_calls.jsonl` is empty or absent)
+- [x] Rankings make sense for every eval ticket (snippets and terms explain them)
+- [x] The `min_score` choice (0.25) is justified by the sweep
+- [x] Non-English handling (OD-2, embeddings) is acceptable; reproducibility via the cache is acceptable given the measured drift
+- [x] No LLM calls in this stage; only masked text sent to the embeddings API
 
-**Sign-off** — Status: ☐ Closed ☐ Changes requested · Reviewer: ______ · Date: ______ · Reports reviewed: ☐ retrieval eval ☐ pytest · Notes: ______
+**AI audit result (recorded by the agent, 2026-10-20):** ☑ all 9 hard gates and both soft gates green: 302/302 offline tests (Stage 1 regression included) + 1 live test, 98.5% coverage on Stage 2 modules, recall@3 16/16 English and 4/4 non-English, MRR 1.0, no-match 3/3, same top 3 after re-embedding 23/23 (max score drift 0.0011), 5/5 exit-criteria runs, 0 LLM calls. Re-run with `python scripts/audit_stage2.py`. **Changes to closed Stage 1 (for the sign-off notes):** five Stage 1 test assertions that expected retrieval to be unbuilt now expect `EVIDENCE_RETRIEVED`, and a synthetic test keeps placeholder pass-through covered; `Config` gained `retriever`/`embedding_model` and `min_score` became retriever-dependent. No `data/` fixture changes.
 
-**Closure commit:** `Close stage 2: Retrieval & evidence` (code, tests, `audit/stage-2/`, this sign-off) · tag `stage-2-closed` · SHA: ______
+**Sign-off** — Status: ☑ Closed ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Reports reviewed: ☑ retrieval eval ☑ pytest · Notes: Approved by the reviewer's instruction in-session ("close stage 2, mark it done"); checklist ticked on that basis. Accepted changes to closed Stage 1: five test assertions updated for implemented retrieval, `Config` gained `retriever`/`embedding_model`, `min_score` is retriever-dependent. No `data/` fixture changes. Generated root artifacts (`retrieval_*.json`, `llm_calls.jsonl`) left out of the commit pending a decision on tracking them.
+
+**Closure commit:** `Close stage 2: Retrieval & evidence` (code, tests, `audit/stage-2/`, this sign-off) · tag `stage-2-closed` · SHA: see `git rev-parse stage-2-closed`
 
 ---
 
@@ -410,7 +416,7 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 | ID | Issue | Recommendation | Decide by |
 |---|---|---|---|
 | OD-1 | `glm-5.2-flash` does not exist on Ollama Cloud | Use `glm-5.3-flash` (Ollama's own suggestion) as the fast dev model | Stage 0 |
-| OD-2 | TF-IDF can't match es/fr/de/pt tickets to the English KB (E-2004 shares no terms with KB-002) | Deterministic, versioned multilingual query-expansion lexicon; C3 still escalates when retrieval is empty. Alternative: local multilingual embeddings (heavier, less explainable) | Stage 2 |
+| OD-2 | TF-IDF can't match es/fr/de/pt tickets to the English KB (E-2004 shares no terms with KB-002) | **Decided (2026-10-20): OpenAI embeddings** (`text-embedding-3-small` via LiteLLM), cached by content hash, masked text only; TF-IDF kept as the offline mode. Measured in Stage 2: 4/4 non-English vs 2/4 for TF-IDF | Stage 2 ✅ |
 | OD-3 | PII not covered by SPEC/DESIGN | Add P-rules, C5, V13, V14 (§3.1) | Stage 1 |
 | OD-4 | Grounding G3: SPEC lists only `will`-style verbs while DESIGN also lists `can/available`; KB sentences with a negation ("should not be promised") could falsely "support" a promise (fixture G-05) | G3 detects `can be / available / will`; supporting sentences containing a negation never count as support | Stage 4 |
 | OD-5 | Pipeline default model in SPEC/DESIGN is `gpt-4o-mini` | Change to `ollama / glm-5.2`; keep `openai` selectable | Stage 1 |

@@ -1,3 +1,5 @@
-# Runtime dependencies (Stage 1). Later stages add retrieval / LLM packages.
+# Runtime dependencies.
 pydantic>=2.9,<3
 python-dotenv>=1.0,<2
+# Provider layer: OpenAI embeddings now (Stage 2), LLM calls from Stage 3.
+litellm==1.106.0

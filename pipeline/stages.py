@@ -6,13 +6,34 @@ stages), writes its artifact atomically, and records facts for the manifest.
 
 from collections import Counter
 
-from pipeline.io_utils import atomic_write_json, atomic_write_text
+from pipeline.cache import JsonCache
+from pipeline.config import Config
+from pipeline.io_utils import atomic_write_json, atomic_write_text, canonical_json, sha256_canonical
 from pipeline.loader import load_inputs
-from pipeline.normalise import normalise_tickets
-from pipeline.orchestrator import RunContext, Stage, StageSpec
+from pipeline.normalise import normalise_article, normalise_tickets
+from pipeline.orchestrator import RunContext, Stage, StageSpec, utc_now
+from pipeline.retrieval import (
+    RETRIEVAL_VERSION,
+    CachedEmbedder,
+    Embedder,
+    LiteLLMEmbedder,
+    build_retriever,
+    kb_hash,
+    retrieve,
+)
+from pipeline.schemas import RetrievalResult
 
 NORMALISED_TICKETS = "artifacts/normalised_tickets.json"
+KB_INDEX = "artifacts/kb_index.json"
+EMBEDDING_CALLS = "artifacts/embedding_calls.jsonl"
+RETRIEVAL_RESULTS = "retrieval_results.json"
+RETRIEVAL_DEBUG = "retrieval_debug.json"
 LLM_CALLS = "llm_calls.jsonl"
+
+
+def make_embedder(config: Config) -> Embedder:
+    """Factory for the embedding backend (tests replace it with an offline fake)."""
+    return LiteLLMEmbedder(config.embedding_model, timeout_s=config.timeout_s)
 
 
 def init(ctx: RunContext) -> None:
@@ -40,6 +61,43 @@ def inputs_loaded(ctx: RunContext) -> None:
     }
 
 
+def kb_indexed(ctx: RunContext) -> None:
+    config = ctx.config
+    articles = [normalise_article(raw) for raw in ctx.data["inputs"].articles]
+    embedder = None
+    if config.retriever == "embedding":
+        cache = JsonCache(config.cache_dir, read_enabled=not config.no_cache)
+        embedder = CachedEmbedder(make_embedder(config), cache, clock=utc_now)
+    retriever = build_retriever(config.retriever, articles, embedder)
+    description = retriever.describe()
+    settings = {
+        "retrieval_version": RETRIEVAL_VERSION,
+        **{k: v for k, v in description.items() if k != "vocabulary_size"},
+        "top_k": config.top_k,
+        "min_score": config.effective_min_score,
+    }
+    ctx.data.update(articles=articles, retriever=retriever, embedder=embedder)
+    ctx.data["kb_hash"] = kb_hash(articles)
+    ctx.data["retrieval_config_hash"] = "sha256:" + sha256_canonical(settings)
+    ctx.data["retrieval_settings"] = settings
+    atomic_write_json(
+        ctx.path(KB_INDEX),
+        {
+            "schema_version": 1,
+            "kb_hash": ctx.data["kb_hash"],
+            "config_hash": ctx.data["retrieval_config_hash"],
+            **description,
+            "top_k": config.top_k,
+            "min_score": config.effective_min_score,
+            "retrieval_version": RETRIEVAL_VERSION,
+            "articles": [
+                {"article_id": a.article_id, "category": a.category, "title": a.title} for a in articles
+            ],
+        },
+    )
+    ctx.manifest["counts"]["articles_indexed"] = len(articles)
+
+
 def tickets_normalised(ctx: RunContext) -> None:
     loaded = ctx.data["inputs"]
     tickets = normalise_tickets(loaded.tickets, ctx.config.max_ticket_chars, ctx.config.pii_salt)
@@ -59,13 +117,56 @@ def tickets_normalised(ctx: RunContext) -> None:
     )
 
 
+def evidence_retrieved(ctx: RunContext) -> None:
+    """Top-k evidence per ticket, reusing cached results for unchanged tickets (R1)."""
+    config = ctx.config
+    retriever = ctx.data["retriever"]
+    cache = JsonCache(config.cache_dir, read_enabled=not config.no_cache)
+    key_prefix = ("retrieval", ctx.data["kb_hash"], ctx.data["retrieval_config_hash"])
+    cached_entries = {t.content_hash: cache.get(*key_prefix, t.content_hash) for t in ctx.data["tickets"]}
+    if hasattr(retriever, "prefetch"):
+        retriever.prefetch([t for t in ctx.data["tickets"] if cached_entries[t.content_hash] is None])
+    results, debug_entries = [], []
+    for ticket in ctx.data["tickets"]:
+        cached = cached_entries[ticket.content_hash]
+        if cached is None:
+            result, debug = retrieve(retriever, ticket, config.top_k, config.effective_min_score)
+            cached = {
+                "retrieved_articles": [a.model_dump(mode="json") for a in result.retrieved_articles],
+                "debug": {k: v for k, v in debug.items() if k != "ticket_id"},
+            }
+            cache.put(cached, *key_prefix, ticket.content_hash)
+        result = RetrievalResult(ticket_id=ticket.ticket_id, retrieved_articles=cached["retrieved_articles"])
+        results.append(result)
+        debug_entries.append({"ticket_id": ticket.ticket_id, **cached["debug"]})
+
+    ctx.data["retrieval"] = {r.ticket_id: r for r in results}
+    atomic_write_json(ctx.path(RETRIEVAL_RESULTS), {"results": [r.model_dump(mode="json") for r in results]})
+    atomic_write_json(
+        ctx.path(RETRIEVAL_DEBUG),
+        {"config": {**ctx.data["retrieval_settings"], "kb_hash": ctx.data["kb_hash"]}, "results": debug_entries},
+    )
+    embedder = ctx.data.get("embedder")
+    log_lines = [canonical_json(record) for record in embedder.log] if embedder else []
+    atomic_write_text(ctx.path(EMBEDDING_CALLS), "".join(line + "\n" for line in log_lines))
+    ctx.manifest["counts"].update(
+        {
+            "tickets_without_evidence": sum(not r.retrieved_articles for r in results),
+            "retrieval_cache": cache.stats(),
+            "embedding_texts": len(embedder.log) if embedder else 0,
+            "embedding_cache_hits": sum(r["cached"] for r in embedder.log) if embedder else 0,
+            "embedding_api_calls": embedder.api_calls if embedder else 0,
+        }
+    )
+
+
 def build_specs() -> list[StageSpec]:
     return [
         StageSpec(Stage.INIT, init, plan_stage=1),
         StageSpec(Stage.INPUTS_LOADED, inputs_loaded, plan_stage=1),
-        StageSpec(Stage.KB_INDEXED, None, plan_stage=2),
+        StageSpec(Stage.KB_INDEXED, kb_indexed, plan_stage=2),
         StageSpec(Stage.TICKETS_NORMALISED, tickets_normalised, plan_stage=1),
-        StageSpec(Stage.EVIDENCE_RETRIEVED, None, requires=(NORMALISED_TICKETS,), plan_stage=2),
+        StageSpec(Stage.EVIDENCE_RETRIEVED, evidence_retrieved, requires=(NORMALISED_TICKETS, KB_INDEX), plan_stage=2),
         StageSpec(Stage.TICKETS_CLASSIFIED, None, plan_stage=3),
         StageSpec(Stage.RESPONSES_DRAFTED, None, plan_stage=4),
         StageSpec(Stage.ESCALATIONS_DECIDED, None, plan_stage=4),

@@ -14,6 +14,7 @@ from pipeline.orchestrator import (
     StageOrderError,
     build_manifest,
 )
+from pipeline.retrieval import EmbeddingError, PIILeakError
 from pipeline.stages import build_specs
 
 MANIFEST = "artifacts/run_manifest.json"
@@ -22,7 +23,10 @@ EXIT_OK = 0
 EXIT_VALIDATION_FAILED = 1
 EXIT_FATAL = 2
 
-FATAL_ERRORS = (ConfigError, InputError, StageOrderError, MissingArtifactError, StageNotImplementedError, OSError)
+FATAL_ERRORS = (
+    ConfigError, InputError, StageOrderError, MissingArtifactError, StageNotImplementedError,
+    PIILeakError, EmbeddingError, OSError,
+)
 
 LLM_STAGES = (Stage.TICKETS_CLASSIFIED, Stage.RESPONSES_DRAFTED)
 
@@ -44,6 +48,8 @@ def run(config: Config, until: Stage | None = None) -> RunOutcome:
         target = pipeline.last_implemented() if until is None else until
         if config.provider != "stub" and any(stage <= target for stage in LLM_STAGES):
             config.require_credentials()
+        if target >= Stage.KB_INDEXED:
+            config.require_embedding_credentials()
         pipeline.run(ctx, until=until)
     except FATAL_ERRORS as exc:
         pipeline.machine.fail()

@@ -17,7 +17,7 @@
 | 0 | Plan approval (this document + data files) | — | — | ☑ Closed (2026-10-20) |
 | 1 | Foundations: config, schemas, loading, normalisation, **PII**, stage machine | No | — (deterministic only) | ☑ Closed (2026-10-20) |
 | 2 | Retrieval & evidence | No | Deterministic retrieval eval | ☑ Closed (2026-10-20) |
-| 3 | LLM layer & classification | **Yes** | 2-model classification eval | ☐ Open |
+| 3 | LLM layer & classification | **Yes** | 2-model classification eval | ☑ Closed (2026-10-20) |
 | 4 | Drafting, guards, grounding & escalation | **Yes** (drafting) | 2-model drafting eval + cross-judging | ☐ Open |
 | 5 | Validation, orchestration, replay & **project closure** | Yes (E2E) | 2-model full-pipeline eval | ☐ Open |
 
@@ -285,16 +285,16 @@ Gates (hard): 100% tests pass; line coverage ≥ 90% for Stage 1 modules; 0 raw-
 - Dev-model run (`glm-5.2`) summary, for information only
 
 **Human audit checklist**
-- [ ] Review every row of the disagreement table; decide for each whether it's a model error, a gold error (fix gold, note it here) or a prompt issue
-- [ ] Rationales are grounded in the retrieved evidence
-- [ ] Trace sample: each record links to an LLM log line and a prompt hash
-- [ ] No raw PII in any logged or dumped prompt
+- [x] Review every row of the disagreement table; decide for each whether it's a model error, a gold error (fix gold, note it here) or a prompt issue
+- [x] Rationales are grounded in the retrieved evidence
+- [x] Trace sample: each record links to an LLM log line and a prompt hash
+- [x] No raw PII in any logged or dumped prompt
 
-**AI audit result (recorded by the agent, 2026-10-20):** ☑ all 17 hard gates green (5 pipeline gates + 6 per eval model): 379/379 offline tests, 99.5% coverage on Stage 3 modules, dev-model root run OK, stub runs byte-identical, 5/5 trace hashes recomputed. Both eval models: 0% fallbacks, `issue_type` 100%, `requires_refund_caution` 100%, injection resisted 3/3; `resolution_action` 97.1% (`gpt-6.1-sol`) / 100% (`deepseek-v4.1-flash`). Soft: 5/6 green; `deepseek-v4.1-flash` repeat stability 20/23 missed, justified in `audit/stage-3/AUDIT_SUMMARY.md` (all variants gold-acceptable, no escalation change). κ: issue_type 0.83, urgency 0.62, resolution_action 0.80. Re-run: `python -m evals.classification_eval` then `python scripts/audit_stage3.py`. **Changes to closed stages (for the sign-off notes):** Stage 1/2 tests that pinned "the latest implemented stage" now derive it from the stage registry (no more edits needed per stage); `PIILeakError` moved from `retrieval.py` to `pii.py` (still importable from both); `RunContext` gained `entering` for the O3 guard. No `data/` fixture changes. **Awaiting human review.**
+**AI audit result (recorded by the agent, 2026-10-20):** ☑ all 17 hard gates green (5 pipeline gates + 6 per eval model): 379/379 offline tests, 99.5% coverage on Stage 3 modules, dev-model root run OK, stub runs byte-identical, 5/5 trace hashes recomputed. Both eval models: 0% fallbacks, `issue_type` 100%, `requires_refund_caution` 100%, injection resisted 3/3; `resolution_action` 97.1% (`gpt-6.1-sol`) / 100% (`deepseek-v4.1-flash`). Soft: 5/6 green; `deepseek-v4.1-flash` repeat stability 20/23 missed, justified in `audit/stage-3/AUDIT_SUMMARY.md` (all variants gold-acceptable, no escalation change). κ: issue_type 0.83, urgency 0.62, resolution_action 0.80. Re-run: `python -m evals.classification_eval` then `python scripts/audit_stage3.py`. **Changes to closed stages (for the sign-off notes):** Stage 1/2 tests that pinned "the latest implemented stage" now derive it from the stage registry (no more edits needed per stage); `PIILeakError` moved from `retrieval.py` to `pii.py` (still importable from both); `RunContext` gained `entering` for the O3 guard. No `data/` fixture changes.
 
-**Sign-off** — Status: ☐ Closed ☐ Changes requested · Reviewer: ______ · Date: ______ · Reports reviewed: ☐ eval report ☐ trace sample ☐ pytest · Notes: ______
+**Sign-off** — Status: ☑ Closed ☐ Changes requested · Reviewer: Nadeem Sajjad · Date: 2026-10-20 · Reports reviewed: ☑ eval report ☑ trace sample ☑ pytest · Notes: Approved by the reviewer's instruction in-session ("sign off 3"); checklist ticked on that basis. Accepted: deepseek repeat-stability soft miss (justified), changes to closed stages listed above. The two policy questions from the audit (E-2014 `request_more_info`; VIP urgency for E-2018/E-2019) were not answered, so gold is unchanged and they stay open for Stage 4/5 review. No `data/` fixture changes.
 
-**Closure commit:** `Close stage 3: LLM layer & classification` (code, tests, `audit/stage-3/`, this sign-off) · tag `stage-3-closed` · SHA: ______
+**Closure commit:** `Close stage 3: LLM layer & classification` (code, tests, `audit/stage-3/`, this sign-off) · tag `stage-3-closed` · SHA: see `git rev-parse stage-3-closed`
 
 ---
 
